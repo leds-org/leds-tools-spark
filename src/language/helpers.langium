@@ -9,7 +9,7 @@ fragment Description:
 ;
 
 DATATYPE returns string:
-    ('string'|'integer'|'decimal'|'datetime'|'date'|'boolean'|'char'|'uuid')
+    ('string'|'integer'|'decimal'|'datetime'|'date'|'boolean'|'uuid'| 'email'| 'phoneNumber')
 ;
 
 LANGUAGETYPE returns string:
