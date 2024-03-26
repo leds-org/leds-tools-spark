@@ -6,6 +6,9 @@
         "fileExtensions": [".r2d2"],
         "textMate": {
             "out": "syntaxes/r-2-d-2.tmLanguage.json"
+        },
+        "monarch": {
+            "out": "syntaxes/r-2-d-2.monarch.ts"
         }
     }],
     "out": "src/language/generated"
