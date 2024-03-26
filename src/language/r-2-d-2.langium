@@ -5,7 +5,7 @@ import 'entities'
 
 entry Model:
     (configuration=Configuration)?
-    (abstractElements+=(AbstractElement))*
+    (abstractElements+=(AbstractElement | ModuleImport))*
 ;
 
 AbstractElement:

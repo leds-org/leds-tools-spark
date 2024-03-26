@@ -5,6 +5,7 @@ Configuration:
         (Name 
         |Description 
         |DataBaseName
+        |PackagePath
         |Language )*
     '}'
 ;
@@ -16,4 +17,8 @@ fragment DataBaseName:
 
 fragment Language:
     'language:' language = LANGUAGETYPE
+;
+
+fragment PackagePath:
+    'package_path:' package_path = LANGUAGETYPE
 ;

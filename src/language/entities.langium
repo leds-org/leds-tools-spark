@@ -4,7 +4,7 @@ import 'helpers'
 type Entity = LocalEntity| ImportedEntity
 
 ModuleImport:
-    'from' ontology=ID 'module' name=ID 'import' entities+=ImportedEntity (',' entities+=ImportedEntity)*
+    'package_path' package_path=STRING 'from' library=ID 'module' name=ID 'import' entities+=ImportedEntity (',' entities+=ImportedEntity)*
 ;
 
 
@@ -25,10 +25,10 @@ LocalEntity:
         )*
     '}'
 ;
-
+// colocar condições de guarda
 Attribute:
     (Comment)?
-    name=ID ':' type=DATATYPE ('fullName' ':' fullName=STRING)? (unique?='unique')?
+    name=ID ':' type=DATATYPE ('fullName' ':' fullName=STRING)? (unique?='unique')? (blank?='blank')?
 ;
 
 EnumEntityAtribute:
