@@ -1,7 +1,10 @@
 grammar R2D2
 
+import 'terminals'
 import 'config'
 import 'entities'
+import 'helpers'
+
 
 entry Model:
     (configuration=Configuration)?
@@ -13,8 +16,9 @@ AbstractElement:
 ;
 
 Module:
-    (Comment)?
+    (Description)?
     'module' name=QualifiedName '{'
         (elements+=(AbstractElement | LocalEntity))*
     '}'
-;
+
+

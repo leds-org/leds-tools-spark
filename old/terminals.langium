@@ -6,6 +6,8 @@ terminal INT returns number: /[0-9]+/;
 terminal STRING: /"[^"]*"|'[^']*'/;
 terminal BOOLEAN: 'true'|'false';
 
+terminal FRAMEWORK: 'micronaut'|'springdata';
+
 hidden terminal ML_COMMENT: /\/\*[\s\S]*?\*\//;
 hidden terminal SL_COMMENT: /\/\/[^\n\r]*/;
 

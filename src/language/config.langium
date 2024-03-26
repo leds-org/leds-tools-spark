@@ -1,26 +1,19 @@
-import 'terminals'
+import 'helpers'
 
 Configuration:
     'Configuration' '{'
         (Name 
-        | Description 
-        | DatabaseName 
-        | Language )*
+        |Description 
+        |DataBaseName
+        |Language )*
     '}'
 ;
 
-fragment Description:
-    'description:' about=STRING 
-;
 
-fragment Name:
-    'name:' software_name=STRING 
-;
-
-fragment DatabaseName:
+fragment DataBaseName:
     'database_name:' database_name=STRING
 ; 
 
 fragment Language:
-    'language:' language = ["pyhton"|"java"]
+    'language:' language = STRING
 ;

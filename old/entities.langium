@@ -15,7 +15,7 @@ ImportedEntity:
 
 
 LocalEntity:
-    (Comment)?
+    (Description)?
     (is_abstract?='abstract')? 'entity' name=ID ('extends' superType=[Entity:QualifiedName])? '{'
         (
         attributes+=Attribute
@@ -27,24 +27,24 @@ LocalEntity:
 ;
 
 Attribute:
-    (Comment)?
+    (Description)?
     name=ID ':' type=DATATYPE ('fullName' ':' fullName=STRING)? (unique?='unique')?
 ;
 
 EnumEntityAtribute:
-    (Comment)?
+    (Description)?
     name=ID 'uses' type=[EnumX:ID]
 ;
 
 EnumX:
-    (Comment)?
+    (Description)?
     'enum' name=ID '{'
         (attributes+=AttributeEnum)*
     '}'
 ;
 
 AttributeEnum:
-    (Comment)?
+    (Description)?
     name=ID (',' 'fullName' ':' fullName=STRING)?
 ;
 
@@ -53,18 +53,18 @@ Relation:
 ;
 
 OneToOne:
-    (Comment)?
+    (Description)?
     name=ID 'OneToOne' type=[Entity:QualifiedName] ('fullName' ':' fullName=STRING)?
 ;
 OneToMany:
-    (Comment)?
+    (Description)?
     name=ID 'OneToMany' type=[Entity:QualifiedName] ('fullName' ':' fullName=STRING)?
 ;
 ManyToOne:
-    (Comment)?
+    (Description)?
     name=ID 'ManyToOne' type=[Entity:QualifiedName] ('fullName' ':' fullName=STRING)?
 ;
 ManyToMany:
-    (Comment)?
+    (Description)?
     name=ID 'ManyToMany' type=[Entity:QualifiedName] ('fullName' ':' fullName=STRING)? ('by' by=[LocalEntity:QualifiedName])?
 ;

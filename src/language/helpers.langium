@@ -1,5 +1,13 @@
 import 'terminals'
 
+fragment Name:
+    'name:' name=STRING 
+;
+
+fragment Description:
+    'description:' description=STRING 
+;
+
 DATATYPE returns string:
     ('string'|'integer'|'decimal'|'datetime'|'date'|'boolean'|'char'|'uuid')
 ;
@@ -12,6 +20,6 @@ QualifiedNameWithWildcard returns string:
     QualifiedName '.*'?
 ;
 
-fragment Description:
-    '#' description=STRING
+fragment Comment:
+    '#' comment=STRING
 ;
