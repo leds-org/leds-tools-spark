@@ -15,5 +15,5 @@ fragment DataBaseName:
 ; 
 
 fragment Language:
-    'language:' language = STRING
+    'language:' language = LANGUAGETYPE
 ;

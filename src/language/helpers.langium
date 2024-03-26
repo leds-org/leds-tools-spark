@@ -12,6 +12,10 @@ DATATYPE returns string:
     ('string'|'integer'|'decimal'|'datetime'|'date'|'boolean'|'char'|'uuid')
 ;
 
+LANGUAGETYPE returns string:
+    ('python'|'java')
+;
+
 QualifiedName returns string:
     ID ('.' ID)*
 ;
