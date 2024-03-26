@@ -1,18 +1,24 @@
 grammar R2D2
 
+import 'terminals'
+import 'config'
+import 'entities'
+import 'helpers'
+
+
 entry Model:
-    (persons+=Person | greetings+=Greeting)*;
+    (configuration=Configuration)?
+    (abstractElements+=(AbstractElement))*
+;
 
-Person:
-    'person' name=ID;
+AbstractElement:
+    Module | EnumX  
+;
 
-Greeting:
-    'Hello' person=[Person:ID] '!';
+Module:
+    (Description)?
+    'module' name=QualifiedName '{'
+        (elements+=(AbstractElement | LocalEntity))*
+    '}'
 
-hidden terminal WS: /\s+/;
-terminal ID: /[_a-zA-Z][\w_]*/;
-terminal INT returns number: /[0-9]+/;
-terminal STRING: /"(\\.|[^"\\])*"|'(\\.|[^'\\])*'/;
 
-hidden terminal ML_COMMENT: /\/\*[\s\S]*?\*\//;
-hidden terminal SL_COMMENT: /\/\/[^\n\r]*/;
