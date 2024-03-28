@@ -36,12 +36,7 @@ export function generateModules(app: Model, target_folder: string) : void {
 
         fs.writeFileSync(path.join(MODULE_PATH, "/apps.py"), createApps(m))
 
-        // fs.writeFileSync(path.join(MODULE_PATH, "/templates/", m.name.toLowerCase(), "/__init__.py"), "")
-
-        // templateGenerator.create(m, fsa, APPS_PATH);
-
-        // fs.writeFileSync(APPS_PATH + m.name.toLowerCase + "/dao.py", daoGenerator.create(m))
-
+      
         fs.writeFileSync(path.join(MODULE_PATH, "/api_urls.py"), generateURLAPI(m))
         fs.writeFileSync(path.join(MODULE_PATH, "/api_views.py"), generateAPIView(m, new Set(entity_to_actor.keys())))
 
@@ -131,19 +126,6 @@ function createApps(m: Module) : string {
 
     return lines.join('\n')
 }
-
-//     def createFactory(Module module)'''
-//         «FOR e : module.elements»
-//             «IF e.eClass.instanceClass == Entity»
-//                 «val Entity entity = e as Entity»
-                
-//                 class «entity.name»Factory(factory.django.DjangoModelFactory):
-//                     class Meta:
-//                         model = «module.name.toLowerCase».«entity.name»
-                
-//             «ENDIF»
-//         «ENDFOR»
-//     '''
 
 function createattributeJsontest(e: LocalEntity) {
     return e.attributes.map(a => `'${a.name}' : ${createAtrributeValuesTest(a)}`)
