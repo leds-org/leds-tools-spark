@@ -2,10 +2,11 @@ grammar R2D2
 
 import 'config'
 import 'entities'
+import 'usescases'
 
 entry Model:
     (configuration=Configuration)?
-    (abstractElements+=(AbstractElement | ModuleImport))*
+    (abstractElements+=(AbstractElement | ModuleImport |Actor| UseCase))*
 ;
 
 AbstractElement:

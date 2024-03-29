@@ -16,7 +16,7 @@ export function generate(app: Model, target_folder: string) : void {
     fs.writeFileSync(path.join(BASE_PATH, "manage.py"), createManage(solution_name))
     fs.writeFileSync(
         path.join(BASE_PATH, "requirements.txt"),
-        toString(createRequirements(app.abstractElements.filter(isModuleImport).filter(i => i.end === 'back')))
+        toString(createRequirements(app.abstractElements.filter(isModuleImport)))
     )
     fs.writeFileSync(path.join(createPath(BASE_PATH, "logs"), ".gitkeep"), "")
     fs.writeFileSync(path.join(createPath(BASE_PATH, "static"), "__init__.py"), "")
@@ -33,7 +33,7 @@ export function generate(app: Model, target_folder: string) : void {
     const CORE_PATH = createPath(BASE_PATH, solution_name)
     fs.writeFileSync(path.join(CORE_PATH, "__init__.py"), "")
     fs.writeFileSync(path.join(CORE_PATH, "asgi.py"), createASGI(solution_name))
-    fs.writeFileSync(path.join(CORE_PATH, "urls.py"), createURL(solution_name, app.configuration?.about ?? "", app))
+    fs.writeFileSync(path.join(CORE_PATH, "urls.py"), createURL(solution_name, app.configuration?.description ?? "", app))
     fs.writeFileSync(path.join(CORE_PATH, "wsgi.py"), createWSGI(solution_name))
     fs.writeFileSync(path.join(createPath(CORE_PATH, "media"), "__init__.py"), "")
     fs.writeFileSync(path.join(createPath(CORE_PATH, "staticfiles"), "__init__.py"), "")

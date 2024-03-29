@@ -5,7 +5,7 @@ import { generateURLAPI } from './url-generator.js'
 import { generateAPIView } from './view-generator.js'
 import { generateSerializer } from './serialize-generator.js'
 import { base_ident, capitalizeString, createPath } from '../../../../util/generator-utils.js'
-import { Attribute, Entity, LocalEntity, Model, Module, isLocalEntity, isModule } from '../../../../../language/generated/ast.js'
+import { Attribute, Entity, LocalEntity, Model, Module, isLocalEntity, isModule, Actor, isActor } from '../../../../../language/generated/ast.js'
 import path from 'path'
 import fs from 'fs'
 import { expandToStringWithNL } from 'langium/generate'
@@ -20,7 +20,7 @@ export function generateModules(app: Model, target_folder: string) : void {
         }
     })
 
-    const APPS_PATH = createPath(target_folder, BACKEND_PATH, "apps/")
+    const APPS_PATH = createPath(target_folder, "backend", "apps/")
     // Criando os models, service e applications
     for(const m of app.abstractElements.filter(isModule)) {
         const MODULE_PATH = createPath(APPS_PATH, m.name.toLowerCase())

@@ -1,4 +1,5 @@
-import { LocalEntity, isLocalEntity } from "../../language-server/generated/ast"
+import { LocalEntity, isLocalEntity } from "../../language/generated/ast.js"
+
 
 export type RelationInfo = {
   tgt: LocalEntity,

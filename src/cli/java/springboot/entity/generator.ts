@@ -11,7 +11,7 @@ export function generate(model: Model, target_folder: string) : void {
     generateConfigs(model, target_folder);
     generateModules(model, target_folder);
     generateSchemaSQLHelper(model,target_folder);
-    generateDebezium(model,target_folder
+    generateDebezium(model,target_folder);
   
 }
   

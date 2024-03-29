@@ -78,7 +78,54 @@
                 "scopeName": "source.r-2-d-2",
                 "path": "syntaxes/r-2-d-2.tmLanguage.json"
             }
-        ]
+        ],
+        "commands": [
+            {
+                "command": "r-2-d-2.generateBack",
+                "title": "Generate Backend"
+            },
+            {
+                "command": "r-2-d-2.generateFront",
+                "title": "Generate Frontend"
+            },
+            {
+                "command": "r-2-d-2.generateBoth",
+                "title": "Generate All"
+            }
+        ],
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "r-2-d-2.generateBack",
+                    "when": "editorLangId == r-2-d-2"
+                },
+                {
+                    "command": "r-2-d-2.generateFront",
+                    "when": "editorLangId == r-2-d-2"
+                },
+                {
+                    "command": "r-2-d-2.generateBoth",
+                    "when": "editorLangId == r-2-d-2"
+                }
+            ],
+            "editor/context": [
+                {
+                    "command": "r-2-d-2.generateBack",
+                    "group": "z_commands",
+                    "when": "editorLangId == r-2-d-2"
+                },
+                {
+                    "command": "r-2-d-2.generateFront",
+                    "group": "z_commands",
+                    "when": "editorLangId == r-2-d-2"
+                },
+                {
+                    "command": "r-2-d-2.generateBoth",
+                    "group": "z_commands",
+                    "when": "editorLangId == r-2-d-2"
+                }
+            ]
+        }
     },
     "activationEvents": [
         "onLanguage:r-2-d-2"
