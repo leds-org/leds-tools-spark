@@ -2,7 +2,7 @@ import { type Module, inject } from 'langium';
 import { createDefaultModule, createDefaultSharedModule, type DefaultSharedModuleContext, type LangiumServices, type LangiumSharedServices, type PartialLangiumServices } from 'langium/lsp';
 import { R2D2GeneratedModule, R2D2GeneratedSharedModule } from './generated/module.js';
 import { R2D2Validator, registerValidationChecks } from './r-2-d-2-validator.js';
-
+import { CustomScopeComputation } from './r-2-d-3-scope.js';
 /**
  * Declaration of custom services - add your own service classes here.
  */
@@ -24,6 +24,9 @@ export type R2D2Services = LangiumServices & R2D2AddedServices
  * selected services, while the custom services must be fully specified.
  */
 export const R2D2Module: Module<R2D2Services, PartialLangiumServices & R2D2AddedServices> = {
+    references:{
+        ScopeComputation: (services) => new CustomScopeComputation(services)
+    },
     validation: {
         R2D2Validator: () => new R2D2Validator()
     }
