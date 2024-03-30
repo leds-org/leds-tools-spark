@@ -91,6 +91,14 @@
             {
                 "command": "r-2-d-2.generateBoth",
                 "title": "Generate All"
+            },
+            {
+                "command": "r-2-d-2.generateDocumentation",
+                "title": "Generate Project Documentation"
+            },
+            {
+                "command": "r-2-d-2.generateBacklog",
+                "title": "Generate Backlog "
             }
         ],
         "menus": {
@@ -107,6 +115,16 @@
                     "command": "r-2-d-2.generateBoth",
                     "when": "editorLangId == r-2-d-2"
                 }
+                ,
+                {
+                    "command": "r-2-d-2.generateDocumentation",
+                    "when": "editorLangId == r-2-d-2"
+                }
+                ,
+                {
+                    "command": "r-2-d-2.generateBacklog",
+                    "when": "editorLangId == r-2-d-2"
+                }
             ],
             "editor/context": [
                 {
@@ -121,6 +139,16 @@
                 },
                 {
                     "command": "r-2-d-2.generateBoth",
+                    "group": "z_commands",
+                    "when": "editorLangId == r-2-d-2"
+                },
+                {
+                    "command": "r-2-d-2.generateDocumentation",
+                    "group": "z_commands",
+                    "when": "editorLangId == r-2-d-2"
+                },
+                {
+                    "command": "r-2-d-2.generateBacklog",
                     "group": "z_commands",
                     "when": "editorLangId == r-2-d-2"
                 }
