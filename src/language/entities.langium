@@ -21,14 +21,28 @@ LocalEntity:
         attributes+=Attribute
         | enumentityatributes+=EnumEntityAtribute
         | relations+=Relation
-
+        | functions+=FunctionEntity
         )*
     '}'
 ;
+
+FunctionEntity:
+    (Comment)?
+    'fun' name=ID '(' (paramters+=Parameter)? ')' ':' response = DATATYPE
+;
+
+Parameter:
+    element = Element (',' element+=Element)?
+;
+
+Element: 
+    name=ID ':' type=DATATYPE
+;
+
 // colocar condições de guarda
 Attribute:
     (Comment)?
-    name=ID ':' type=DATATYPE ('fullName' ':' fullName=STRING)? (unique?='unique')? (blank?='blank')?
+    name=ID ':' type=DATATYPE ('fullName' ':' fullName=STRING)? (unique?='unique')? (blank?='blank')? ('max' ':'max=INT)? ('min' ':'min=INT)?
 ;
 
 EnumEntityAtribute:

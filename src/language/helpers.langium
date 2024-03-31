@@ -1,15 +1,8 @@
 import 'terminals'
 
-fragment Name:
-    'name:' name=STRING 
-;
-
-fragment Description:
-    'description:' description=STRING 
-;
 
 DATATYPE returns string:
-    ('string'|'integer'|'decimal'|'datetime'|'date'|'boolean'|'uuid'| 'email'| 'brazilian_person_id'|'brazilian_organization_id'|'zipcode'|'currency'|'phoneNumber'| 'file')
+    ('string'|'integer'|'decimal'|'datetime'|'date'|'boolean'|'uuid'| 'email'| 'brazilian_person_id'|'brazilian_organization_id'|'zipcode'|'currency'|'mobilePhoneNumber'|'phoneNumber'| 'file'|'void')
 ;
 
 LANGUAGETYPE returns string:
@@ -25,5 +18,5 @@ QualifiedNameWithWildcard returns string:
 ;
 
 fragment Comment:
-    '#' comment=STRING
+     comment = (SL_COMMENT |ML_COMMENT)
 ;

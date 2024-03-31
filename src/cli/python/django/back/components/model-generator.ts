@@ -4,11 +4,7 @@ const ident = base_ident
 
 export function generateModels(m: Module) : string {
     const get_entities_prereqs = (e: LocalEntity) => {
-        // const internal_relations = e.relations
-        //     .map(r => r.type.ref)
-        //     .filter(isLocalEntity)
-        //     .filter(l_e => l_e.$container === e.$container)
-
+        
         if(e.superType?.ref?.$container === e.$container && isLocalEntity(e.superType.ref)) {
             return [e.superType.ref]
         }

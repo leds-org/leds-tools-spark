@@ -2,8 +2,8 @@ import 'helpers'
 
 Configuration:
     'Configuration' '{'
-        (Name 
-        |Description 
+        ('software_name' ':' name=STRING 
+        |'about' ':' description=STRING
         |DataBaseName
         |PackagePath
         |Language )*
