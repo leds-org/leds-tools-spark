@@ -179,6 +179,7 @@ function generateAttribute(a: Attribute) : string {
         case 'datetime':
             return `${a.name} = models.DateTimeField(${fullname}blank=True)`
         case 'url':
+            return `${a.name} = models.URLField(verbose_name=${fullname}blank=True)`
         case 'uuid':
             return `${a.name} = models.${a.type.toUpperCase()}Field(${fullname}blank=True)`
         default:
