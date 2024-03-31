@@ -19,7 +19,7 @@ const packageContent = await fs.readFile(packagePath, 'utf-8');
 export const generateAction = async (fileName: string, opts: GenerateOptions): Promise<void> => {
     const services = createR2D2Services(NodeFileSystem).R2D2;
     const model = await extractAstNode<Model>(fileName, services);
-    const generatedFilePath = generate(model, fileName, opts);
+    const generatedFilePath = generate(model, fileName,opts.destination, opts);
     console.log(chalk.green(`Code generated successfully: ${generatedFilePath}`));
 };
 

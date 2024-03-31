@@ -2,7 +2,7 @@ import { LocalEntity, Module, isLocalEntity } from "../../../../../language/gene
 import { ident_size } from "../../../../util/generator-utils.js"
 
 const ident = ident_size
-// Cria o conteúdo do arquivo Admin
+
 export function generateAdmin(m: Module) : string {
     const non_abstract_entities = m.elements.filter(isLocalEntity).filter(e => !e.is_abstract)
     if(non_abstract_entities.length === 0) {

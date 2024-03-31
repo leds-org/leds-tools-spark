@@ -58,8 +58,8 @@ function createEnv(softwareName: string) : Generated{
         USE_SQLITE=True
         
         DB_ENGINE_LOCAL=django.db.backends.sqlite3
-        DB_HOST_LOCAL=
-        DB_NAME_LOCAL=sqlite3.db
+        DB_HOST_LOCAL=''
+        DB_NAME_LOCAL='sqlite3.db'
         DB_USER_LOCAL=
         DB_PASSWORD_LOCAL=
         DB_PORT_LOCAL=
@@ -82,7 +82,7 @@ function createEnv(softwareName: string) : Generated{
         DEBUG=True
         SECRET_KEY=3izb^ryglj(bvrjb2_y1fZvcnbky#358_l6-nn#i8fkug4mmz!
         
-        DEFAULT_FROM_EMAIL=Crefisa xxxx <xxx@xxxx.com>
+        DEFAULT_FROM_EMAIL=xxxxxxx@xxxx.com
         EMAIL_HOST=xxxx
         EMAIL_HOST_PASSWORD=xxxx
         EMAIL_HOST_USER=xxxx
@@ -332,7 +332,7 @@ function createBaseSetting(app: Model, solution_name: string) : string {
         `${ident}'oauth2_provider',`,
         `${ident}'drf_yasg',`,
         `${ident}'behave_django',`,
-        `# Recomb Apps`,
+        `# External Apps`,
         ...app.abstractElements.filter(isModuleImport).map(m =>
             `${ident}'${m.name}',`
         ),

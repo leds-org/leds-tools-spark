@@ -79,7 +79,7 @@ function registerGenerateCommands(context: vscode.ExtensionContext) : void {
     context.subscriptions.push(vscode.commands.registerCommand("r-2-d-2.generateBoth", generateBoth))
     
     const generateDocumentation = build_generate_functions({ only_Documentation: true })
-    context.subscriptions.push(vscode.commands.registerCommand("r-2-d-2.generateBoth", generateDocumentation))
+    context.subscriptions.push(vscode.commands.registerCommand("r-2-d-2.generateDocumentation", generateDocumentation))
 
     const generateBacklog = build_generate_functions({ only_Backlog: true })
     context.subscriptions.push(vscode.commands.registerCommand("r-2-d-2.generateBacklog", generateBacklog))

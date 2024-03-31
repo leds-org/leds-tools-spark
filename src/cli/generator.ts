@@ -1,14 +1,32 @@
 import type { Model } from '../language/generated/ast.js';
-import { extractDestinationAndName } from './cli-util.js';
 import { GenerateOptions } from './main.js';
+import { generate as pyhtonGenerate } from './python/generator.js';
+import { generate as javaGenerate } from './java/generator.js';
+import { generate as docGenerate} from './documentation/generator.js';
 
-export function generate(model: Model, filePath: string,   opts: GenerateOptions): string {
-    
-    const data = extractDestinationAndName(filePath, opts.destination);
-    
-    console.log ("Back:"+opts.only_back)
-    console.log ("Front:"+opts.only_front)
-    console.log ("Both:"+opts.all)
+import path from 'path';
 
-    return data.destination;
+export function generate(model: Model,  filePath: string, destination: string | undefined,  opts: GenerateOptions): string {
+    
+    const final_destination  = extractDestination(filePath, destination);
+
+    if (model.configuration?.language == 'python'){
+        pyhtonGenerate(model,final_destination )
+    }
+    else{
+        javaGenerate (model,final_destination )
+    }
+    
+
+    docGenerate (model, final_destination)
+    
+    return final_destination ;
 }
+
+function extractDestination(filePath: string, destination?: string) : string {
+    const path_ext = new RegExp(path.extname(filePath)+'$', 'g')
+    filePath = filePath.replace(path_ext, '')
+  
+    return destination ?? path.join(path.dirname(filePath))
+  }
+
