@@ -1,7 +1,7 @@
 import type { Model } from '../language/generated/ast.js';
 import { GenerateOptions } from './main.js';
-import { generate as pyhtonGenerate } from './python/generator.js';
-import { generate as javaGenerate } from './java/generator.js';
+import { generate as pyhtonGenerate } from './backend/python/generator.js';
+import { generate as javaGenerate } from './backend/java/generator.js';
 import { generate as docGenerate} from './documentation/generator.js';
 
 import path from 'path';
