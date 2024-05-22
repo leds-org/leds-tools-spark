@@ -2,11 +2,11 @@ import 'terminals'
 
 
 DATATYPE returns string:
-    ('string'|'integer'|'decimal'|'datetime'|'date'|'boolean'|'uuid'| 'email'| 'brazilian_person_id'|'brazilian_organization_id'|'zipcode'|'currency'|'mobilePhoneNumber'|'phoneNumber'| 'file'|'void')
+    ('string'|'integer'|'decimal'|'datetime'|'date'|'boolean'|'uuid'| 'email'| 'cpf'|'cnpj'|'zipcode'|'currency'|'mobilePhoneNumber'|'phoneNumber'| 'file'|'void')
 ;
 
 LANGUAGETYPE returns string:
-    ('python'|'java')
+    ('python'|'java'|'csharp-minimal-api')
 ;
 
 QualifiedName returns string:

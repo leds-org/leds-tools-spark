@@ -3,6 +3,8 @@ import { GenerateOptions } from './main.js';
 import { generate as pyhtonGenerate } from './backend/python/generator.js';
 import { generate as javaGenerate } from './backend/java/generator.js';
 import { generate as docGenerate} from './documentation/generator.js';
+;
+import { generate as csharpMinimalAPI} from './backend/csharp/generator.js';
 
 import path from 'path';
 
@@ -12,6 +14,9 @@ export function generate(model: Model,  filePath: string, destination: string | 
 
     if (model.configuration?.language == 'python'){
         pyhtonGenerate(model,final_destination )
+    }
+    if (model.configuration?.language == 'csharp-minimal-api'){
+        csharpMinimalAPI(model,final_destination)
     }
     else{
         javaGenerate (model,final_destination )

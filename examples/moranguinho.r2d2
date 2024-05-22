@@ -1,0 +1,26 @@
+Configuration {
+    software_name: "Morango"
+    about: "Moranguinho!"
+    language: csharp-minimal-api
+}
+
+module Moranguinho {
+
+    
+    entity Agricultor{
+        nome: string
+        identification: cpf
+        email_x: email
+        telefone: string
+        foto: file
+
+    }
+
+    entity Propriedade {
+        nome: string
+        distrito: string
+        agricultor ManyToOne Agricultor
+    }
+    
+    
+}
