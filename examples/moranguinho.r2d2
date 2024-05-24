@@ -13,7 +13,7 @@ module Moranguinho {
         email_x: email
         telefone: string
         foto: file
-
+        Agricultor OneToMany Moranguinho.Propriedade
     }
 
     entity Propriedade {

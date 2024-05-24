@@ -24,7 +24,7 @@ function generateProgram(model: Model, target_folder: string) : string {
         private static void Main(String[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddDbContext<${generateContextNames(modules)}>(opt => opt.UseInMemoryDatabase("db"));
+            builder.Services.AddDbContext<ContextDb>(opt => opt.UseInMemoryDatabase("db"));
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
@@ -51,18 +51,6 @@ function generateModuleNames(modules: Module[]) : string {
     return moduleNames;
   
 }
-
-function generateContextNames(modules: Module[]): string {
-    let contextName = "";
-    for (const mod of modules) {
-      const mod_classes = mod.elements.filter(isLocalEntity);
-      for (const classe of mod_classes) {
-        contextName += `${classe.name}Db,`;
-      }
-    }
-    // Remove the trailing comma
-    return contextName.slice(0, -1) || "undefined";
-  }
   
 function generateMapGroups(modules : Module[]) : string {
     let mapGroups = "";
