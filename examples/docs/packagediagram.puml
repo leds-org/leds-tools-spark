@@ -1,0 +1,3 @@
+@startuml Morango
+namespace Moranguinho{}
+@enduml

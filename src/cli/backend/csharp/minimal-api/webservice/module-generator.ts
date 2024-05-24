@@ -27,12 +27,14 @@ export function generateModules(model: Model, target_folder: string) : void {
 function generateClassEnt(cls: LocalEntity, mod_name: string) : string {
     return expandToStringWithNL`
     namespace ${mod_name}
+    {
 
         public class ${cls.name}
         {
             public int Id { get; set; }
             ${cls.attributes.map(attribute => generateAttribute(attribute)).join("\n")}
         }
+    }
     `
 
 }
@@ -40,7 +42,7 @@ function generateClassEnt(cls: LocalEntity, mod_name: string) : string {
 function generateClassDB(cls: LocalEntity, mod_name: string) : string {
     return expandToStringWithNL`
     namespace ${mod_name}
-
+    {
         using Microsoft.EntityFrameworkCore;
         internal class ${cls.name}Db
         {
@@ -50,6 +52,7 @@ function generateClassDB(cls: LocalEntity, mod_name: string) : string {
                 : base(options) { }
             public DbSet<${cls.name}> ${cls.name.toLowerCase()}s => Set<${cls.name}>();
         }
+    }
     `
 
 }

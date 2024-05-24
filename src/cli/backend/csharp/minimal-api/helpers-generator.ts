@@ -14,6 +14,7 @@ export function generate(model: Model, target_folder: string) : void {
     fs.writeFileSync(path.join(target_folder, 'appsettings.Development.json'), generateAppSettingsDevelopment())
     fs.writeFileSync(path.join(target_folder, model.configuration?.name + '.csproj'), generatecsproj())
     fs.writeFileSync(path.join(target_folder, model.configuration?.name + '.csproj.user'), generatecsprojuser())
+    fs.writeFileSync(path.join(target_folder, 'Dockerfile'), generateDockerfile(model))
 }
 
 function generateAppSettings (): string {
@@ -82,4 +83,32 @@ function generatecsprojuser() : string {
     <ActiveDebugProfile>Container (Dockerfile)</ActiveDebugProfile>
   </PropertyGroup>
 </Project>`
+}
+
+function generateDockerfile(model : Model) : string {
+  return expandToStringWithNL`
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+USER app
+WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["${model.configuration?.name}/${model.configuration?.name}.csproj", "${model.configuration?.name}/"]
+RUN dotnet restore "./${model.configuration?.name}/${model.configuration?.name}.csproj"
+COPY . .
+WORKDIR "/src/${model.configuration?.name}"
+RUN dotnet build "./${model.configuration?.name}.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./${model.configuration?.name}.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "${model.configuration?.name}.dll"]`
 }
