@@ -1,7 +1,7 @@
 import { Model } from "../../../../../language/generated/ast.js";
 import fs from "fs";
 
-import {generateModules} from "./module-generator.js"
+import {generateModules} from "./module2.js"
 import { generateCrud } from "./crud-generator.js";
 
 export function generate(model: Model, target_folder: string) : void {

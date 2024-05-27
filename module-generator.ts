@@ -8,15 +8,18 @@ import { RelationInfo, processRelations } from "../../../../util/relations.js";
 export function generateModules(model: Model, target_folder: string) : void {
     
     const modules = model.abstractElements.filter(isModule);
+    const imported_entities = processImportedEntities(model)
 
     for(const mod of modules) {
         const MODULE_PATH = createPath(target_folder, mod.name.toLowerCase())
-    
+        const supertype_classes = processSupertypes(mod)
         const mod_classes = mod.elements.filter(isLocalEntity)
         const relation_maps = processRelations(mod_classes);
+
         console.log(relation_maps);
         for(const cls of mod_classes) {
             const class_name = cls.name
+            const {attributes, relations} = getAttrsAndRelations(cls, relation_maps)
 
             if(!cls.is_abstract){
                 fs.writeFileSync(path.join(MODULE_PATH, `${class_name}.cs`), generateClassEnt(cls, mod.name))
@@ -36,6 +39,7 @@ function generateClassEnt(cls: LocalEntity, mod_name: string) : string {
         {
             public int Id { get; set; }
             ${cls.attributes.map(attribute => generateAttribute(attribute)).join("\n")}
+            
         }
     }
     `

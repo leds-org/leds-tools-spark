@@ -9,13 +9,26 @@ export function generate(model: Model, target_folder: string) : void {
 
     if(model.configuration){
         fs.writeFileSync(path.join(target_folder, 'README.md'),createProjectReadme(model.configuration))
-        fs.writeFileSync(path.join(target_folder, '.gitlab-ci.yml'),createGitLab())
+        fs.writeFileSync(path.join(target_folder, '.gitlab-ci.yml'),createGitLab(model))
     }
 }
 
-function createGitLab():string{
+function createGitLab(model : Model):string{
     return expandToStringWithNL`
-    teste
+stages:
+  - build
+
+job:
+  stage: build
+  script:
+  - echo "Restoring NuGet Packages..."
+  - '"c:\\nuget\\nuget.exe" restore "${model.configuration?.name}.sln"'
+  - ''
+  - echo "Release build..."
+  - C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\msbuild.exe /consoleloggerparameters:ErrorsOnly /maxcpucount /nologo /property:Configuration=Release /verbosity:quiet "MySolution.sln"
+  tags:
+  except:
+  - tags
     `
 }
 
