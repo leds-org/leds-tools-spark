@@ -98,9 +98,9 @@ function generateContextDb(mod : Module, package_name: string, relation_maps: Ma
   return expandToStringWithNL`
     namespace ${package_name}{
 
-    using Microsoft.EntityFrameWorkCore;
+    using Microsoft.EntityFrameworkCore;
 
-    internal class ContextDb : Dbcontext
+    internal class ContextDb : DbContext
         {
             public ContextDb(DbContextOptions<ContextDb> options) : base(options) { }
             ${generateDbSet(mod)}
@@ -115,7 +115,6 @@ function generateDbSet (mod : Module) : string {
     let dbsets = "";
     for(const cls of mod.elements.filter(isLocalEntity)) {
         dbsets += `public DbSet<${cls.name}> ${cls.name}s { get; set; } \n`
-        dbsets += `public DbSet<${cls.name}> ${cls.name.toLowerCase()}s => Set<${cls.name}>();\n\n`
     }
     return dbsets
 }
@@ -150,21 +149,29 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
       if(owner) {
         return ''
       } else {
-        return ''
-      }
-    case "ManyToOne":
-      if(owner) {
         return expandToStringWithNL`
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<${cls.name}>()
-                .HasMany(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${tgt.name}) 
+                .HasMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
                 .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
-                .HasForeignKey<${tgt.name}>(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}Id); 
-        }
+                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name.toLowerCase()}Id); 
+        } 
         `
-      } else {
+      }
+    case "ManyToOne":
+      if(owner) {
         return ''
+      } else {
+        return expandToStringWithNL`
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<${cls.name}>()
+                .HasMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
+                .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
+                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name.toLowerCase()}Id); 
+        } 
+        `
       }
     case "ManyToMany":
       if(owner) {

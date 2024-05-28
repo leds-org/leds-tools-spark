@@ -19,7 +19,6 @@ module Moranguinho {
     entity Propriedade {
         nome: string
         distrito: string
-        agricultor ManyToOne Agricultor
     }
     
     

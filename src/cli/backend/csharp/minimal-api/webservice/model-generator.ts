@@ -23,7 +23,7 @@ export function generateModel(cls: LocalEntity, is_supertype: boolean, relations
       ${is_abstract?`public Guid Id { get; set; }`: undefined}
       private DateTime createdAt = DateTime.Now;
 
-      ${!supertype && !is_abstract?`public Guid id { get; set; }`: undefined}
+      ${!supertype && !is_abstract?`public Guid Id { get; set; }`: undefined}
       
       ${cls.attributes.map(a => generateAttribute(a,is_abstract)).join('\n')}
       ${generateRelations(cls, relations)}
@@ -101,11 +101,12 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
     if(owner) {
       return expandToStringWithNL`
         //OneToOne
-        public ${tgt.name} ${tgt.name.toLowerCase()} { get; set; }
         public Guid ${tgt.name.toLowerCase()}Id {get; set; }
+        public ${tgt.name} ${tgt.name} { get; set; }
       `
     } else {
-      return ''
+      return expandToStringWithNL`
+      `
     }
   case "OneToMany":
     if(owner) {
@@ -113,15 +114,14 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
     } else {
       return expandToStringWithNL`
       //OneToMany
-      public ${tgt.name} ${tgt.name.toLowerCase()} { get; set; }
-      public Guid ${tgt.name.toLowerCase()}Id {get; set; }
+      public ICollection<${tgt.name}> ${tgt.name}s { get; set;}
       `
     }
   case "ManyToOne":
     if(owner) {
       return expandToStringWithNL`
         //ManyToOne
-        public ${tgt.name} ${tgt.name.toLowerCase()} { get; set; }
+        public ${tgt.name} ${tgt.name} { get; set; }
         public Guid ${tgt.name.toLowerCase()}Id {get; set; }
       `
     } else {
@@ -131,13 +131,7 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
     if(owner) {
       return expandToStringWithNL`
         //ManyToMany
-        @JoinTable(
-            name = "${cls.name.toLowerCase()}_${tgt.name.toLowerCase()}",
-            joinColumns = @JoinColumn(name = "${cls.name.toLowerCase()}_id"),
-            inverseJoinColumns = @JoinColumn(name = "${tgt.name.toLowerCase()}_id")
-        )
-        @Builder.Default
-        private Set<${tgt.name}> ${tgt.name.toLowerCase()}s = new HashSet<>();
+        public ICollection<${tgt.name}> ${tgt.name}s { get; set;}
       `
     } else {
       return ''
