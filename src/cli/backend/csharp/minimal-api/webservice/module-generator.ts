@@ -104,8 +104,10 @@ function generateContextDb(mod : Module, package_name: string, relation_maps: Ma
         {
             public ContextDb(DbContextOptions<ContextDb> options) : base(options) { }
             ${generateDbSet(mod)}
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
             ${generateDbRelations(mod, relation_maps)}
-        
+            } 
         }
     }
   `
@@ -139,51 +141,41 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
       if(owner) {
         return expandToStringWithNL`
           //OneToOne
-          public ${tgt.name} ${tgt.name.toLowerCase()} { get; set; }
-          public Guid ${tgt.name.toLowerCase()}Id {get; set; }
         `
       } else {
-        return ''
+        return expandToStringWithNL`
+            modelBuilder.Entity<${cls.name}>()
+                .HasOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
+                .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
+                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name.toLowerCase()}Id);`
       }
     case "OneToMany":
       if(owner) {
         return ''
       } else {
         return expandToStringWithNL`
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
             modelBuilder.Entity<${cls.name}>()
                 .HasMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
                 .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
-                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name.toLowerCase()}Id); 
-        } 
-        `
+                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name.toLowerCase()}Id);`
       }
     case "ManyToOne":
       if(owner) {
         return ''
       } else {
         return expandToStringWithNL`
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
             modelBuilder.Entity<${cls.name}>()
                 .HasMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
                 .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
-                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name.toLowerCase()}Id); 
-        } 
-        `
+                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name.toLowerCase()}Id);`
       }
     case "ManyToMany":
       if(owner) {
         return expandToStringWithNL`
           //ManyToMany
-          @JoinTable(
-              name = "${cls.name.toLowerCase()}_${tgt.name.toLowerCase()}",
-              joinColumns = @JoinColumn(name = "${cls.name.toLowerCase()}_id"),
-              inverseJoinColumns = @JoinColumn(name = "${tgt.name.toLowerCase()}_id")
-          )
-          @Builder.Default
-          private Set<${tgt.name}> ${tgt.name.toLowerCase()}s = new HashSet<>();
+          modelBuilder.Entity<${cls.name}>()
+            .HasMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
+            .WithMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}s);
         `
       } else {
         return ''

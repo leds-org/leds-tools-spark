@@ -80,6 +80,15 @@ function generateTypeAttribute(attribute:Attribute): Generated{
   if (attribute.type.toString().toLowerCase() === "file"){
     return "Byte[]"
   }
+  if (attribute.type.toString().toLowerCase() === "mobilephonenumber"){
+    return "String"
+  }
+  if (attribute.type.toString().toLowerCase() === "zipcode"){
+    return "String"
+  }
+  if (attribute.type.toString().toLowerCase() === "phonenumber"){
+    return "String"
+  }
   return attribute.type
 
 }
@@ -101,8 +110,8 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
     if(owner) {
       return expandToStringWithNL`
         //OneToOne
-        public Guid ${tgt.name.toLowerCase()}Id {get; set; }
-        public ${tgt.name} ${tgt.name} { get; set; }
+        public Guid? ${tgt.name.toLowerCase()}Id {get; set; }
+        public ${tgt.name}? ${tgt.name} { get; set; }
       `
     } else {
       return expandToStringWithNL`
@@ -114,15 +123,15 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
     } else {
       return expandToStringWithNL`
       //OneToMany
-      public ICollection<${tgt.name}> ${tgt.name}s { get; set;}
+      public ICollection<${tgt.name}>? ${tgt.name}s { get; set;}
       `
     }
   case "ManyToOne":
     if(owner) {
       return expandToStringWithNL`
         //ManyToOne
-        public ${tgt.name} ${tgt.name} { get; set; }
-        public Guid ${tgt.name.toLowerCase()}Id {get; set; }
+        public ${tgt.name}? ${tgt.name} { get; set; }
+        public Guid? ${tgt.name.toLowerCase()}Id {get; set; }
       `
     } else {
       return ''
@@ -131,19 +140,19 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
     if(owner) {
       return expandToStringWithNL`
         //ManyToMany
-        public ICollection<${tgt.name}> ${tgt.name}s { get; set;}
+        public ICollection<${tgt.name}>? ${tgt.name}s { get; set;}
       `
     } else {
-      return ''
+      return expandToStringWithNL`
+        public ICollection<${tgt.name}>? ${tgt.name}s { get; set;}
+      `
     }
   }
 }
 
 function createEnum(enumEntityAtribute: EnumEntityAtribute):string {
   return expandToString`
-  @Builder.Default
-  @Enumerated(EnumType.STRING)
-  private ${enumEntityAtribute.type.ref?.name} ${enumEntityAtribute.name.toLowerCase()} = ${enumEntityAtribute.type.ref?.name}.${enumEntityAtribute.type.ref?.attributes[0].name.toUpperCase()};
+  public ${enumEntityAtribute.type.ref?.name} ${enumEntityAtribute.type.ref?.name.toLowerCase()} { get; set; }
   `
 }
 
