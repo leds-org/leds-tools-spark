@@ -15,8 +15,6 @@ function generateProgram(model: Model, target_folder: string) : string {
 
     return expandToStringWithNL`
     using Microsoft.EntityFrameworkCore;
-    using Microsoft.AspNetCore.OpenApi;
-    using MinimalAPI;
     // modules
     ${generateModuleNames(modules)}
 
@@ -26,11 +24,12 @@ function generateProgram(model: Model, target_folder: string) : string {
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddDbContext<ContextDb>(opt => opt.UseInMemoryDatabase("db"));
+            builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            if (app.environment.IsDevelopment()) 
+            if (app.Environment.IsDevelopment()) 
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
@@ -38,7 +37,9 @@ function generateProgram(model: Model, target_folder: string) : string {
 
             //mapgroups:
             ${generateMapGroups(modules)}
-
+            
+            app.MapGet("/", () => "Hello World!");
+            app.Run();
         }
     }
     `
