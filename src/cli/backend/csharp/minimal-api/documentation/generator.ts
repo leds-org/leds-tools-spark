@@ -15,21 +15,23 @@ export function generate(model: Model, target_folder: string) : void {
 
 function createGitLab(model : Model):string{
     return expandToStringWithNL`
-stages:
-  - build
-
-job:
-  stage: build
-  script:
-  - echo "Restoring NuGet Packages..."
-  - '"c:\\nuget\\nuget.exe" restore "${model.configuration?.name}.sln"'
-  - ''
-  - echo "Release build..."
-  - C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\msbuild.exe /consoleloggerparameters:ErrorsOnly /maxcpucount /nologo /property:Configuration=Release /verbosity:quiet "MySolution.sln"
-  tags:
-  except:
-  - tags
-    `
+    docker-build:
+    image: docker:cli
+    stage: build
+    services:
+      - docker:dind
+    variables:
+      DOCKER_IMAGE_NAME: "$CI_REGISTRY_IMAGE:latest"
+      CI_DOCKERFILE_IMAGE: Dockerfile
+    before_script:
+      - cd backend/
+      - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    script:
+      - docker build -t "$DOCKER_IMAGE_NAME" -f "$CI_DOCKERFILE_IMAGE" .
+      - docker push "$DOCKER_IMAGE_NAME"
+    rules:
+      - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "dev"'
+  `
 }
 
 function stackREADME (): string {

@@ -14,9 +14,9 @@ module Main {
         cliente: string
         patrocinador: string
         objetivo: string
-        Project OneToMany Projeto
-        Project OneToMany Time
-        Project uses ProjetoStatus
+        Projeto OneToMany Projeto
+        Projeto OneToMany Time
+        Projeto uses ProjetoStatus
     }
 
     enum ProjetoStatus {
