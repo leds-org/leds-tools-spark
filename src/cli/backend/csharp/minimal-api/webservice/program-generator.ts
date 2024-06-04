@@ -14,7 +14,10 @@ function generateProgram(model: Model, target_folder: string) : string {
     const modules = model.abstractElements.filter(isModule);
 
     return expandToStringWithNL`
+    using ApiAuthIdentity;
+    using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
+    
     // modules
     ${generateModuleNames(modules)}
 
@@ -26,6 +29,12 @@ function generateProgram(model: Model, target_folder: string) : string {
             builder.Services.AddDbContext<ContextDb>(opt => opt.UseInMemoryDatabase("db"));
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            // Authorization
+            builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+                .AddEntityFrameworkStores<ContextDb>();
+            
+            builder.Services.AddAuthorization();
+            // End Authorization
 
             var app = builder.Build();
 
@@ -35,7 +44,10 @@ function generateProgram(model: Model, target_folder: string) : string {
                 app.UseSwaggerUI();
             }
 
-            //mapgroups:
+            // Authentication Mapgroup
+            app.MapGroup("/identity").MapIdentityApi<IdentityUser>();
+
+            // Mapgroups:
             ${generateMapGroups(modules)}
             
             app.MapGet("/", () => "Hello World!");
