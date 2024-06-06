@@ -4,7 +4,7 @@ import { Attribute, ImportedEntity, LocalEntity, Model, Module, ModuleImport, is
 import { createPath } from "../../../../util/generator-utils.js";
 import { RelationInfo, processRelations } from "../../../../util/relations.js";
 import { CompositeGeneratorNode, Generated, expandToStringWithNL, toString } from "langium/generate";
-import { generateModel } from "./model-generator.js";
+import { generateIdentityUser, generateModel } from "./model-generator.js";
 import { generateEnum } from "./enum-generator.js";
 
 export function generateModules(model: Model, target_folder: string) : void {
@@ -17,6 +17,10 @@ export function generateModules(model: Model, target_folder: string) : void {
 
   const imported_entities = processImportedEntities(model)
 
+  const features = model.configuration?.feature
+
+  const clsauth = model.configuration?.entity
+
   for(const mod of modules) {
     
     const package_name      = `${mod.name}`
@@ -26,14 +30,18 @@ export function generateModules(model: Model, target_folder: string) : void {
 
     const mod_classes = mod.elements.filter(isLocalEntity)
 
-    fs.writeFileSync(path.join(MODULE_PATH, `ContextDb.cs`), toString(generateContextDb(mod, package_name, relation_maps)))
+    fs.writeFileSync(path.join(MODULE_PATH, `ContextDb.cs`), toString(generateContextDb(mod, package_name, relation_maps, features)))
     for(const cls of mod_classes) {
       const class_name = cls.name
       const {attributes, relations} = getAttrsAndRelations(cls, relation_maps)
       
       attributes
-
-      fs.writeFileSync(path.join(MODULE_PATH,`${class_name}.cs`), toString(generateModel(cls, supertype_classes.has(cls), relations, package_name, imported_entities)))
+      if (clsauth != undefined && clsauth.ref?.name == cls.name) {
+        fs.writeFileSync(path.join(MODULE_PATH,`${class_name}.cs`), toString(generateModel(cls, supertype_classes.has(cls), relations, package_name, imported_entities, true)))
+        fs.writeFileSync(path.join(MODULE_PATH,`AppUser.cs`), toString(generateIdentityUser(cls, package_name)))
+      } else {
+        fs.writeFileSync(path.join(MODULE_PATH,`${class_name}.cs`), toString(generateModel(cls, supertype_classes.has(cls), relations, package_name, imported_entities, false)))
+      }
       if (!cls.is_abstract){
       }
       
@@ -92,9 +100,28 @@ function getAttrsAndRelations(cls: LocalEntity, relation_map: Map<LocalEntity, R
   }
 }
 
-function generateContextDb(mod : Module, package_name: string, relation_maps: Map<LocalEntity, RelationInfo[]>) : Generated {
+function generateContextDb(mod : Module, package_name: string, relation_maps: Map<LocalEntity, RelationInfo[]>, features: string | undefined) : Generated {
   
    
+  if (features == 'authentication'){
+    return expandToStringWithNL`
+    namespace ${package_name}{
+
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
+    internal class ContextDb : IdentityDbContext
+        {
+            public ContextDb(DbContextOptions<ContextDb> options) : base(options) { }
+            ${generateDbSet(mod)}
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
+            ${generateDbRelations(mod, relation_maps)}
+            } 
+        }
+    }`
+  }
+  else{
   return expandToStringWithNL`
     namespace ${package_name}{
 
@@ -111,6 +138,7 @@ function generateContextDb(mod : Module, package_name: string, relation_maps: Ma
         }
     }
   `
+  }
 }
 
 function generateDbSet (mod : Module) : string {
@@ -132,6 +160,7 @@ function generateDbRelations(mod : Module, relation_maps: Map<LocalEntity, Relat
         }
         
     }
+    node.append('base.OnModelCreating(modelBuilder);')
     return node
 }
 

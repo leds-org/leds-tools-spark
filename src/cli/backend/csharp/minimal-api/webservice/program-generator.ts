@@ -4,7 +4,8 @@ import { LocalEntity, Model, Module, isLocalEntity, isModule,  } from "../../../
 import { expandToStringWithNL } from "langium/generate";
 import { capitalizeString } from "../../../../util/generator-utils.js";
 
-export function generate(model: Model, target_folder: string) : void{
+export function generate(model: Model, target_folder: string) : void{7
+    console.log(model.configuration?.feature)
 
     fs.writeFileSync(path.join(target_folder, `Program.cs`), generateProgram(model, target_folder))
 }
@@ -12,9 +13,9 @@ export function generate(model: Model, target_folder: string) : void{
 function generateProgram(model: Model, target_folder: string) : string {
 
     const modules = model.abstractElements.filter(isModule);
+    const features = model.configuration?.feature
 
     return expandToStringWithNL`
-    using ApiAuthIdentity;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
     
@@ -29,12 +30,7 @@ function generateProgram(model: Model, target_folder: string) : string {
             builder.Services.AddDbContext<ContextDb>(opt => opt.UseInMemoryDatabase("db"));
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            // Authorization
-            builder.Services.AddIdentityApiEndpoints<IdentityUser>()
-                .AddEntityFrameworkStores<ContextDb>();
-            
-            builder.Services.AddAuthorization();
-            // End Authorization
+            ${generateFeatureBuilder(features)}
 
             var app = builder.Build();
 
@@ -44,11 +40,8 @@ function generateProgram(model: Model, target_folder: string) : string {
                 app.UseSwaggerUI();
             }
 
-            // Authentication Mapgroup
-            app.MapGroup("/identity").MapIdentityApi<IdentityUser>();
-
             // Mapgroups:
-            ${generateMapGroups(modules)}
+            ${generateMapGroups(features, modules)}
             
             app.MapGet("/", () => "Hello World!");
             app.Run();
@@ -66,8 +59,12 @@ function generateModuleNames(modules: Module[]) : string {
   
 }
   
-function generateMapGroups(modules : Module[]) : string {
+function generateMapGroups(features : string | undefined, modules : Module[]) : string {
     let mapGroups = "";
+    if (features == 'authentication') {
+        mapGroups += `// Authentication Mapgroup
+app.MapGroup("/identity").MapIdentityApi<IdentityUser>();`;
+    }
     for (const mod of modules) {
         mapGroups += `var ${mod.name.toLowerCase()} = app.MapGroup("/${mod.name}"); \n \n`;
         const mod_classes = mod.elements.filter(isLocalEntity);
@@ -91,4 +88,16 @@ function generateInputs(classe : LocalEntity) : string {
         inputs += `\n        ${classe.name.toLowerCase()}.${capitalizeString(att.name)} = input${classe.name}.${capitalizeString(att.name)};`
     }
     return inputs;
+}
+
+function generateFeatureBuilder(features: string | undefined) : string {
+    if (features == 'authentication'){
+        return expandToStringWithNL`
+        // Authentication Builder
+        builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+            .AddEntityFrameworkStores<ContextDb>();
+    
+        builder.Services.AddAuthorization();`
+    }
+    return '';
 }

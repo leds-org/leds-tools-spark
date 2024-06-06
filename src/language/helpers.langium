@@ -20,3 +20,7 @@ QualifiedNameWithWildcard returns string:
 fragment Comment:
      comment = (SL_COMMENT |ML_COMMENT)
 ;
+
+FEATURE_TYPE returns string:
+    ('authentication')
+;

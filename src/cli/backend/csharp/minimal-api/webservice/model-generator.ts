@@ -4,12 +4,33 @@ import { RelationInfo } from "../../../../util/relations.js"
 import { capitalizeString } from "../../../../util/generator-utils.js"
 
 
-export function generateModel(cls: LocalEntity, is_supertype: boolean, relations: RelationInfo[], package_name: string, importedEntities: Map<ImportedEntity, ModuleImport | undefined>) : Generated {
+export function generateModel(cls: LocalEntity, is_supertype: boolean, relations: RelationInfo[], package_name: string, importedEntities: Map<ImportedEntity, ModuleImport | undefined>, identity: boolean) : Generated {
   const supertype = cls.superType?.ref  
   const is_abstract = cls?.is_abstract
 
   const external_relations = relations.filter(relation => relation.tgt.$container != cls.$container)
+  if (identity) {
+    return expandToStringWithNL`
+    namespace ${package_name}
+    {
+      using Microsoft.EntityFrameworkCore;
 
+    ${external_relations.map(relation => `using ${package_name.replace(cls.$container.name,relation.tgt.$container.name)}.${relation.tgt.name};`).join('\n')}
+    
+    ${supertype ? generateImportSuperEntity(package_name, cls, supertype, importedEntities) : undefined}
+    public ${is_abstract? `abstract` : undefined} class ${cls.name} ${supertype ? `extends ${supertype.name}` : ': AppUser'} {
+          
+      private DateTime createdAt = DateTime.Now;
+      
+      ${cls.attributes.map(a => generateAttribute(a,is_abstract)).join('\n')}
+      ${generateRelations(cls, relations)}
+      ${generateEnum(cls)}
+
+    }
+    }
+  `
+  }
+  else{
   return expandToStringWithNL`
     namespace ${package_name}
     {
@@ -31,6 +52,22 @@ export function generateModel(cls: LocalEntity, is_supertype: boolean, relations
 
     }
     }
+  `
+  }
+}
+
+export function generateIdentityUser(cls: LocalEntity, package_name: string): string {
+  return expandToStringWithNL`
+  using Microsoft.AspNetCore.Identity;
+
+  namespace ${package_name}
+  {
+      public class AppUser : IdentityUser<Guid>
+      {
+          public ${cls.name} ${cls.name} { get; set; }
+      }
+  
+  }
   `
 }
 

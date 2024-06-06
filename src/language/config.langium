@@ -1,3 +1,4 @@
+import './entities'
 import 'helpers'
 
 Configuration:
@@ -6,7 +7,8 @@ Configuration:
         |'about' ':' description=STRING
         |DataBaseName
         |PackagePath
-        |Language )*
+        |Language 
+        |Features)*
     '}'
 ;
 
@@ -21,4 +23,8 @@ fragment Language:
 
 fragment PackagePath:
     'package_path:' package_path = LANGUAGETYPE
+;
+
+fragment Features:
+    'features:' feature = FEATURE_TYPE ('of' entity = [Entity:QualifiedName])?
 ;
