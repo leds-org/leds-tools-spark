@@ -5,44 +5,8 @@ import path from "path";
 
 export function generate(model: Model, target_folder: string) : void {
 
-    fs.writeFileSync(path.join(target_folder, '.dockerignore'), generateDockerIgnore())
     fs.writeFileSync(path.join(target_folder, model.configuration?.name + ".sln"), generateProjectsln(model))
 
-}
-
-function generateDockerIgnore() : string {
-    return expandToStringWithNL`
-**/.classpath
-**/.dockerignore
-**/.env
-**/.git
-**/.gitignore
-**/.project
-**/.settings
-**/.toolstarget
-**/.vs
-**/.vscode
-**/*.*proj.user
-**/*.dbmdl
-**/*.jfm
-**/azds.yaml
-**/bin
-**/charts
-**/docker-compose*
-**/Dockerfile*
-**/node_modules
-**/npm-debug.log
-**/obj
-**/secrets.dev.yaml
-**/values.dev.yaml
-LICENSE
-README.md
-!**/.gitignore
-!.git/HEAD
-!.git/config
-!.git/packed-refs
-!.git/refs/heads/**
-    `
 }
 
 function generateProjectsln(model: Model) : string {

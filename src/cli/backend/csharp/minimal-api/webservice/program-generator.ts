@@ -27,7 +27,8 @@ function generateProgram(model: Model, target_folder: string) : string {
         private static void Main(String[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddDbContext<ContextDb>(opt => opt.UseInMemoryDatabase("db"));
+            builder.Services.AddDbContext<ContextDb>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             ${generateFeatureBuilder(features)}
@@ -44,6 +45,7 @@ function generateProgram(model: Model, target_folder: string) : string {
             ${generateMapGroups(features, modules)}
             
             app.MapGet("/", () => "Hello World!");
+            ${generateFeatureCors(features)}
             app.Run();
         }
     }
@@ -96,8 +98,17 @@ function generateFeatureBuilder(features: string | undefined) : string {
         // Authentication Builder
         builder.Services.AddIdentityApiEndpoints<IdentityUser>()
             .AddEntityFrameworkStores<ContextDb>();
-    
+        
+        builder.Services.AddCors();
         builder.Services.AddAuthorization();`
+    }
+    return '';
+}
+
+function generateFeatureCors(features: string | undefined) : string {
+    if (features == 'authentication'){
+        return expandToStringWithNL`
+        app.UseCors();`
     }
     return '';
 }

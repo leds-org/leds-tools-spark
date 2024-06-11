@@ -51,6 +51,7 @@ export function generateModules(model: Model, target_folder: string) : void {
     for (const enumx of mod.elements.filter(isEnumX)){
       fs.writeFileSync(path.join(MODULE_PATH,`${enumx.name}.cs`), generateEnum(enumx,package_name))
     }
+    fs.writeFileSync(path.join(MODULE_PATH, `ContextDbFactory.cs`), generateContextDbFactory(package_name))
   }
 }
 
@@ -210,4 +211,32 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
         return ''
       }
     }
+  }
+
+  function generateContextDbFactory(package_name: string): string{
+    return expandToStringWithNL`
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
+using System.IO;
+
+namespace ${package_name}
+{
+    public class ContextDbFactory : IDesignTimeDbContextFactory<ContextDb>
+    {
+        public ContextDb CreateDbContext(string[] args)
+        {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .Build();
+
+            var optionsBuilder = new DbContextOptionsBuilder<ContextDb>();
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            optionsBuilder.UseSqlServer(connectionString);
+
+            return new ContextDb(optionsBuilder.Options);
+        }
+    }
+}`
   }
