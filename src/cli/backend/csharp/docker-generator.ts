@@ -5,7 +5,7 @@ import { expandToStringWithNL } from "langium/generate";
 
 export function generate(model: Model, target_folder: string) : void { 
     generateDockerCompose(model, target_folder);
-    fs.writeFileSync(path.join(target_folder, 'Dockerfile'), generateDockerfile(model));
+    fs.writeFileSync(path.join(`${target_folder}/${model.configuration?.name}/`, 'Dockerfile'), generateDockerfile(model));
     fs.writeFileSync(path.join(target_folder, '.dockerignore'),generateDockerIgnore());
     fs.writeFileSync(path.join(target_folder, 'launchSettings.json'), generateLaunchSettings(model));
 }

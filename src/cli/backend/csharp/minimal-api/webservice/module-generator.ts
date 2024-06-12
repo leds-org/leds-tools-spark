@@ -128,7 +128,7 @@ function generateContextDb(mod : Module, package_name: string, relation_maps: Ma
 
     using Microsoft.EntityFrameworkCore;
 
-    internal class ContextDb : DbContext
+    public class ContextDb : DbContext
         {
             public ContextDb(DbContextOptions<ContextDb> options) : base(options) { }
             ${generateDbSet(mod)}
