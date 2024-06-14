@@ -6,7 +6,7 @@ DATATYPE returns string:
 ;
 
 LANGUAGETYPE returns string:
-    ('python'|'java'|'csharp-minimal-api')
+    ('python'|'java'|'csharp-minimal-api'|'csharp-clean-architecture')
 ;
 
 QualifiedName returns string:

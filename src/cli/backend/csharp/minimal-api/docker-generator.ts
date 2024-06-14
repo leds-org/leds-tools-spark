@@ -1,4 +1,4 @@
-import { Model } from "../../../language/generated/ast.js";
+import { Model } from "../../../../language/generated/ast.js";
 import fs from "fs";
 import path from "path";
 import { expandToStringWithNL } from "langium/generate";
@@ -51,9 +51,9 @@ function generateDockerfile(model : Model) : string {
     <ProjectVersion>2.1</ProjectVersion>
     <DockerTargetOS>Linux</DockerTargetOS>
     <DockerPublishLocally>False</DockerPublishLocally>
-    <ProjectGuid>{PROJECT_GUID}</ProjectGuid>
+    <ProjectGuid></ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
-    <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/</DockerServiceUrl>
+    <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
     <DockerServiceName>${model.configuration?.name?.toLowerCase()}</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>

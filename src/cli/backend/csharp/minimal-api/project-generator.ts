@@ -1,5 +1,5 @@
 import { expandToStringWithNL } from "langium/generate";
-import { Model } from "../../../language/generated/ast.js"
+import { Model } from "../../../../language/generated/ast.js"
 import fs from "fs";
 import path from "path";
 
@@ -11,11 +11,14 @@ export function generate(model: Model, target_folder: string) : void {
 
 function generateProjectsln(model: Model) : string {
     return expandToStringWithNL`
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34902.65
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "${model.configuration?.name}", "${model.configuration?.name}\\${model.configuration?.name}.csproj", "{PROJECT GUID}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{COMPOSE_GUID}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
