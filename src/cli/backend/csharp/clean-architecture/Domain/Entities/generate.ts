@@ -4,7 +4,6 @@ import { Attribute, ImportedEntity, LocalEntity, Model, Module, ModuleImport, is
 import { RelationInfo, processRelations } from "../../../../../util/relations.js";
 import { toString } from "langium/generate";
 import { generateModel } from "./model-generator.js";
-//import { generateEnum } from "./enum-generator.js";
 
 export function generate(model: Model, target_folder: string) : void {
 
@@ -18,7 +17,7 @@ export function generate(model: Model, target_folder: string) : void {
   
     for(const mod of modules) {
       
-      const package_name      = `${mod.name}` 
+      const package_name      = `${model.configuration?.name}` 
   
       const supertype_classes = processSupertypes(mod)
   
@@ -34,10 +33,6 @@ export function generate(model: Model, target_folder: string) : void {
         }
         
       }
-  
-    //   for (const enumx of mod.elements.filter(isEnumX)){
-    //     fs.writeFileSync(path.join(target_folder,`${enumx.name}.cs`), generateEnum(enumx,package_name))
-    //   }
     }
 }
 
