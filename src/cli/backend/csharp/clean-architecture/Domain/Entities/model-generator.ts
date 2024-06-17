@@ -14,7 +14,6 @@ using System.Text.RegularExpressions;
 
   namespace ${package_name}
     {
-      using Microsoft.EntityFrameworkCore;
     ${external_relations.map(relation => `using ${package_name.replace(cls.$container.name,relation.tgt.$container.name)}.${relation.tgt.name};`).join('\n')}
     ${supertype ? generateImportSuperEntity(package_name, cls, supertype, importedEntities) : undefined}
     public ${is_abstract? `abstract` : undefined} class ${cls.name} ${supertype ? `extends ${supertype.name}` : ''} {

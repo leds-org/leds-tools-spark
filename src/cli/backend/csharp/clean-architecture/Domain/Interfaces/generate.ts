@@ -22,13 +22,14 @@ export function generate(model: Model, target_folder: string) : void {
     }
 
     fs.writeFileSync(path.join(target_folder,`IUnitOfWork.cs`), generateUnitOfWork(model))
+    fs.writeFileSync(path.join(target_folder,`IBaseRepository.cs`), generateBaseRepository(model))
 }
 
 function generateRepository(model: Model, cls: LocalEntity, package_name: string) : string {
     return expandToStringWithNL`
 using ${model.configuration?.name}.Domain.Entities;
 
-namespace ${model.configuration?.name}.Domain.Entities
+namespace ${model.configuration?.name}.Domain.Interfaces
 {
     public interface I${cls.name}Repository : IBaseRepository<${cls.name}>
     {
@@ -46,4 +47,23 @@ namespace ${model.configuration?.name}.Domain.Interfaces
         Task Commit(CancellationToken cancellationToken);
     }
 }`
+}
+
+function generateBaseRepository(model: Model): string {
+    return expandToStringWithNL`
+﻿using ${model.configuration?.name}.Domain.Common;
+
+namespace ${model.configuration?.name}.Domain.Interfaces
+{
+    public interface IBaseRepository<T> where T : BaseEntity
+    {
+        void Create(T entity);
+        void Update(T entity);
+        void Delete(T entity);
+        IQueryable<T> GetById(Guid id);
+        IQueryable<T> GetByEntityId(T entity);
+        IQueryable<T> GetAll();
+    }
+}
+`
 }
