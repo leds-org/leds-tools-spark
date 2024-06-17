@@ -1,7 +1,7 @@
 Configuration {
-    software_name: "Slave-One"
+    software_name: "SlaveOne"
     about: "Slave-one project example"
-    language: csharp-minimal-api
+    language: csharp-clean-architecture
 }
 
 module Main {

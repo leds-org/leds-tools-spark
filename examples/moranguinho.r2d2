@@ -1,7 +1,7 @@
 Configuration {
     software_name: "Morango"
     about: "Moranguinho!"
-    language: csharp-minimal-api
+    language: csharp-clean-architecture
 }
 
 module Moranguinho {
