@@ -1,8 +1,12 @@
 import { Model } from "../../../../../language/generated/ast.js"
-import { generate as projectGenerator} from "./project-generator.js"
+import fs from "fs"
+import { generate as CommonGenerator } from "./Common/generate.js"
 
 export function generate(model: Model, target_folder: string) : void {
     
-    projectGenerator(model, target_folder)
+    const common_folder = target_folder + "/Common"
 
+    fs.mkdirSync(common_folder, {recursive: true})
+
+    CommonGenerator(model, common_folder)
 }
