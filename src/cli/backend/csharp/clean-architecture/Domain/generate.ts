@@ -14,12 +14,14 @@ export function generate(model: Model, target_folder: string) : void {
     const enums_folder = target_folder + "/Enums"
     const interfaces_folder = target_folder + "/Interfaces"
     const validation_folder = target_folder + "/Validation"
+    const security_folder = target_folder + "/Security"
 
     fs.mkdirSync(common_folder, {recursive: true})
     fs.mkdirSync(entities_folder, {recursive: true})
     fs.mkdirSync(enums_folder, {recursive: true})
     fs.mkdirSync(interfaces_folder, {recursive: true})
     fs.mkdirSync(validation_folder, {recursive: true})
+    fs.mkdirSync(security_folder, {recursive: true})
 
     ProjectGenerator(model, target_folder)
     CommonGenerator(model, common_folder)
@@ -27,4 +29,5 @@ export function generate(model: Model, target_folder: string) : void {
     EnumGenerator(model, enums_folder);
     InterfaceGenerator(model, interfaces_folder)
     ValidationGenerator(model, validation_folder)
+    
 }

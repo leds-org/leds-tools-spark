@@ -2,6 +2,7 @@ import { expandToStringWithNL } from "langium/generate"
 import { LocalEntity, Model, isLocalEntity, isModule } from "../../../../../../language/generated/ast.js"
 import fs from "fs"
 import path from "path";
+import { generate as GenerateSecurity} from "./Security/generate.js"
 
 export function generate(model: Model, target_folder: string) : void {
 
@@ -23,6 +24,10 @@ export function generate(model: Model, target_folder: string) : void {
 
     fs.writeFileSync(path.join(target_folder,`IUnitOfWork.cs`), generateUnitOfWork(model))
     fs.writeFileSync(path.join(target_folder,`IBaseRepository.cs`), generateBaseRepository(model))
+
+    const security_folder = target_folder + "/Security"
+    fs.mkdirSync(security_folder, {recursive: true})
+    GenerateSecurity(model, security_folder)
 }
 
 function generateRepository(model: Model, cls: LocalEntity, package_name: string) : string {
