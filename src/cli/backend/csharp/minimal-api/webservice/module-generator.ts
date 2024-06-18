@@ -239,4 +239,4 @@ namespace ${package_name}
         }
     }
 }`
-  }
+}

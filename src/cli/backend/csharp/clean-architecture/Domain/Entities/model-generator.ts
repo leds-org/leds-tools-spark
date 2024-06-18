@@ -16,7 +16,7 @@ using System.Text.RegularExpressions;
     {
     ${external_relations.map(relation => `using ${package_name.replace(cls.$container.name,relation.tgt.$container.name)}.${relation.tgt.name};`).join('\n')}
     ${supertype ? generateImportSuperEntity(package_name, cls, supertype, importedEntities) : undefined}
-    public ${is_abstract? `abstract` : undefined} class ${cls.name} ${supertype ? `extends ${supertype.name}` : ''} {
+    public ${is_abstract? `abstract` : undefined} class ${cls.name} ${supertype ? `extends ${supertype.name}` : ': BaseEntity'} {
       ${cls.attributes.map(a => generateAttribute(a,is_abstract)).join('')}
       ${generateRelations(cls, relations)}
       ${generateEnum(cls)}
