@@ -6,6 +6,7 @@ import { generate as ProjectGenerator} from "./project-generator.js"
 import { generate as EnumGenerator } from "./Enums/generate.js"
 import { generate as InterfaceGenerator } from "./Interfaces/generate.js"
 import { generate as ValidationGenerator } from "./Validation/generate.js"
+import { generate as SecurityGenerator } from "./Security/generate.js"
 
 export function generate(model: Model, target_folder: string) : void {
     
@@ -29,5 +30,6 @@ export function generate(model: Model, target_folder: string) : void {
     EnumGenerator(model, enums_folder);
     InterfaceGenerator(model, interfaces_folder)
     ValidationGenerator(model, validation_folder)
+    SecurityGenerator(model, security_folder)
     
 }
