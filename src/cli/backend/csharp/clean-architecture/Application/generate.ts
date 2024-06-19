@@ -7,6 +7,7 @@ import { generate as DTOGenerator} from "./DTOs/generate.js"
 import { generate as InterfacesGenerator} from "./Interfaces/generate.js"
 import { generate as MappersGenerator} from "./Mappers/generate.js"
 import { generate as ConfigurationGenerator} from "./Configuration/generate.js"
+import { generate as SecurityGenerator} from "./Security/generate.js"
 
 export function generate(model: Model, target_folder: string) : void {
     
@@ -16,6 +17,7 @@ export function generate(model: Model, target_folder: string) : void {
     const Interfaces_Folder = target_folder + "/Interfaces"
     const Mappers_Folder = target_folder + "/Mappers"
     const Configuration_Folder = target_folder + "/Configuration"
+    const Security_Folder = target_folder + "/Security"
 
     fs.mkdirSync(Shared_folder, {recursive: true})
     fs.mkdirSync(Services_Folder, {recursive: true})
@@ -23,6 +25,7 @@ export function generate(model: Model, target_folder: string) : void {
     fs.mkdirSync(Interfaces_Folder, {recursive: true})
     fs.mkdirSync(Mappers_Folder, {recursive: true})
     fs.mkdirSync(Configuration_Folder, {recursive: true})
+    fs.mkdirSync(Security_Folder, {recursive: true})
 
     projectGenerator(model, target_folder)
     sharedGenerator(model, Shared_folder)   
@@ -31,5 +34,6 @@ export function generate(model: Model, target_folder: string) : void {
     InterfacesGenerator(model, Interfaces_Folder)
     MappersGenerator(model, Mappers_Folder)
     ConfigurationGenerator(model, Configuration_Folder)
+    SecurityGenerator(model, Security_Folder)
 
 }
