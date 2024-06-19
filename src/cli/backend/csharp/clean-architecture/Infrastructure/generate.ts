@@ -5,6 +5,7 @@ import { generate as GenerateMigrations } from "./Migrations/generate.js"
 import { generate as GenerateRepository } from  "./Repositories/generator.js"
 import { generate as GenerateEntitiesConfig } from "./EntitiesConfiguration/generate.js"
 import { generate as GenerateSecurity } from "./Security/generate.js"
+import { generate as generateServiceExtensions } from "./serviceextensions-generator.js"
 import fs from "fs"
 
 export function generate(model: Model, target_folder: string) : void {
@@ -27,5 +28,6 @@ export function generate(model: Model, target_folder: string) : void {
     GenerateRepository(model, repositories_folder)
     GenerateEntitiesConfig(model, entitiesconfig_folder)
     GenerateSecurity(model, security_folder)
+    generateServiceExtensions(model, target_folder)
 
 }
