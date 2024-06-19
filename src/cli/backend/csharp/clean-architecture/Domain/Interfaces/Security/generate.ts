@@ -12,7 +12,7 @@ export function generate(model: Model, target_folder: string) : void {
 
 function generateUserRepository(model: Model): string {
     return expandToStringWithNL`
-namespace ${model.configuration?.name}.Domain.Interfacies.Security
+namespace ${model.configuration?.name}.Domain.Interfaces.Security
 {
     public interface IUserRepository : IBaseSecurityRepository<User>
     {
@@ -30,7 +30,7 @@ function generateRoleRepository(model: Model): string {
     return expandToStringWithNL`
 using ${model.configuration?.name}.Domain.Security.Account.Entities;
 
-namespace ${model.configuration?.name}.Domain.Interfacies.Security
+namespace ${model.configuration?.name}.Domain.Interfaces.Security
 {
     public interface IRoleRepository : IBaseSecurityRepository<Role>
     {
@@ -44,7 +44,7 @@ function generateBaseSecurity(model: Model): string {
     return expandToStringWithNL`
 using ${model.configuration?.name}.Domain.Security.Shared.Entities;
 
-namespace ${model.configuration?.name}.Domain.Interfacies.Security
+namespace ${model.configuration?.name}.Domain.Interfaces.Security
 {
     public interface IBaseSecurityRepository<T> where T : Entity
     {

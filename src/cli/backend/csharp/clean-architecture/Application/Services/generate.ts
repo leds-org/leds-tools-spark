@@ -17,8 +17,7 @@ function generateService(model: Model, cls: LocalEntity) : string {
     return expandToStringWithNL`
 using AutoMapper;
 using MediatR;
-using ${model.configuration?.name}.Application.DTOs.Request;
-using ${model.configuration?.name}.Application.DTOs.Response;
+using ${model.configuration?.name}.Application.DTOs;
 using ${model.configuration?.name}.Application.Interfaces;
 using ${model.configuration?.name}.Application.ServiceWs;
 using ${model.configuration?.name}.Application.UseCase.${cls.name}Case.Create${cls.name};

@@ -6,6 +6,7 @@ import { generate as servicesGenerator} from "./Services/generate.js"
 import { generate as DTOGenerator} from "./DTOs/generate.js"
 import { generate as InterfacesGenerator} from "./Interfaces/generate.js"
 import { generate as MappersGenerator} from "./Mappers/generate.js"
+import { generate as ConfigurationGenerator} from "./Configuration/generate.js"
 
 export function generate(model: Model, target_folder: string) : void {
     
@@ -14,12 +15,14 @@ export function generate(model: Model, target_folder: string) : void {
     const DTOs_Folder = target_folder + "/DTOs"
     const Interfaces_Folder = target_folder + "/Interfaces"
     const Mappers_Folder = target_folder + "/Mappers"
+    const Configuration_Folder = target_folder + "/Configuration"
 
     fs.mkdirSync(Shared_folder, {recursive: true})
     fs.mkdirSync(Services_Folder, {recursive: true})
     fs.mkdirSync(DTOs_Folder, {recursive: true})
     fs.mkdirSync(Interfaces_Folder, {recursive: true})
     fs.mkdirSync(Mappers_Folder, {recursive: true})
+    fs.mkdirSync(Configuration_Folder, {recursive: true})
 
     projectGenerator(model, target_folder)
     sharedGenerator(model, Shared_folder)   
@@ -27,5 +30,6 @@ export function generate(model: Model, target_folder: string) : void {
     DTOGenerator(model, DTOs_Folder)
     InterfacesGenerator(model, Interfaces_Folder)
     MappersGenerator(model, Mappers_Folder)
+    ConfigurationGenerator(model, Configuration_Folder)
 
 }

@@ -10,9 +10,12 @@ export function generateModel(cls: LocalEntity, is_supertype: boolean, relations
   const external_relations = relations.filter(relation => relation.tgt.$container != cls.$container)
   return expandToStringWithNL`
 using ${package_name}.Domain.Common;
-using System.Text.RegularExpressions;
+using ${package_name}.Domain.Enums;
+using ${package_name}.Domain.Validation;
+using System.ComponentModel.DataAnnotations.Schema;
 
-  namespace ${package_name}
+
+  namespace ${package_name}.Domain.Entities
     {
     ${external_relations.map(relation => `using ${package_name.replace(cls.$container.name,relation.tgt.$container.name)}.${relation.tgt.name};`).join('\n')}
     ${supertype ? generateImportSuperEntity(package_name, cls, supertype, importedEntities) : undefined}

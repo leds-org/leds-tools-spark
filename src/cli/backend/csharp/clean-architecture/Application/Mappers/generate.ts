@@ -18,12 +18,11 @@ export function generate(model: Model, target_folder: string) : void {
 function generateMappers(model: Model, cls: LocalEntity) : string {
     return expandToString`
 using AutoMapper;
-using ${model.configuration?.name}.Application.DTOs.Request;
-using ${model.configuration?.name}.Application.DTOs.Response;
+using ${model.configuration?.name}.Application.DTOs.${cls.name};
 using ${model.configuration?.name}.Application.UseCase.${cls.name}Case.Create${cls.name};
 using ${model.configuration?.name}.Application.UseCase.${cls.name}Case.Delete${cls.name};
 using ${model.configuration?.name}.Application.UseCase.${cls.name}Case.Update${cls.name};
-using ${model.configuration?.name}.Domain.Entitites;
+using ${model.configuration?.name}.Domain.Entities;
 
 namespace ${model.configuration?.name}.Application.Mappers
 {

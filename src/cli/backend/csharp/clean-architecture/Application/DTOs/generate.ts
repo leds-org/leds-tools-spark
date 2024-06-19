@@ -41,7 +41,7 @@ function generateRequestDTO(model : Model, cls : LocalEntity, relations : Relati
 using ${model.configuration?.name}.Application.DTOs.${cls.name}.Response;
 using MediatR;
 
-namespace ${model.configuration?.name}.Application.DTOs.${cls.name}.Request
+namespace ${model.configuration?.name}.Application.DTOs.${cls.name}
 {
     public class ${cls.name}RequestDTO : IRequest<${cls.name}ResponseDTO>
     {
@@ -54,7 +54,7 @@ namespace ${model.configuration?.name}.Application.DTOs.${cls.name}.Request
 
 function generateResponseDTO(model : Model, cls : LocalEntity, relations: RelationInfo[]) : string {
     return expandToStringWithNL`
-namespace ${model.configuration?.name}.Application.DTOs.${cls.name}.Response
+namespace ${model.configuration?.name}.Application.DTOs.${cls.name}
 {
     public class ${cls.name}ResponseDTO : BaseDTO
     {
