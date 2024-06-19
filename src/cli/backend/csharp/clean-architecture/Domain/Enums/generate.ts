@@ -15,9 +15,11 @@ export function generate(model: Model, target_folder: string) {
 
 function createEnum(enumx:EnumX, package_name: string) : string {
     return expandToString`
-${package_name}.Domain.Enums
+namespace ${package_name}.Domain.Enums
+{
     public enum ${enumx.name} {
         ${enumx.attributes.map(a => `${a.name.toUpperCase()}` ).join(",\n")}
     }
+}
 `
 }
