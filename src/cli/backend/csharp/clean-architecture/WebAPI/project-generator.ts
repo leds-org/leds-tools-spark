@@ -11,7 +11,7 @@ export function generate(model: Model, target_folder: string) : void {
 
 function generateProjectsln(model: Model) : string {
     return expandToStringWithNL`
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
