@@ -31,7 +31,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ${model.configuration?.name}.Domain.Entities;
 
-namespace ${model.configuration?.name}.infrastructure.EntitiesConfiguration
+namespace ${model.configuration?.name}.Infrastructure.EntitiesConfiguration
 {
     public class ${cls.name}Configuration : IEntityTypeConfiguration<${cls.name}>
     {

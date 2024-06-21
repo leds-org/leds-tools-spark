@@ -14,7 +14,7 @@ function generateBaseSecurity(model: Model) : string {
     return expandToStringWithNL`
 using ${model.configuration?.name}.Domain.Interfaces.Security;
 using ${model.configuration?.name}.Domain.Security.Shared.Entities;
-using ${model.configuration?.name}.infrastructure.Context;
+using ${model.configuration?.name}.Infrastructure.Context;
 
 namespace ${model.configuration?.name}.infrastructure.Security.Repositories
 {

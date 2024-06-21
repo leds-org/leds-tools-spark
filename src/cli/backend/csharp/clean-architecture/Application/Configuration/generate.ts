@@ -31,7 +31,7 @@ using ${model.configuration?.name}.Application.Security.Services;
 using ${model.configuration?.name}.Application.Shared.Behavior;
 using System.Reflection;
 
-namespace ${model.configuration?.name}.Application.Services
+namespace ${model.configuration?.name}.Application.Configuration
 {
     public static class ServiceExtensions
     {
