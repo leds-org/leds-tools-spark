@@ -38,6 +38,7 @@ namespace ${model.configuration?.name}.Application.DTOs
 
 function generateRequestDTO(model : Model, cls : LocalEntity, relations : RelationInfo[]) : string {
     return expandToStringWithNL`
+using ${model.configuration?.name}.Domain.Enums;
 using ${model.configuration?.name}.Application.DTOs.Response;
 using MediatR;
 
@@ -54,6 +55,7 @@ namespace ${model.configuration?.name}.Application.DTOs.Request
 
 function generateResponseDTO(model : Model, cls : LocalEntity, relations: RelationInfo[]) : string {
     return expandToStringWithNL`
+using ${model.configuration?.name}.Domain.Enums;
 namespace ${model.configuration?.name}.Application.DTOs.Response
 {
     public class ${cls.name}ResponseDTO : BaseDTO

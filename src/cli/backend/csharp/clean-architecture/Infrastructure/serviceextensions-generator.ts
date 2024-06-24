@@ -40,7 +40,7 @@ function generateAddScoped(model: Model): string{
         const mod_classes = mod.elements.filter(isLocalEntity)
 
         for(const cls of mod_classes) {
-            addscopeds += `services.AddScoped<I${cls.name}, ${cls.name}>(); \n`
+            addscopeds += `services.AddScoped<I${cls.name}Repository, ${cls.name}Repository>(); \n`
         }
     }
     return addscopeds

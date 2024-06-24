@@ -26,6 +26,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using ${model.configuration?.name}.Application.Interfaces;
+using ${model.configuration?.name}.Application.Services;
 using ${model.configuration?.name}.Application.Security.Interfaces;
 using ${model.configuration?.name}.Application.Security.Services;
 using ${model.configuration?.name}.Application.Shared.Behavior;
