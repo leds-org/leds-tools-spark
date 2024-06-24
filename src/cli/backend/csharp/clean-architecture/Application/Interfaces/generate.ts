@@ -37,7 +37,7 @@ function generateService(model: Model, cls: LocalEntity) : string {
     return expandToString`
 using ${model.configuration?.name}.Application.DTOs.Request;
 using ${model.configuration?.name}.Application.DTOs.Response;
-using ${model.configuration?.name}.Domain.Entitites;
+using ${model.configuration?.name}.Domain.Entities;
 
 namespace ${model.configuration?.name}.Application.Interfaces
 {

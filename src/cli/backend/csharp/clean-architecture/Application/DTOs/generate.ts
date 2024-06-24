@@ -38,10 +38,10 @@ namespace ${model.configuration?.name}.Application.DTOs
 
 function generateRequestDTO(model : Model, cls : LocalEntity, relations : RelationInfo[]) : string {
     return expandToStringWithNL`
-using ${model.configuration?.name}.Application.DTOs.Request;
+using ${model.configuration?.name}.Application.DTOs.Response;
 using MediatR;
 
-namespace ${model.configuration?.name}.Application.DTOs.${cls.name}
+namespace ${model.configuration?.name}.Application.DTOs.Request
 {
     public class ${cls.name}RequestDTO : IRequest<${cls.name}ResponseDTO>
     {
