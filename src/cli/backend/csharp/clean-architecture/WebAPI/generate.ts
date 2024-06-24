@@ -16,12 +16,14 @@ export function generate(model: Model, target_folder: string) : void {
     const properties_folder = target_folder + "/Properties"
     const controllers_folder = target_folder + "/Controllers"
     const scripts_folder = target_folder + "/Scripts"
+    const logs_folder = target_folder + "/logs"
 
     fs.mkdirSync(config_folder, {recursive: true})
     fs.mkdirSync(extensions_folder, {recursive: true})
     fs.mkdirSync(controllers_folder, { recursive: true })
     fs.mkdirSync(properties_folder, { recursive: true })
     fs.mkdirSync(scripts_folder, { recursive: true })
+    fs.mkdirSync(logs_folder, { recursive: true })
 
     projectGenerator(model, target_folder)
     helperGenerator(model, target_folder)
