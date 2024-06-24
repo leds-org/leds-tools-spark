@@ -6,6 +6,7 @@ import { generate as configGenerator } from "./.config/generate.js"
 import { generate as extensionsGenerator } from "./Extensions/generate.js"
 import { generate as propertiesGenerator } from "./Properties/generate.js"
 import { generate as generateControllers } from "./Controllers/generate.js"
+import { generate as generateScripts } from "./Scripts/generate.js"
 import fs from "fs"
 
 export function generate(model: Model, target_folder: string) : void {
@@ -14,11 +15,13 @@ export function generate(model: Model, target_folder: string) : void {
     const extensions_folder = target_folder + "/Extensions"
     const properties_folder = target_folder + "/Properties"
     const controllers_folder = target_folder + "/Controllers"
+    const scripts_folder = target_folder + "/Scripts"
 
     fs.mkdirSync(config_folder, {recursive: true})
     fs.mkdirSync(extensions_folder, {recursive: true})
-    fs.mkdirSync(config_folder, { recursive: true })
+    fs.mkdirSync(controllers_folder, { recursive: true })
     fs.mkdirSync(properties_folder, { recursive: true })
+    fs.mkdirSync(scripts_folder, { recursive: true })
 
     projectGenerator(model, target_folder)
     helperGenerator(model, target_folder)
@@ -27,5 +30,6 @@ export function generate(model: Model, target_folder: string) : void {
     extensionsGenerator(model, extensions_folder)
     propertiesGenerator(model, properties_folder)
     generateControllers(model, controllers_folder)
+    generateScripts(model, scripts_folder)
 
 }
