@@ -151,6 +151,6 @@ function generateRelationsRequest(cls: LocalEntity, relations: RelationInfo[]) :
 
   function UpdateEnum(enumEntityAtribute: EnumEntityAtribute):string {
     return expandToString`
-    ${enumEntityAtribute.type.ref?.name} ${enumEntityAtribute.type.ref?.name.toLowerCase()}
+    ${enumEntityAtribute.type.ref?.name} ${enumEntityAtribute.type.ref?.name.toLowerCase()},
     `
   }

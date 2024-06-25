@@ -32,7 +32,7 @@ using ${model.configuration?.name}.Application.Security.Services;
 using ${model.configuration?.name}.Application.Shared.Behavior;
 using System.Reflection;
 
-namespace ${model.configuration?.name}.Application.Configuration
+namespace ${model.configuration?.name}.Application.Services
 {
     public static class ServiceExtensions
     {

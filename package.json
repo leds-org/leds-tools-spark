@@ -1,12 +1,23 @@
 {
     "name": "r2d2",
-    "description": "Please enter a brief description here",
-    "version": "0.0.1",
+    "description": "A code generator that speeds up development by creating code in Django, Java, and C#.",
+    "version": "0.0.3",
+    "icon": "images/icon.png",
+    "license": "Apache-2.0",
+    "author": {
+        "name": "LEDS-IFES",
+        "email": "ledsifes@gmail.com"
+    },
     "files": [
         "bin",
         "out",
         "src"
     ],
+    "publisher": "ledsifes",
+    "repository": {
+        "type": "git",
+        "url": "https://gitlab.com/ledsifes/tools/r2d2"
+    },
     "type": "module",
     "scripts": {
         "build": "tsc -b tsconfig.src.json && node esbuild.mjs",

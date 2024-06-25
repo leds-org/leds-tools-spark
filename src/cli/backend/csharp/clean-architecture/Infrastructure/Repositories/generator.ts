@@ -18,59 +18,57 @@ export function generate(model: Model, target_folder: string) : void {
 
 function generateBase (model: Model): string {
     return expandToStringWithNL`
+using Microsoft.EntityFrameworkCore;
 using ${model.configuration?.name}.Domain.Common;
 using ${model.configuration?.name}.Domain.Interfaces;
 using ${model.configuration?.name}.Infrastructure.Context;
-using Microsoft.EntityFrameworkCore;
 
 namespace ${model.configuration?.name}.Infrastructure.Repositories
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
     {
         protected readonly AppDbContext Context;
+
         public BaseRepository(AppDbContext context)
         {
             Context = context;
         }
 
-        public async Task Create(T entity)
+        public void Create(T entity)
         {
-            entity.Create();
-            await Context.AddAsync(entity);
+            entity.DateCreated = DateTimeOffset.UtcNow;
+            Context.Add(entity);
         }
 
-        public async Task Delete(T entity)
+        public void Update(T entity)
         {
-            entity.Delete();
-            Context.Remove(entity);
-        }
-
-        public async Task Update(T entity)
-        {
-            entity.Update();
+            entity.DateUpdated = DateTimeOffset.UtcNow;
             Context.Update(entity);
         }
 
-        public async Task<IQueryable<T>> GetAll()
+        public void Delete(T entity)
         {
-            return Context.Set<T>().ToList().AsQueryable();
+            entity.DateDeleted = DateTimeOffset.UtcNow;
+            Context.Remove(entity);
         }
 
-        public async Task<IQueryable<T>> GetByEntityId(T entity)
-        {
-            if (entity.Id.Equals(null)) return null;
-            return Context.Set<T>().Where(x => x.Id == entity.Id).AsNoTracking().AsQueryable();
-        }
-
-        public async Task<IQueryable<T>> GetById(Guid id)
+        public IQueryable<T> GetById(Guid id)
         {
             return Context.Set<T>().Where(x => x.Id == id).AsQueryable();
         }
 
+        public IQueryable<T> GetAll()
+        {
+            return Context.Set<T>().ToList().AsQueryable();
+        }
 
+        public IQueryable<T> GetByEntityId(T entity)
+        {
+            if (entity.Id.Equals(null)) return null;
+            return Context.Set<T>().Where(x => x.Id == entity.Id).AsNoTracking().AsQueryable();
+        }
     }
-}
-`
+}`
 }
 
 function generateUnitOfWork(model: Model) : string {

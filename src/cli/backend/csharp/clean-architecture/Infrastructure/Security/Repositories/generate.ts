@@ -16,7 +16,7 @@ using ${model.configuration?.name}.Domain.Interfaces.Security;
 using ${model.configuration?.name}.Domain.Security.Shared.Entities;
 using ${model.configuration?.name}.Infrastructure.Context;
 
-namespace ${model.configuration?.name}.infrastructure.Security.Repositories
+namespace ${model.configuration?.name}.Infrastructure.Security.Repositories
 {
     public class BaseSecurityRepository<T> : IBaseSecurityRepository<T> where T : Entity
     {
@@ -60,9 +60,9 @@ function generateRoleRepository(model: Model) : string {
 using Microsoft.EntityFrameworkCore;
 using ${model.configuration?.name}.Domain.Interfaces.Security;
 using ${model.configuration?.name}.Domain.Security.Account.Entities;
-using ${model.configuration?.name}.infrastructure.Context;
+using ${model.configuration?.name}.Infrastructure.Context;
 
-namespace ${model.configuration?.name}.infrastructure.Security.Repositories
+namespace ${model.configuration?.name}.Infrastructure.Security.Repositories
 {
     public class RoleRepository : BaseSecurityRepository<Role>, IRoleRepository
     {
@@ -83,11 +83,11 @@ namespace ${model.configuration?.name}.infrastructure.Security.Repositories
 function generateUserRepository(model : Model) : string {
     return expandToStringWithNL`
 using Microsoft.EntityFrameworkCore;
-using ${model.configuration?.name}.Domain.Interfacies.Security;
+using ${model.configuration?.name}.Domain.Interfaces.Security;
 using ${model.configuration?.name}.Domain.Security.Account.Entities;
-using ${model.configuration?.name}.infrastructure.Context;
+using ${model.configuration?.name}.Infrastructure.Context;
 
-namespace ${model.configuration?.name}.infrastructure.Security.Repositories
+namespace ${model.configuration?.name}.Infrastructure.Security.Repositories
 {
     public class UserRepository : BaseSecurityRepository<User>, IUserRepository
     {

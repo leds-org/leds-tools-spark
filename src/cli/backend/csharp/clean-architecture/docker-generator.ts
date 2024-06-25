@@ -11,36 +11,40 @@ export function generate(model: Model, target_folder: string) : void {
 }
 function generateDockerfile(model : Model) : string {
     return expandToStringWithNL`
-  
-  FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-  USER app
-  WORKDIR /app
-  EXPOSE 8080
-  EXPOSE 8081
-  
-  FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-  ARG BUILD_CONFIGURATION=Release
-  WORKDIR /src
-  COPY ["${model.configuration?.name}/${model.configuration?.name}.csproj", "${model.configuration?.name}/"]
-  RUN dotnet restore "./${model.configuration?.name}/${model.configuration?.name}.csproj"
-  COPY . .
-  WORKDIR "/src/${model.configuration?.name}"
-  RUN dotnet build "./${model.configuration?.name}.csproj" -c $BUILD_CONFIGURATION -o /app/build
-  
-  FROM build AS publish
-  ARG BUILD_CONFIGURATION=Release
-  RUN dotnet publish "./${model.configuration?.name}.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-  
-  FROM base AS final
-  WORKDIR /app
-  COPY --from=publish /app/publish .
-  ENTRYPOINT ["dotnet", "${model.configuration?.name}.dll"]`
-  }
+#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+USER app
+WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["${model.configuration?.name}/${model.configuration?.name}.WebAPI/${model.configuration?.name}.WebAPI.csproj", "${model.configuration?.name}/${model.configuration?.name}.WebAPI/"]
+COPY ["${model.configuration?.name}/${model.configuration?.name}.Application/${model.configuration?.name}.Application.csproj", "${model.configuration?.name}/${model.configuration?.name}.Application/"]
+COPY ["${model.configuration?.name}/${model.configuration?.name}.Domain/${model.configuration?.name}.Domain.csproj", "${model.configuration?.name}/${model.configuration?.name}.Domain/"]
+COPY ["${model.configuration?.name}/${model.configuration?.name}.Infrastructure/${model.configuration?.name}.Infrastructure.csproj", "${model.configuration?.name}/${model.configuration?.name}.Infrastructure/"]
+RUN dotnet restore "./${model.configuration?.name}/${model.configuration?.name}.WebAPI/${model.configuration?.name}.WebAPI.csproj"
+COPY . .
+WORKDIR "/src/${model.configuration?.name}/${model.configuration?.name}.WebAPI"
+RUN dotnet build "./${model.configuration?.name}.WebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./${model.configuration?.name}.WebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "${model.configuration?.name}.WebAPI.dll"]`
+}
 
   function generateDockerCompose(model: Model, target_folder: string): void {
     fs.writeFileSync(path.join(target_folder,'docker-compose.dcproj'), generatedockercomposedcproj(model));
     fs.writeFileSync(path.join(target_folder, 'docker-compose.yml'), generatedockercomposeyml(model));
-    fs.writeFileSync(path.join(target_folder, 'docker-compose.override.yml'), generateDockerComposeOverride());
+    fs.writeFileSync(path.join(target_folder, 'docker-compose.override.yml'), generateDockerComposeOverride(model));
   }
 
   function generatedockercomposedcproj(model: Model): string {
@@ -118,7 +122,7 @@ services:
   ${model.configuration?.name?.toLowerCase()}:
     build:
       context: .
-      dockerfile: ${model.configuration?.name}/Dockerfile
+      dockerfile: ${model.configuration?.name}/${model.configuration?.name}.WebAPI/Dockerfile
     networks:
       - backend
     ports:
@@ -143,12 +147,12 @@ function generateLaunchSettings(model: Model): string {
 }`
 }
 
-function generateDockerComposeOverride(): string{
+function generateDockerComposeOverride(model: Model): string{
   return expandToStringWithNL`
 version: '3.4'
 
 services:
-  morango:
+  ${model.configuration?.name?.toLowerCase()}:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080

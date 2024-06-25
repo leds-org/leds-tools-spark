@@ -19,6 +19,7 @@ function generateService(model: Model, cls: LocalEntity) : string {
     return expandToStringWithNL`
 using AutoMapper;
 using MediatR;
+using ${model.configuration?.name}.Application.DTOs;
 using ${model.configuration?.name}.Application.DTOs.Request;
 using ${model.configuration?.name}.Application.DTOs.Response;
 using ${model.configuration?.name}.Application.Interfaces;
@@ -28,6 +29,7 @@ using ${model.configuration?.name}.Application.UseCase.${cls.name}Case.Delete${c
 using ${model.configuration?.name}.Application.UseCase.${cls.name}Case.Update${cls.name};
 using ${model.configuration?.name}.Domain.Entities;
 using ${model.configuration?.name}.Domain.Interfaces;
+
 
 namespace ${model.configuration?.name}.Application.Services
 {
@@ -53,6 +55,7 @@ function generateBaseService(model: Model): string {
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
+using ${model.configuration?.name}.Application.DTOs;
 using ${model.configuration?.name}.Application.DTOs.Request;
 using ${model.configuration?.name}.Application.DTOs.Response;
 using ${model.configuration?.name}.Application.Interfaces;

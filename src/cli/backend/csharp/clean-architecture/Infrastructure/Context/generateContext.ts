@@ -29,7 +29,9 @@ namespace ${name}.Infrastructure.Context
         {
             modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
         }
-
+        
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; } = null!;
         ${generateDbSet(modules)}
     }
 }`

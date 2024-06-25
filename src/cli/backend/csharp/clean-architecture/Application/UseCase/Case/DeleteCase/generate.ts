@@ -22,7 +22,7 @@ namespace ${model.configuration?.name}.Application.UseCase.${cls.name}Case.Delet
 {
     public sealed class Delete${cls.name}Handler : DeleteHandler<I${cls.name}Repository, Delete${cls.name}Request, ${cls.name}ResponseDTO, ${cls.name}>
     {
-        public Delete${cls.name}tHandler(IUnitOfWork unitOfWork, I${cls.name}Repository repository, IMapper mapper) : base(unitOfWork, repository, mapper)
+        public Delete${cls.name}Handler(IUnitOfWork unitOfWork, I${cls.name}Repository repository, IMapper mapper) : base(unitOfWork, repository, mapper)
         {
         }
     }

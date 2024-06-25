@@ -1,5 +1,5 @@
 
-![Logo](https://ledsifes.gallerycdn.vsassets.io/extensions/ledsifes/r2d2/0.0.2/1713449929541/Microsoft.VisualStudio.Services.Icons.Default)
+![Logo](images/icon.png)
 
 # R2D2
 ### Gerador de código Backend, documentação e diagramas uml. Utilizando linguagem de programação própria feita em Langium, aqui explicaremos sua utilização e sintaxe.
@@ -11,7 +11,7 @@ Instale a extensão pelo [Visual Studio Marketplace](https://marketplace.visuals
 
 Para utilizar o R2D2, crie seu arquivo `.r2d2`, programe a estrutura desejada e depois clique com o botão direito e escolha o que você deseja gerar.
 
-![image](https://github-production-user-asset-6210df.s3.amazonaws.com/136522676/330921920-f7c1e85d-0a8c-4b96-bb19-007299249a72.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20240515%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20240515T183804Z&X-Amz-Expires=300&X-Amz-Signature=918628e7b12afd68c146435e3e53bab0e06825e6ab9d5d7b8c04b1754b068aaf&X-Amz-SignedHeaders=host&actor_id=136522676&key_id=0&repo_id=657693919)
+![Right Click Menu](images/right-click-R2D2.png)
 ## Componentes da linguagem
 
 ### Configuration:

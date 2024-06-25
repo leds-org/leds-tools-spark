@@ -37,7 +37,7 @@ namespace ${model.configuration?.name}.Infrastructure.EntitiesConfiguration
     {
         public void Configure(EntityTypeBuilder<${cls.name}> builder)
         {
-            ${generateRelations(mod, relation_maps)}
+            ${generateRelations(cls, relation_maps)}
         }
     }
 }
@@ -65,15 +65,12 @@ function getAttrsAndRelations(cls: LocalEntity, relation_map: Map<LocalEntity, R
   }
 }
 
-function generateRelations(mod : Module, relation_maps: Map<LocalEntity, RelationInfo[]>) : Generated {
+function generateRelations(cls : LocalEntity, relation_maps: Map<LocalEntity, RelationInfo[]>) : Generated {
     const node = new CompositeGeneratorNode()
-    for (const cls of mod.elements.filter(isLocalEntity)) {
-        const {relations} = getAttrsAndRelations(cls, relation_maps)
-
-        for(const rel of relations) {
-          node.append(generateRelation(cls, rel))
-          node.appendNewLine()
-        }
+    const {relations} = getAttrsAndRelations(cls, relation_maps)
+    for(const rel of relations) {
+      node.append(generateRelation(cls, rel))
+      node.appendNewLine()
         
     }
     return node
@@ -86,8 +83,8 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
         return ""
       } else {
         return expandToStringWithNL`
-            builder.Entity<${cls.name}>()
-                .HasOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
+            builder
+                .HasOne<${tgt.name}>(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${tgt.name}s) 
                 .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
                 .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name.toLowerCase()}Id);`
       }
@@ -96,8 +93,8 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
         return ""
       } else {
         return expandToStringWithNL`
-            builder.Entity<${cls.name}>()
-                .HasMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
+            builder
+                .HasMany<${tgt.name}>(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${tgt.name}s) 
                 .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
                 .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name.toLowerCase()}Id);`
       }
@@ -106,17 +103,16 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
         return ""
       } else {
         return expandToStringWithNL`
-            builder.Entity<${cls.name}>()
-                .HasMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
+            builder
+                .HasMany<${tgt.name}>(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${tgt.name}s) 
                 .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
                 .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name.toLowerCase()}Id);`
       }
     case "ManyToMany":
       if(owner) {
         return expandToStringWithNL`
-          builder.Entity<${cls.name}>()
-            .HasMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
-            .WithMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}s);`
+          builder
+            .HasMany<${tgt.name}>(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${tgt.name}s);`
       } else {
         return ""
       }

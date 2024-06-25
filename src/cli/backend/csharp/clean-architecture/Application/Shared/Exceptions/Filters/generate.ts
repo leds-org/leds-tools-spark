@@ -11,17 +11,11 @@ export function generate(model: Model, target_folder: string) : void {
 
 function generateBadExceptionFilter (model: Model): string {
     return expandToStringWithNL`
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using ${model.configuration?.name}.Domain.Validation;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.EntityFrameworkCore.Storage;
+using ${model.configuration?.name}.Domain.Validation;
+using System.Linq;
 
 namespace ${model.configuration?.name}.Application.Shared.Exceptions.Filters
 {
@@ -41,7 +35,7 @@ namespace ${model.configuration?.name}.Application.Shared.Exceptions.Filters
                 context.Result = result;
                 context.ExceptionHandled = true;
             }
-            else if (context.Exception is DomainValidationException domainValidationException)
+            else if (context.Exception is DomainExceptionValidation domainValidationException)
             {
                 var errors = domainValidationException.Message;
                 var result = new ObjectResult(new { Errors = errors })
