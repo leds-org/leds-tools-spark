@@ -13,9 +13,12 @@ function generateServiceExtensions(model: Model): string {
 using ${model.configuration?.name}.Domain.Interfaces;
 using ${model.configuration?.name}.Infrastructure.Context;
 using ${model.configuration?.name}.Infrastructure.Repositories;
+using ${model.configuration?.name}.Domain.Interfaces.Security;
+using ${model.configuration?.name}.Infrastructure.Security.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
 
 namespace ${model.configuration?.name}.Infrastructure
 {
@@ -27,6 +30,8 @@ namespace ${model.configuration?.name}.Infrastructure
             IServiceCollection serviceCollection = services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(connectionString, x => x.MigrationsAssembly("${model.configuration?.name}.Infrastructure")), ServiceLifetime.Scoped);
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
             ${generateAddScoped(model)}
         }
     }
