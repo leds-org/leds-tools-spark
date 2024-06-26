@@ -12,7 +12,7 @@ using ${model.configuration?.name}.WebApi.Controllers.Generics;
 
 namespace ${model.configuration?.name}.WebApi.Controllers.Command
 {
-    [Route("api/${cls.name}")]
+    [Route("api/${cls.name.toLowerCase()}")]
     [ApiController]
     public class ${cls.name}CommandController : CommandController<I${cls.name}Service, ${cls.name}RequestDTO, ${cls.name}ResponseDTO, ${cls.name}>
     {

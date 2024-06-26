@@ -9,19 +9,15 @@ export function generate(model: Model, target_folder: string) : void {
   const modules =  model.abstractElements.filter(isModule);
   const all_entities = modules.map(module => module.elements.filter(isLocalEntity)).flat()
   const relation_maps = processRelations(all_entities)
-
+  fs.writeFileSync(path.join(target_folder,`UserConfiguration.cs`), generateUserConfiguration(model))
+  fs.writeFileSync(path.join(target_folder,`RoleConfiguration.cs`), generateRoleConfiguration(model))
   for(const mod of modules) {
     
-    // const package_name      = `${mod.name}` 
     const mod_classes = mod.elements.filter(isLocalEntity)
 
     for(const cls of mod_classes) {
-      fs.writeFileSync(path.join(target_folder,`${cls.name}Repository.cs`), generateConfiguration(model, cls, mod, relation_maps))
+      fs.writeFileSync(path.join(target_folder,`${cls.name}Configuration.cs`), generateConfiguration(model, cls, mod, relation_maps))
     }
-
-    // for (const enumx of mod.elements.filter(isEnumX)){
-    //   fs.writeFileSync(path.join(MODULE_PATH,`${enumx.name}.cs`), generateEnum(enumx,package_name))
-    // }
   }
 }
 
@@ -118,3 +114,108 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
       }
     }
   }
+
+  function generateUserConfiguration(model: Model) : string {
+    return expandToStringWithNL`
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using ${model.configuration?.name}.Domain.Security.Account.Entities;
+
+
+namespace ${model.configuration?.name}.infrastructure.EntitiesConfiguration
+{
+    public class UserConfiguration : IEntityTypeConfiguration<User>
+    {
+        public void Configure(EntityTypeBuilder<User> builder)
+        {
+            builder.HasKey(x => x.Id);
+
+            builder.Property(x => x.Name)
+                .HasColumnName("Name")
+                .HasColumnType("NVARCHAR")
+                .HasMaxLength(100)
+                .IsRequired();
+
+            builder.Property(x => x.RefreshToken)
+                .HasColumnName("RefreshToken");
+
+            builder.OwnsOne(x => x.Email)
+               .Property(x => x.Address)
+               .HasColumnName("Email")
+               .IsRequired(true);
+
+            builder.OwnsOne(x => x.Email)
+                .OwnsOne(x => x.Verification)
+                .Property(x => x.Code)
+                .HasColumnName("EmailVerificationCode")
+                .IsRequired(true);
+
+            builder.OwnsOne(x => x.Email)
+                .OwnsOne(x => x.Verification)
+                .Property(x => x.ExpiresAt)
+                .HasColumnName("EmailVerificationExpiresAt")
+                .IsRequired(false);
+
+            builder.OwnsOne(x => x.Email)
+                .OwnsOne(x => x.Verification)
+                .Property(x => x.VerifiedAt)
+                .HasColumnName("EmailVerificationVerifiedAt")
+                .IsRequired(false);
+
+            builder.OwnsOne(x => x.Email)
+                .OwnsOne(x => x.Verification)
+                .Ignore(x => x.IsActive);
+
+            builder.OwnsOne(x => x.Password)
+                .Property(x => x.Hash)
+                .HasColumnName("PasswordHash")
+                .IsRequired();
+
+            builder.OwnsOne(x => x.Password)
+                .Property(x => x.ResetCode)
+                .HasColumnName("PasswordResetCode")
+                .IsRequired();
+
+            builder
+                .HasMany(x => x.Roles)
+                .WithMany(x => x.Users)
+                .UsingEntity<Dictionary<string, object>>(
+                    "UserRole",
+                    role => role
+                        .HasOne<Role>()
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade),
+                    user => user
+                        .HasOne<User>()
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade));
+        }
+    }
+}
+`
+}
+
+function generateRoleConfiguration(model: Model) : string {
+  return expandToStringWithNL`
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using ${model.configuration?.name}.Domain.Security.Account.Entities;
+
+namespace ${model.configuration?.name}.infrastructure.EntitiesConfiguration
+{
+    public class RoleConfiguration : IEntityTypeConfiguration<Role>
+    {
+        public void Configure(EntityTypeBuilder<Role> builder)
+        {
+            builder.HasKey(x => x.Id);
+            builder.Property(x => x.Name)
+                .HasColumnName("Name")
+                .HasColumnType("NVARCHAR")
+                .HasMaxLength(120)
+                .IsRequired(true);
+        }
+    }
+}`
+}

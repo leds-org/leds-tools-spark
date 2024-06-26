@@ -149,6 +149,7 @@ static void CreateDatabase(WebApplication app)
     var serviceScope = app.Services.CreateScope();
     var dataContext = serviceScope.ServiceProvider.GetService<AppDbContext>();
         dataContext?.Database.EnsureCreated();
+        dataContext?.Database.Migrate();
     // Carga no banco de dados
     //var sqlFile = "./Scripts/inserts.sql";
     //var sql = File.ReadAllText(sqlFile);

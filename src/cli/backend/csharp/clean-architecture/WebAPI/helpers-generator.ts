@@ -16,7 +16,7 @@ function generateAppSettings () : string {
     return expandToString`
 {
   "ConnectionStrings": {
-    "SqlServer": ""
+    "SqlServer": "Server=sqlserver;Database=master;User Id=sa;Password=Senha@123;TrustServerCertificate=true;"
   },
   "Secrets": {
     "ApiKey": "",
