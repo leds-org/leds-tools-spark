@@ -71,7 +71,7 @@ function slicer(cls: LocalEntity, relations: RelationInfo[]): string {
 
 function generateAttribute(attribute:Attribute): string{
     return expandToString`
-    ${generateTypeAttribute(attribute) ?? 'NOTYPE'} ${capitalizeString(attribute.name)},
+    ${generateTypeAttribute(attribute) ?? 'NOTYPE'}? ${capitalizeString(attribute.name)},
     `
 }
 

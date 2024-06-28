@@ -8,6 +8,9 @@ export function generateModel(cls: LocalEntity, is_supertype: boolean, relations
   const is_abstract = cls?.is_abstract
 
   const external_relations = relations.filter(relation => relation.tgt.$container != cls.$container)
+
+  const AttParameters = cls.attributes.map(a => generateAttParameters(a,is_abstract))
+  const AttSendParameters = cls.attributes.map(a => generateAttSendParameters(a,is_abstract))
   return expandToStringWithNL`
 using ${package_name}.Domain.Common;
 using ${package_name}.Domain.Enums;
@@ -24,6 +27,25 @@ using System.ComponentModel.DataAnnotations.Schema;
       ${generateRelations(cls, relations)}
       ${generateEnum(cls)}
 
+    public ${cls.name}()
+        {
+        }
+    public ${cls.name}(${AttParameters})
+        {
+            ValidateDomain(${AttSendParameters});
+        }
+
+
+        public void Update(${cls.name} ${cls.name.toLowerCase()})
+        {
+            ValidateDomain(${cls.attributes.map(a => generateAttSendClassParameters(cls,a,is_abstract))});
+            Id = ${cls.name.toLowerCase()}.Id;
+        }
+
+        private void ValidateDomain(${AttParameters})
+        {
+        ${cls.attributes.map(a => generateSetAtt(a,is_abstract)).join('\n')}
+        }
     }
     }
   `
@@ -51,6 +73,26 @@ function generateAttribute(attribute:Attribute, is_abstract:Boolean): Generated{
   return expandToString`
   ${generateUniqueCollumn(attribute)}
   ${is_abstract? `protected`: `public`} ${toString(generateTypeAttribute(attribute) ?? 'NOTYPE')}? ${capitalizeString(attribute.name)} { get; set; }`
+}
+
+function generateAttParameters(attribute:Attribute, is_abstract:Boolean): Generated{
+  return expandToString`
+${toString(generateTypeAttribute(attribute) ?? 'NOTYPE')}? ${attribute.name.toLowerCase()}`
+}
+
+function generateAttSendParameters(attribute:Attribute, is_abstract:Boolean): Generated{
+  return expandToString`
+${attribute.name.toLowerCase()}`
+}
+
+function generateAttSendClassParameters(cls: LocalEntity, attribute:Attribute, is_abstract:Boolean): Generated{
+  return expandToString`
+${cls.name.toLowerCase()}.${capitalizeString(attribute.name)}`
+}
+
+function generateSetAtt(attribute:Attribute, is_abstract:Boolean): Generated{
+  return expandToString`
+${attribute.name} = ${attribute.name.toLowerCase()};`
 }
 
 function generateUniqueCollumn(attribute: Attribute): Generated{
