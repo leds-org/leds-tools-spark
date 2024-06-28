@@ -122,7 +122,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ${model.configuration?.name}.Domain.Security.Account.Entities;
 
 
-namespace ${model.configuration?.name}.infrastructure.EntitiesConfiguration
+namespace ${model.configuration?.name}.Infrastructure.EntitiesConfiguration
 {
     public class UserConfiguration : IEntityTypeConfiguration<User>
     {
@@ -203,7 +203,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ${model.configuration?.name}.Domain.Security.Account.Entities;
 
-namespace ${model.configuration?.name}.infrastructure.EntitiesConfiguration
+namespace ${model.configuration?.name}.Infrastructure.EntitiesConfiguration
 {
     public class RoleConfiguration : IEntityTypeConfiguration<Role>
     {

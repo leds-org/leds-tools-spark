@@ -26,7 +26,7 @@ namespace ${model.configuration?.name}.Infrastructure
     {
         public static void ConfigurePersistenceApp(this IServiceCollection services, IConfiguration configuration)
         {
-            var connectionString = configuration.GetConnectionString("SqlServer");
+            var connectionString = Environment.GetEnvironmentVariable("SqlServer");
             IServiceCollection serviceCollection = services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(connectionString, x => x.MigrationsAssembly("${model.configuration?.name}.Infrastructure")), ServiceLifetime.Scoped);
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();

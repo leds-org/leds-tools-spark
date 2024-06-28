@@ -61,11 +61,7 @@ namespace ${model.configuration?.name}.Application.Security.Account.UseCases.Cre
             {
                 email = new Email(request.Email);
                 password = new Password(request.Password);
-
-                Role role = await _roleRepository.GetRoleByName("Coordenador", cancelationToken);
-
                 user = new User(request.Name, email, password);
-                user.addRole(role);
             }
             catch (Exception ex)
             {

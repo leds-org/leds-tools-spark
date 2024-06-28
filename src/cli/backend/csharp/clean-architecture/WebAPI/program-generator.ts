@@ -105,12 +105,6 @@ builder.Services.AddSwaggerGen(options =>
     options.CustomSchemaIds(type => type.ToString());
 });
 
-//descomente para utilizar a requisio baseada na Role do User
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("Coordenador", policy => policy.RequireRole("Coordenador"));
-});
-
 #region Adio das configuraes definidas no Builder Extension
 builder.AddConfiguration();
 builder.AddJwtAuthentication();
@@ -135,9 +129,7 @@ app.UseAuthorization();
 
 //app.UseRouting();
 app.MapAccountEndpoints();
-//descomente para utilizar a requisio baseada na Role do User
-app.MapControllers().RequireAuthorization("Coordenador");
-//app.MapControllers().RequireAuthorization();
+app.MapControllers().RequireAuthorization();
 //app.MapControllers();
 
 app.Run();

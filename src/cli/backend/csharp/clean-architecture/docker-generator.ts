@@ -110,7 +110,7 @@ networks:
   backend:
 services:
   sqlserver:
-    container_name: sqlserver  
+    container_name: sqlserver
     image: mcr.microsoft.com/mssql/server
     environment:
       - ACCEPT_EULA=Y
@@ -119,6 +119,7 @@ services:
       - backend
     ports:
       - "1433:1433"
+
   ${model.configuration?.name?.toLowerCase()}:
     build:
       context: .
@@ -129,7 +130,14 @@ services:
       - "8080:8080"
       - "8081:8081"
     depends_on:
-      - sqlserver`
+      - sqlserver
+    environment:
+      SqlServer: "Server=sqlserver,1433;Database=${model.configuration?.name?.toLowerCase()};User ID=sa;Password=Senha@123;Trusted_Connection=False;TrustServerCertificate=True;"
+      ApiKey: ""
+      JwtPrivateKey: ""
+      PasswordSaltKey: ""
+      DefaultFromEmail: ""
+      EmailApiKey: ""`
 }
 
 function generateLaunchSettings(model: Model): string {
