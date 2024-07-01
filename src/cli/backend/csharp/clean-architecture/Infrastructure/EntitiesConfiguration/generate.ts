@@ -82,7 +82,7 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
             builder
                 .HasOne<${tgt.name}>(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${tgt.name}s) 
                 .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
-                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name.toLowerCase()}Id);`
+                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name}Id);`
       }
     case "OneToMany":
       if(owner) {
@@ -92,7 +92,7 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
             builder
                 .HasMany<${tgt.name}>(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${tgt.name}s) 
                 .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
-                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name.toLowerCase()}Id);`
+                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name}Id);`
       }
     case "ManyToOne":
       if(owner) {
@@ -102,7 +102,7 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
             builder
                 .HasMany<${tgt.name}>(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${tgt.name}s) 
                 .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
-                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name.toLowerCase()}Id);`
+                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name}Id);`
       }
     case "ManyToMany":
       if(owner) {

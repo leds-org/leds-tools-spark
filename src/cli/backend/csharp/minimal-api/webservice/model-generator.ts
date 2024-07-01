@@ -126,6 +126,9 @@ function generateTypeAttribute(attribute:Attribute): Generated{
   if (attribute.type.toString().toLowerCase() === "phonenumber"){
     return "String"
   }
+  if (attribute.type.toString().toLowerCase() === "integer"){
+    return "int"
+  }
   return attribute.type
 
 }

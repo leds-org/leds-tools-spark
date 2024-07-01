@@ -9,8 +9,13 @@ export function generateModel(cls: LocalEntity, is_supertype: boolean, relations
 
   const external_relations = relations.filter(relation => relation.tgt.$container != cls.$container)
 
-  const AttParameters = cls.attributes.map(a => generateAttParameters(a,is_abstract))
-  const AttSendParameters = cls.attributes.map(a => generateAttSendParameters(a,is_abstract))
+  let AttParameters = `${cls.attributes.map(a => generateAttParameters(a,is_abstract))}, ${generateRelationsParameter(cls, relations)} ${generateEnumParameter(cls)}`
+  AttParameters = AttParameters.slice(0, AttParameters.lastIndexOf(','))
+  let AttSendParameters = `${cls.attributes.map(a => generateAttSendParameters(a,is_abstract))}, ${generateRelationsSendParameter(cls, relations)} ${generateEnumSendParameter(cls)}`
+  AttSendParameters = AttSendParameters.slice(0, AttSendParameters.lastIndexOf(','))
+  let AttClassParameters = `${cls.attributes.map(a => generateAttSendClassParameters(cls,a,is_abstract))}, ${generateRelationsSendClass(cls, relations)} ${generateEnumSendClass(cls)}`
+  AttClassParameters = AttClassParameters.slice(0, AttClassParameters.lastIndexOf(','))
+
   return expandToStringWithNL`
 using ${package_name}.Domain.Common;
 using ${package_name}.Domain.Enums;
@@ -38,13 +43,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 
         public void Update(${cls.name} ${cls.name.toLowerCase()})
         {
-            ValidateDomain(${cls.attributes.map(a => generateAttSendClassParameters(cls,a,is_abstract))});
+            ValidateDomain(${AttClassParameters});
             Id = ${cls.name.toLowerCase()}.Id;
         }
 
         private void ValidateDomain(${AttParameters})
         {
         ${cls.attributes.map(a => generateSetAtt(a,is_abstract)).join('\n')}
+        ${generateSetRelations(cls, relations)}
+        ${generateSetEnum(cls)}
         }
     }
     }
@@ -92,7 +99,7 @@ ${cls.name.toLowerCase()}.${capitalizeString(attribute.name)}`
 
 function generateSetAtt(attribute:Attribute, is_abstract:Boolean): Generated{
   return expandToString`
-${attribute.name} = ${attribute.name.toLowerCase()};`
+${capitalizeString(attribute.name)} = ${attribute.name.toLowerCase()};`
 }
 
 function generateUniqueCollumn(attribute: Attribute): Generated{
@@ -125,6 +132,9 @@ function generateTypeAttribute(attribute:Attribute): Generated{
   if (attribute.type.toString().toLowerCase() === "phonenumber"){
     return "String"
   }
+  if (attribute.type.toString().toLowerCase() === "integer"){
+    return "int"
+  }
   return attribute.type
 
 }
@@ -146,7 +156,7 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
     if(owner) {
       return expandToStringWithNL`
         //OneToOne
-        public Guid? ${tgt.name.toLowerCase()}Id {get; set; }
+        public Guid? ${tgt.name}Id {get; set; }
         public ${tgt.name}? ${tgt.name} { get; set; }
       `
     } else {
@@ -166,7 +176,7 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
       return expandToStringWithNL`
         //ManyToOne
         public ${tgt.name}? ${tgt.name} { get; set; }
-        public Guid? ${tgt.name.toLowerCase()}Id {get; set; }
+        public Guid? ${tgt.name}Id {get; set; }
       `
     } else {
       return ''
@@ -187,12 +197,212 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
 
 function createEnum(enumEntityAtribute: EnumEntityAtribute):string {
   return expandToString`
-  public ${enumEntityAtribute.type.ref?.name} ${enumEntityAtribute.type.ref?.name.toLowerCase()} { get; set; }
+  public ${enumEntityAtribute.type.ref?.name} ${enumEntityAtribute.type.ref?.name} { get; set; }
   `
 }
 
 function generateEnum (cls: LocalEntity):string {
   return expandToStringWithNL`
   ${cls.enumentityatributes.map(enumEntityAtribute =>createEnum(enumEntityAtribute)).join("\n")}
+  `
+}
+
+function generateRelationsParameter(cls: LocalEntity, relations: RelationInfo[]) : Generated {
+  
+  let node = ""
+
+  for(const rel of relations) {
+    node += generateRelationParameterText(cls, rel)
+  }
+  return node
+}
+
+
+function generateRelationParameterText(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : Generated {
+  switch(card) {
+  case "OneToOne":
+    if(owner) {
+      return expandToString`Guid? ${tgt.name.toLowerCase()}Id,`
+    } else {
+      return expandToString``
+    }
+  case "OneToMany":
+    if(owner) {
+      return ''
+    } else {
+      return expandToString`ICollection<${tgt.name}>? ${tgt.name.toLowerCase()}s,`
+    }
+  case "ManyToOne":
+    if(owner) {
+      return expandToString`Guid? ${tgt.name.toLowerCase()}Id,`
+    } else {
+      return ''
+    }
+  case "ManyToMany":
+    if(owner) {
+      return expandToString`ICollection<${tgt.name}>? ${tgt.name.toLowerCase()}s,`
+    } else {
+      return expandToString``
+    }
+  }
+}
+
+function generateEnumParameter (cls: LocalEntity):string {
+  return expandToString`${cls.enumentityatributes.map(enumEntityAtribute =>createEnumParameter(enumEntityAtribute))}`
+}
+
+function createEnumParameter(enumEntityAtribute: EnumEntityAtribute):string {
+  return expandToString`${enumEntityAtribute.type.ref?.name} ${enumEntityAtribute.type.ref?.name.toLowerCase()},`
+}
+
+function generateRelationsSendParameter(cls: LocalEntity, relations: RelationInfo[]) : Generated {
+  
+  let node = ""
+
+  for(const rel of relations) {
+    node += generateRelationSendParameterText(cls, rel)
+  }
+  return node
+}
+
+
+function generateRelationSendParameterText(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : Generated {
+  switch(card) {
+  case "OneToOne":
+    if(owner) {
+      return expandToString`${tgt.name.toLowerCase()}Id,`
+    } else {
+      return expandToString``
+    }
+  case "OneToMany":
+    if(owner) {
+      return ''
+    } else {
+      return expandToString`${tgt.name}s,`
+    }
+  case "ManyToOne":
+    if(owner) {
+      return expandToString`${tgt.name.toLowerCase()}Id,`
+    } else {
+      return ''
+    }
+  case "ManyToMany":
+    if(owner) {
+      return expandToString`${tgt.name}s,`
+    } else {
+      return expandToString``
+    }
+  }
+}
+
+function generateEnumSendParameter (cls: LocalEntity):string {
+  return expandToString`${cls.enumentityatributes.map(enumEntityAtribute =>createEnumSendParameter(enumEntityAtribute))}`
+}
+
+function createEnumSendParameter(enumEntityAtribute: EnumEntityAtribute):string {
+  return expandToString`${enumEntityAtribute.type.ref?.name.toLowerCase()},`
+}
+
+function generateRelationsSendClass(cls: LocalEntity, relations: RelationInfo[]) : Generated {
+  
+  let node = ""
+
+  for(const rel of relations) {
+    node += generateRelationSendClassText(cls, rel)
+  }
+  return node
+}
+
+
+function generateRelationSendClassText(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : Generated {
+  switch(card) {
+  case "OneToOne":
+    if(owner) {
+      return expandToString`${cls.name.toLowerCase()}.${tgt.name}Id,`
+    } else {
+      return expandToString``
+    }
+  case "OneToMany":
+    if(owner) {
+      return ''
+    } else {
+      return expandToString`${cls.name.toLowerCase()}.${tgt.name}s,`
+    }
+  case "ManyToOne":
+    if(owner) {
+      return expandToString`${cls.name.toLowerCase()}.${tgt.name}Id,`
+    } else {
+      return ''
+    }
+  case "ManyToMany":
+    if(owner) {
+      return expandToString`${cls.name.toLowerCase()}.${tgt.name}s,`
+    } else {
+      return expandToString``
+    }
+  }
+}
+
+function generateEnumSendClass (cls: LocalEntity):string {
+  return expandToString`${cls.enumentityatributes.map(enumEntityAtribute =>createEnumSendClass(cls, enumEntityAtribute))}`
+}
+
+function createEnumSendClass(cls: LocalEntity, enumEntityAtribute: EnumEntityAtribute):string {
+  return expandToString`${cls.name.toLowerCase()}.${enumEntityAtribute.type.ref?.name},`
+}
+
+function generateSetRelations(cls: LocalEntity, relations: RelationInfo[]) : Generated {
+  
+  const node = new CompositeGeneratorNode()
+
+  for(const rel of relations) {
+    node.append(generateSetRelation(cls, rel))
+    node.appendNewLine()
+  }
+  return node
+}
+
+function generateSetRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : Generated {
+  switch(card) {
+  case "OneToOne":
+    if(owner) {
+      return expandToStringWithNL`${tgt.name.toLowerCase()}Id = ${tgt.name.toLowerCase()}Id;`
+    } else {
+      return expandToString``
+    }
+  case "OneToMany":
+    if(owner) {
+      return ''
+    } else {
+      return expandToStringWithNL`${tgt.name}s = ${tgt.name.toLowerCase()}s;`
+    }
+  case "ManyToOne":
+    if(owner) {
+      return expandToStringWithNL`
+        ${tgt.name}Id = ${tgt.name.toLowerCase()}Id;
+      `
+    } else {
+      return ''
+    }
+  case "ManyToMany":
+    if(owner) {
+      return expandToStringWithNL`
+        ${tgt.name}s = ${tgt.name.toLowerCase()}s;
+      `
+    } else {
+      return ""
+    }
+  }
+}
+
+function createSetEnum(enumEntityAtribute: EnumEntityAtribute):string {
+  return expandToString`
+  ${enumEntityAtribute.type.ref?.name} = ${enumEntityAtribute.type.ref?.name.toLowerCase()};
+  `
+}
+
+function generateSetEnum (cls: LocalEntity):string {
+  return expandToStringWithNL`
+  ${cls.enumentityatributes.map(enumEntityAtribute =>createSetEnum(enumEntityAtribute)).join("\n")}
   `
 }

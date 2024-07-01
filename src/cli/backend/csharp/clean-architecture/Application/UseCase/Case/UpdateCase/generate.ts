@@ -98,6 +98,9 @@ function generateTypeAttribute(attribute:Attribute): string | undefined {
     if (attribute.type.toString().toLowerCase() === "phonenumber"){
         return "String"
     }
+    if (attribute.type.toString().toLowerCase() === "integer"){
+      return "int"
+    }
     return attribute.type
 
 }

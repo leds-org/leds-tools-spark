@@ -98,6 +98,9 @@ function generateTypeAttribute(attribute:Attribute): string | undefined {
     if (attribute.type.toString().toLowerCase() === "phonenumber"){
         return "String"
     }
+    if (attribute.type.toString().toLowerCase() === "integer"){
+      return "int"
+    }
     return attribute.type
 
 }
@@ -117,7 +120,7 @@ function generateRelationsRequest(cls: LocalEntity, relations: RelationInfo[]) :
     case "OneToOne":
       if(owner) {
         return expandToString`
-            Guid ${tgt.name.toLowerCase()},`
+            Guid ${tgt.name.toLowerCase()}Id,`
       } else {
         return ''
       }
@@ -130,7 +133,7 @@ function generateRelationsRequest(cls: LocalEntity, relations: RelationInfo[]) :
     case "ManyToOne":
       if(owner) {
         return expandToString`
-            Guid ${tgt.name.toLowerCase()},`
+            Guid ${tgt.name.toLowerCase()}Id,`
       } else {
         return ''
       }
