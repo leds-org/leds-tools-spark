@@ -188,9 +188,7 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
         public ICollection<${tgt.name}>? ${tgt.name}s { get; set;}
       `
     } else {
-      return expandToStringWithNL`
-        public ICollection<${tgt.name}>? ${tgt.name}s { get; set;}
-      `
+      return ""
     }
   }
 }
