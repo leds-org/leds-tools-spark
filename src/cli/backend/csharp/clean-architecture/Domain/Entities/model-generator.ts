@@ -37,22 +37,28 @@ using System.ComponentModel.DataAnnotations.Schema;
         }
     public ${cls.name}(${AttParameters})
         {
-            ValidateDomain(${AttSendParameters});
+          
+          var validationErrors = ${cls.name}Validation(${AttSendParameters});
+
+          if (validationErrors.Count > 0)
+            {
+              throw new DomainValidationException(validationErrors);
+            }
+            
+          ${cls.attributes.map(a => generateSetAtt(a,is_abstract)).join('\n')}
+          ${generateSetRelations(cls, relations)}
+          ${generateSetEnum(cls)}
+
         }
 
+    private List<string>${cls.name}Validation(${AttParameters})
+      {
+        var errors = new List<string>();
 
-        public void Update(${cls.name} ${cls.name.toLowerCase()})
-        {
-            ValidateDomain(${AttClassParameters});
-            Id = ${cls.name.toLowerCase()}.Id;
-        }
+        // Validations
 
-        private void ValidateDomain(${AttParameters})
-        {
-        ${cls.attributes.map(a => generateSetAtt(a,is_abstract)).join('\n')}
-        ${generateSetRelations(cls, relations)}
-        ${generateSetEnum(cls)}
-        }
+        return errors;
+      }
     }
     }
   `

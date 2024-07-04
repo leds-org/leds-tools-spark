@@ -12,16 +12,19 @@ function generateDomainException(model: Model): string {
     return expandToStringWithNL`
 namespace ${model.configuration?.name}.Domain.Validation
 {
-    public class DomainExceptionValidation : Exception
+    public class DomainValidationException : Exception
     {
-        public DomainExceptionValidation(string error) : base(error) { }
+        public List<string> Errors { get; }
 
-        public static void When(bool hasError, string error)
+        public DomainValidationException(List<string> validationsErrors)
         {
-            if (hasError)
-                throw new DomainExceptionValidation(error);
+            Errors = validationsErrors;
+        }
+
+        public override string ToString()
+        {
+            return string.Join(Environment.NewLine, Errors);
         }
     }
-}
-`
+}`
 }
