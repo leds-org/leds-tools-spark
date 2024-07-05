@@ -7,23 +7,25 @@ import { RelationInfo } from "../../../../../../../util/relations.js";
 
 export function generate(model: Model, target_folder: string, cls: LocalEntity, relations: RelationInfo[]) : void {
     fs.writeFileSync(path.join(target_folder,`Create${cls.name}Handler.cs`), generateHandler(model, cls))
-    fs.writeFileSync(path.join(target_folder,`Create${cls.name}Request.cs`), generateRequest(model, cls, relations))
+    fs.writeFileSync(path.join(target_folder,`Create${cls.name}Command.cs`), generateCommand(model, cls, relations))
     fs.writeFileSync(path.join(target_folder,`Create${cls.name}Validator.cs`), generateValidator(model, cls))
 }
 
 function generateHandler (model: Model, cls: LocalEntity): string {
     return expandToString`
 using AutoMapper;
-using ${model.configuration?.name}.Application.DTOs.Response;
+using ${model.configuration?.name}.Application.DTOs.Entities.Request;
+using ${model.configuration?.name}.Application.DTOs.Entities.Response;
+using ${model.configuration?.name}.Application.Interfaces.Entities;
 using ${model.configuration?.name}.Application.UseCase.BaseCase;
 using ${model.configuration?.name}.Domain.Entities;
-using ${model.configuration?.name}.Domain.Interfaces;
+using ${model.configuration?.name}.Domain.Interfaces.Common;
 
-namespace ${model.configuration?.name}.Application.UseCase.${cls.name}Case.Create${cls.name}
+namespace ${model.configuration?.name}.Application.UseCase.Entities.${cls.name}Case.Create
 {
-    public class Create${cls.name}Handler : CreateHandler<I${cls.name}Repository, Create${cls.name}Request, ${cls.name}ResponseDTO, ${cls.name}>
+    public class Create${cls.name}Handler : CreateHandler<I${cls.name}Service, Create${cls.name}Command, ${cls.name}RequestDTO, ${cls.name}ResponseDTO, ${cls.name}>
     {
-        public Create${cls.name}Handler(IUnitOfWork unitOfWork, I${cls.name}Repository repository, IMapper mapper) : base(unitOfWork, repository, mapper)
+        public Create${cls.name}Handler(IUnitOfWork unitOfWork, I${cls.name}Service service, IMapper mapper) : base(unitOfWork, service, mapper)
         {
         }
     }
@@ -34,32 +36,31 @@ function generateValidator (model: Model, cls: LocalEntity): string {
     return expandToString`
 using FluentValidation;
 
-namespace ${model.configuration?.name}.Application.UseCase.${cls.name}Case.Create${cls.name}
+namespace ${model.configuration?.name}.Application.UseCase.Entities.${cls.name}Case.Create
 {
-    public class Create${cls.name}Validator : AbstractValidator<Create${cls.name}Request>
+    public class Create${cls.name}Validator : AbstractValidator<Create${cls.name}Command>
     {
         public Create${cls.name}Validator()
         {
-
         }
     }
 }`
 }
 
-function generateRequest (model: Model, cls: LocalEntity, relations : RelationInfo[]): string {
+function generateCommand (model: Model, cls: LocalEntity, relations : RelationInfo[]): string {
     return expandToString`
+using ${model.configuration?.name}.Application.DTOs.Common;
 using MediatR;
-using ${model.configuration?.name}.Application.DTOs.Response;
 using ${model.configuration?.name}.Domain.Enums;
 
-namespace ${model.configuration?.name}.Application.UseCase.${cls.name}Case.Create${cls.name}
+namespace ${model.configuration?.name}.Application.UseCase.Entities.${cls.name}Case.Create
 {
-    public sealed record Create${cls.name}Request(
+    public record Create${cls.name}Command(
+      ${slicer(cls, relations).slice(0, slicer(cls, relations).lastIndexOf(','))}
+    ) : IRequest<ApiResponse>;
+}
 
-        ${slicer(cls, relations).slice(0, slicer(cls, relations).lastIndexOf(','))}
-
-     ) : IRequest<${cls.name}ResponseDTO>;
-}`
+`
 }
 
 function slicer(cls: LocalEntity, relations: RelationInfo[]): string {

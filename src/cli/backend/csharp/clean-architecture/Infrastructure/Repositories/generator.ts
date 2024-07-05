@@ -5,67 +5,73 @@ import path from "path"
 
 export function generate(model: Model, target_folder: string) : void {
     
-    fs.writeFileSync(path.join(target_folder, `BaseRepository.cs`), generateBase(model))
-    fs.writeFileSync(path.join(target_folder, `UnitOfWork.cs`), generateUnitOfWork(model))
+    const common_folder = target_folder + '/Common'
+    const entities_folder = target_folder + '/Entities'
+
+
+    fs.mkdirSync(common_folder, {recursive: true})
+    fs.mkdirSync(entities_folder, {recursive: true})
+
+    fs.writeFileSync(path.join(common_folder, `BaseRepository.cs`), generateBase(model))
+    fs.writeFileSync(path.join(common_folder, `UnitOfWork.cs`), generateUnitOfWork(model))
     const modules =  model.abstractElements.filter(isModule);
   
     for(const mod of modules) {
         for(const cls of mod.elements.filter(isLocalEntity)) {
-            fs.writeFileSync(path.join(target_folder,`${cls.name}Repository.cs`), generateEntityRepository(model, cls))
+            fs.writeFileSync(path.join(entities_folder,`${cls.name}Repository.cs`), generateEntityRepository(model, cls))
         }
     }
 }
 
 function generateBase (model: Model): string {
     return expandToStringWithNL`
-using Microsoft.EntityFrameworkCore;
-using ${model.configuration?.name}.Domain.Common;
-using ${model.configuration?.name}.Domain.Interfaces;
+﻿using ${model.configuration?.name}.Domain.Common;
+using ${model.configuration?.name}.Domain.Interfaces.Common;
 using ${model.configuration?.name}.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 
-namespace ${model.configuration?.name}.Infrastructure.Repositories
+namespace ${model.configuration?.name}.Infrastructure.Repositories.Common
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
     {
         protected readonly AppDbContext Context;
-
         public BaseRepository(AppDbContext context)
         {
             Context = context;
         }
 
-        public void Create(T entity)
+        public async Task Create(T entity)
         {
-            entity.DateCreated = DateTimeOffset.UtcNow;
-            Context.Add(entity);
+            entity.Create();
+            await Context.AddAsync(entity);
         }
 
-        public void Update(T entity)
+        public async Task Delete(T entity)
         {
-            entity.DateUpdated = DateTimeOffset.UtcNow;
-            Context.Update(entity);
-        }
-
-        public void Delete(T entity)
-        {
-            entity.DateDeleted = DateTimeOffset.UtcNow;
+            entity.Delete();
             Context.Remove(entity);
         }
 
-        public IQueryable<T> GetById(Guid id)
+        public async Task Update(T entity)
         {
-            return Context.Set<T>().Where(x => x.Id == id).AsQueryable();
+            //entity.Update(entity);
+            Context.Update(entity);
         }
 
-        public IQueryable<T> GetAll()
+        public async Task<IQueryable<T>> GetAll()
         {
             return Context.Set<T>().ToList().AsQueryable();
         }
 
-        public IQueryable<T> GetByEntityId(T entity)
+        public async Task<IQueryable<T>> GetByEntityId(T entity)
         {
             if (entity.Id.Equals(null)) return null;
             return Context.Set<T>().Where(x => x.Id == entity.Id).AsNoTracking().AsQueryable();
+        }
+
+        public async Task<IQueryable<T>> GetById(Guid id)
+        {
+            return Context.Set<T>().Where(x => x.Id == id).AsNoTracking().AsQueryable();
         }
     }
 }`
@@ -97,17 +103,20 @@ namespace ${model.configuration?.name}.Infrastructure.Repositories
 
 function generateEntityRepository(model: Model, cls: LocalEntity): string {
     return expandToStringWithNL`
-using ${model.configuration?.name}.Domain.Entities;
-using ${model.configuration?.name}.Domain.Interfaces;
+﻿using ${model.configuration?.name}.Domain.Entities;
+using ${model.configuration?.name}.Domain.Enums;
+using ${model.configuration?.name}.Domain.Interfaces.Entities;
 using ${model.configuration?.name}.Infrastructure.Context;
+using ${model.configuration?.name}.Infrastructure.Repositories.Common;
+using Microsoft.EntityFrameworkCore;
 
-namespace ${model.configuration?.name}.Infrastructure.Repositories
+namespace ${model.configuration?.name}.Infrastructure.Repositories.Entities
 {
     public class ${cls.name}Repository : BaseRepository<${cls.name}>, I${cls.name}Repository
     {
         public ${cls.name}Repository(AppDbContext context) : base(context) { }
+
     }
-}
-`
+}`
 }
 

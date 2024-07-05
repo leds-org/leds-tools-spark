@@ -7,25 +7,25 @@ import { RelationInfo } from "../../../../../../../util/relations.js";
 
 export function generate(model: Model, target_folder: string, cls: LocalEntity, relations: RelationInfo[]) : void {
     fs.writeFileSync(path.join(target_folder,`Update${cls.name}Handler.cs`), generateHandler(model, cls))
-    fs.writeFileSync(path.join(target_folder,`Update${cls.name}Request.cs`), generateRequest(model, cls, relations))
+    fs.writeFileSync(path.join(target_folder,`Update${cls.name}Command.cs`), generateCommand(model, cls, relations))
     fs.writeFileSync(path.join(target_folder,`Update${cls.name}Validator.cs`), generateValidator(model, cls))
 }
 
 function generateHandler (model: Model, cls: LocalEntity): string {
     return expandToString`
 using AutoMapper;
-using ${model.configuration?.name}.Application.DTOs.Response;
+using ${model.configuration?.name}.Application.DTOs.Entities.Request;
+using ${model.configuration?.name}.Application.DTOs.Entities.Response;
+using ${model.configuration?.name}.Application.Interfaces.Entities;
 using ${model.configuration?.name}.Application.UseCase.BaseCase;
 using ${model.configuration?.name}.Domain.Entities;
-using ${model.configuration?.name}.Domain.Interfaces;
+using ${model.configuration?.name}.Domain.Interfaces.Common;
 
-namespace ${model.configuration?.name}.Application.UseCase.${cls.name}Case.Update${cls.name}
+namespace ${model.configuration?.name}.Application.UseCase.Entities.${cls.name}Case.Update
 {
-    public class Update${cls.name}Handler : UpdateHandler<I${cls.name}Repository, Update${cls.name}Request, ${cls.name}ResponseDTO, ${cls.name}>
+    public class Update${cls.name}Handler : UpdateHandler<I${cls.name}Service, Update${cls.name}Command, ${cls.name}RequestDTO, ${cls.name}ResponseDTO, ${cls.name}>
     {
-        public Update${cls.name}Handler(IUnitOfWork unitOfWork, I${cls.name}Repository repository, IMapper mapper) : base(unitOfWork, repository, mapper)
-        {
-        }
+        public Update${cls.name}Handler(IUnitOfWork unitOfWork, I${cls.name}Service service, IMapper mapper) : base(unitOfWork, service, mapper) { }
     }
 }`
 }
@@ -33,10 +33,10 @@ namespace ${model.configuration?.name}.Application.UseCase.${cls.name}Case.Updat
 function generateValidator (model: Model, cls: LocalEntity): string {
     return expandToString`
 using FluentValidation;
-using ${model.configuration?.name}.Application.UseCase.${cls.name}Case.Update${cls.name};
-namespace ${model.configuration?.name}.Application.UseCase.AllocarionCase.Update${cls.name}
+
+namespace ${model.configuration?.name}.Application.UseCase.Entities.${cls.name}Case.Update
 {
-    public class Update${cls.name}Validator : AbstractValidator<Update${cls.name}Request>
+    public class Update${cls.name}Validator : AbstractValidator<Update${cls.name}Command>
     {
         public Update${cls.name}Validator()
         {
@@ -46,19 +46,17 @@ namespace ${model.configuration?.name}.Application.UseCase.AllocarionCase.Update
 }`
 }
 
-function generateRequest (model: Model, cls: LocalEntity, relations : RelationInfo[]): string {
+function generateCommand (model: Model, cls: LocalEntity, relations : RelationInfo[]): string {
     return expandToString`
+using ${model.configuration?.name}.Application.DTOs.Common;
 using MediatR;
-using ${model.configuration?.name}.Application.DTOs.Response;
 using ${model.configuration?.name}.Domain.Enums;
 
-namespace ${model.configuration?.name}.Application.UseCase.${cls.name}Case.Update${cls.name}
+namespace ${model.configuration?.name}.Application.UseCase.Entities.${cls.name}Case.Update
 {
-    public sealed record Update${cls.name}Request(
-
-        ${slicer(cls, relations).slice(0, slicer(cls, relations).lastIndexOf(','))}
-
-     ) : IRequest<${cls.name}ResponseDTO>;
+    public record Update${cls.name}Command(
+      ${slicer(cls, relations).slice(0, slicer(cls, relations).lastIndexOf(','))}
+    ) : IRequest<ApiResponse>;
 }`
 }
 

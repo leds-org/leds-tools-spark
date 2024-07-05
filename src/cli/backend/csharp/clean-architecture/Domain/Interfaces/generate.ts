@@ -42,7 +42,7 @@ function generateRepository(model: Model, cls: LocalEntity, package_name: string
 using ${model.configuration?.name}.Domain.Entities;
 using ${model.configuration?.name}.Domain.Interfaces.Common
 
-namespace ${model.configuration?.name}.Domain.Interfaces
+namespace ${model.configuration?.name}.Domain.Interfaces.Entities
 {
     public interface I${cls.name}Repository : IBaseRepository<${cls.name}>
     {
@@ -53,7 +53,7 @@ namespace ${model.configuration?.name}.Domain.Interfaces
 
 function generateUnitOfWork(model: Model): string {
     return expandToStringWithNL`
-namespace ${model.configuration?.name}.Domain.Interfaces
+namespace ${model.configuration?.name}.Domain.Interfaces.Common
 {
     public interface IUnitOfWork
     {

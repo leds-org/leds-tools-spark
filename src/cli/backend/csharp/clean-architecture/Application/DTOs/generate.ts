@@ -2,32 +2,43 @@ import { CompositeGeneratorNode, Generated, expandToString, expandToStringWithNL
 import { Attribute, EnumEntityAtribute, LocalEntity, Model, isLocalEntity, isModule } from "../../../../../../language/generated/ast.js"
 import fs from "fs"
 import path from "path"
-import { capitalizeString, createPath } from "../../../../../util/generator-utils.js"
+import { capitalizeString } from "../../../../../util/generator-utils.js"
 import { RelationInfo, processRelations } from "../../../../../util/relations.js"
 export function generate(model: Model, target_folder: string) : void {
 
-    fs.writeFileSync(path.join(target_folder, "BaseDTO.cs"), generateBaseDTO(model))
+  const common_folder = target_folder + '/Common'
+  const entities_folder = target_folder + '/Entities'
+  const request_folder = entities_folder + '/Request'
+  const response_folder = entities_folder + '/Response'
 
-    const modules =  model.abstractElements.filter(isModule);
-    const all_entities = modules.map(module => module.elements.filter(isLocalEntity)).flat()
-    const relation_maps = processRelations(all_entities)
-    
-    for(const mod of modules) {
-        for(const cls of mod.elements.filter(isLocalEntity)) {
-            const { relations } = getAttrsAndRelations(cls, relation_maps)
-            const cls_name = `${cls.name}`
-            const cls_path = createPath(target_folder, cls_name.replaceAll(".","/")) 
-            fs.writeFileSync(path.join(cls_path, `${cls_name}ResponseDTO.cs`), generateResponseDTO(model, cls, relations))
-            fs.writeFileSync(path.join(cls_path, `${cls_name}RequestDTO.cs`), generateRequestDTO(model, cls, relations))
-        }
-        
+  fs.mkdirSync(common_folder, {recursive: true})
+  fs.mkdirSync(entities_folder, {recursive: true})
+  fs.mkdirSync(request_folder, {recursive: true})
+  fs.mkdirSync(response_folder, {recursive: true})
+
+  fs.writeFileSync(path.join(common_folder, "BaseDTO.cs"), generateBaseDTO(model))
+  fs.writeFileSync(path.join(common_folder, "ApiResponse.cs"), generateApiResponse(model))
+  fs.writeFileSync(path.join(common_folder, "ResponseBase.cs"), generateResponseBase(model))
+
+  const modules =  model.abstractElements.filter(isModule);
+  const all_entities = modules.map(module => module.elements.filter(isLocalEntity)).flat()
+  const relation_maps = processRelations(all_entities)
+  
+  for(const mod of modules) {
+      for(const cls of mod.elements.filter(isLocalEntity)) {
+          const { relations } = getAttrsAndRelations(cls, relation_maps)
+          const cls_name = `${cls.name}`
+          fs.writeFileSync(path.join(response_folder, `${cls_name}ResponseDTO.cs`), generateResponseDTO(model, cls, relations))
+          fs.writeFileSync(path.join(request_folder, `${cls_name}RequestDTO.cs`), generateRequestDTO(model, cls, relations))
       }
+      
+    }
 
 }
 
 function generateBaseDTO(model: Model) : string {
     return expandToStringWithNL`
-namespace ${model.configuration?.name}.Application.DTOs
+namespace ${model.configuration?.name}.Application.DTOs.Common
 {
     public class BaseDTO
     {
@@ -38,13 +49,13 @@ namespace ${model.configuration?.name}.Application.DTOs
 
 function generateRequestDTO(model : Model, cls : LocalEntity, relations : RelationInfo[]) : string {
     return expandToStringWithNL`
+using ${model.configuration?.name}.Application.DTOs.Common;
 using ${model.configuration?.name}.Domain.Enums;
-using ${model.configuration?.name}.Application.DTOs.Response;
 using MediatR;
 
-namespace ${model.configuration?.name}.Application.DTOs.Request
+namespace ${model.configuration?.name}.Application.DTOs.Entities.Request
 {
-    public class ${cls.name}RequestDTO : IRequest<${cls.name}ResponseDTO>
+    public class ${cls.name}RequestDTO : IRequest<ApiResponse>
     {
         ${cls.attributes.map(a => generateAttribute(a)).join('\n')}
         ${generateEnum(cls)}
@@ -55,8 +66,10 @@ namespace ${model.configuration?.name}.Application.DTOs.Request
 
 function generateResponseDTO(model : Model, cls : LocalEntity, relations: RelationInfo[]) : string {
     return expandToStringWithNL`
+using ${model.configuration?.name}.Application.DTOs.Common;
 using ${model.configuration?.name}.Domain.Enums;
-namespace ${model.configuration?.name}.Application.DTOs.Response
+
+namespace ${model.configuration?.name}.Application.DTOs.Entities.Response
 {
     public class ${cls.name}ResponseDTO : BaseDTO
     {
@@ -222,3 +235,65 @@ function getAttrsAndRelations(cls: LocalEntity, relation_map: Map<LocalEntity, R
       }
     }
   }
+
+  function generateApiResponse(model: Model){
+    return expandToString`
+using System.Text.Json.Serialization;
+
+namespace ${model.configuration?.name}.Application.DTOs.Common
+{
+    public class ApiResponse : ResponseBase
+    {
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Uri { get; set; }
+        public string Message { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public object? Body { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public List<string>? Errors { get; set; }
+
+
+        public ApiResponse(int Estado, string message) : base(Estado)
+        {
+            Message = message;
+        }
+
+        public ApiResponse(int Estado, string? uri, string message) : base(Estado)
+        {
+            Uri = uri;
+            Message = message;
+        }
+
+        public ApiResponse(int Estado, string? uri, string message, object body) : base(Estado)
+        {
+            Uri = uri;
+            Message = message;
+            Body = body;
+        }
+
+        public ApiResponse(int Estado, string? uri, string message, List<string>? errors) : base(Estado)
+        {
+            Uri = uri;
+            Message = message;
+            Errors = errors;
+        }
+    }
+}`
+}
+
+function generateResponseBase(model: Model){
+  return expandToString`
+﻿namespace ${model.configuration?.name}.Application.DTOs.Common
+{
+    public class ResponseBase
+    {
+        public int EstadoCode { get; set; }
+
+        public ResponseBase() { }
+        public ResponseBase(int Estado)
+        {
+            EstadoCode = Estado;
+        }
+    }
+}`
+}

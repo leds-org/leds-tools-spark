@@ -11,21 +11,39 @@ export function generate(model: Model, target_folder: string) : void {
 
 function generateBaseEntity(model : Model) : string {
     return expandToStringWithNL`
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
+﻿using System.Reflection;
 
 namespace ${model.configuration?.name}.Domain.Common
 {
-    public abstract class BaseEntity
+    public class BaseEntity
     {
-        [Key]
         public Guid Id { get; set; }
-        [JsonIgnore]
         public DateTimeOffset DateCreated { get; set; }
-        [JsonIgnore]
         public DateTimeOffset? DateUpdated { get; set; }
-        [JsonIgnore]
         public DateTimeOffset? DateDeleted { get; set; }
+
+        public void Create()
+        {
+            this.DateCreated = DateTime.Now;
+        }
+
+        public void Update(BaseEntity entity)
+        {
+            foreach (PropertyInfo property in entity.GetType().GetProperties())
+            {
+                if (property.CanWrite && property.Name != nameof(Id) && property.Name != nameof(DateCreated))
+                {
+                    property.SetValue(this, property.GetValue(entity));
+                }
+            }
+
+            this.DateUpdated = DateTime.Now;
+        }
+
+        public void Delete()
+        {
+            this.DateDeleted = DateTime.Now;
+        }
     }
 }`
 }
