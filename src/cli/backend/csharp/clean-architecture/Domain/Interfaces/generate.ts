@@ -40,7 +40,7 @@ export function generate(model: Model, target_folder: string) : void {
 function generateRepository(model: Model, cls: LocalEntity, package_name: string) : string {
     return expandToStringWithNL`
 using ${model.configuration?.name}.Domain.Entities;
-using ${model.configuration?.name}.Domain.Interfaces.Common
+using ${model.configuration?.name}.Domain.Interfaces.Common;
 
 namespace ${model.configuration?.name}.Domain.Interfaces.Entities
 {

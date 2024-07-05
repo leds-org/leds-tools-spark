@@ -2,14 +2,16 @@ import { expandToString } from "langium/generate";
 import { Model } from "../../../../../../language/generated/ast.js"
 import fs from "fs";
 import path from "path";
+import { generateODataExtension } from "./generateODataExtension.js";
 
 export function generate(model: Model, target_folder: string) : void {
 
     fs.writeFileSync(path.join(target_folder, "AccountContextExtension.cs"), generateAccountContext(model))
     fs.writeFileSync(path.join(target_folder, "BuilderExtension.cs"), generateBuilderExtension(model))
     fs.writeFileSync(path.join(target_folder, "ClaimsPrincipalExtension.cs"), generateClaimsPrincipalExtension(model))
-    fs.writeFileSync(path.join(target_folder, "ConfigureCorsPolicy.cs"), generateConfigureCorsPolicy(model))
+    fs.writeFileSync(path.join(target_folder, "ConfigureCorsPolicy.cs"), generateCorsPolicyExtension(model))
     fs.writeFileSync(path.join(target_folder, "JwtExtension.cs"), generateJwtExtension(model))
+    fs.writeFileSync(path.join(target_folder, "ODataExtension.cs"), generateODataExtension(model))
 
 }
 
@@ -258,11 +260,11 @@ namespace ${model.configuration?.name}.WebApi.Extensions
 }`
 }
 
-function generateConfigureCorsPolicy(model: Model): string {
+function generateCorsPolicyExtension(model: Model): string {
     return expandToString`
-namespace ${model.configuration?.name}.WebApi.Extensions
+﻿namespace ${model.configuration?.name}.WebApi.Extensions
 {
-    public static class CorsPolicyExtensions
+    public static class CorsPolicyExtension
     {
         public static void ConfigureCorsPolicy(this IServiceCollection services)
         {
@@ -275,5 +277,6 @@ namespace ${model.configuration?.name}.WebApi.Extensions
             });
         }
     }
-}`
+}
+`
 }

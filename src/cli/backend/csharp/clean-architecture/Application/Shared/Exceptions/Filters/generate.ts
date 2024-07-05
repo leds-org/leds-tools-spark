@@ -35,7 +35,7 @@ namespace ${model.configuration?.name}.Application.Shared.Exceptions.Filters
                 context.Result = result;
                 context.ExceptionHandled = true;
             }
-            else if (context.Exception is DomainExceptionValidation domainValidationException)
+            else if (context.Exception is DomainValidationException domainValidationException)
             {
                 var errors = domainValidationException.Message;
                 var result = new ObjectResult(new { Errors = errors })

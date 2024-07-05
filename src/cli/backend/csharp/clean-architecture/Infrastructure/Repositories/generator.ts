@@ -79,7 +79,7 @@ namespace ${model.configuration?.name}.Infrastructure.Repositories.Common
 
 function generateUnitOfWork(model: Model) : string {
     return expandToStringWithNL`
-using ${model.configuration?.name}.Domain.Interfaces;
+using ${model.configuration?.name}.Domain.Interfaces.Common;
 using ${model.configuration?.name}.Infrastructure.Context;
 
 namespace ${model.configuration?.name}.Infrastructure.Repositories

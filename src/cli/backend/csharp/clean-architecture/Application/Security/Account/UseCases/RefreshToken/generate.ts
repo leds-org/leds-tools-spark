@@ -12,7 +12,7 @@ function generateHandler(model: Model): string {
     return expandToString`
 using MediatR;
 using ${model.configuration?.name}.Application.Security.Account.UseCases.Authenticate;
-using ${model.configuration?.name}.Domain.Interfaces;
+using ${model.configuration?.name}.Domain.Interfaces.Common;
 using ${model.configuration?.name}.Domain.Interfaces.Security;
 using ${model.configuration?.name}.Domain.Security.Account.Entities;
 
