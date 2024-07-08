@@ -5,9 +5,9 @@ import path from "path";
 import { RelationInfo } from "../../../../../../../util/relations.js";
 
 export function generate(model: Model, target_folder: string, cls: LocalEntity, relations: RelationInfo[]) : void {
-    fs.writeFileSync(path.join(target_folder,`Create${cls.name}Handler.cs`), generateHandler(model, cls))
-    fs.writeFileSync(path.join(target_folder,`Create${cls.name}Command.cs`), generateCommand(model, cls, relations))
-    fs.writeFileSync(path.join(target_folder,`Create${cls.name}Validator.cs`), generateValidator(model, cls))
+    fs.writeFileSync(path.join(target_folder,`GetById${cls.name}Handler.cs`), generateHandler(model, cls))
+    fs.writeFileSync(path.join(target_folder,`GetById${cls.name}Command.cs`), generateCommand(model, cls, relations))
+    fs.writeFileSync(path.join(target_folder,`GetById${cls.name}Validator.cs`), generateValidator(model, cls))
 }
 
 function generateHandler (model: Model, cls: LocalEntity): string {

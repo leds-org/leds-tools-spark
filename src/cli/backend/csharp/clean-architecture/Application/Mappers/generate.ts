@@ -46,6 +46,7 @@ namespace ${model.configuration?.name}.Application.Mappers.Entities
             CreateMap<${cls.name}, Create${cls.name}Command>().ReverseMap();
             CreateMap<${cls.name}, Update${cls.name}Command>().ReverseMap();
             CreateMap<${cls.name}, GetById${cls.name}Command>().ReverseMap();
+            CreateMap<${cls.name}, Delete${cls.name}Command>().ReverseMap();
             #endregion
 
             #region DTO's para Commads de Caso de Uso

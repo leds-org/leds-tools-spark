@@ -57,6 +57,7 @@ namespace ${model.configuration?.name}.Application.DTOs.Entities.Request
 {
     public class ${cls.name}RequestDTO : IRequest<ApiResponse>
     {
+        public Guid Id {get; set;}
         ${cls.attributes.map(a => generateAttribute(a)).join('\n')}
         ${generateEnum(cls)}
         ${generateRelationsRequest(cls, relations)}

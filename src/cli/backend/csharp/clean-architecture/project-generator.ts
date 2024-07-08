@@ -24,7 +24,7 @@ function generateProjectsln(model: Model) : string {
 	EndProject
 	Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "${model.configuration?.name}.WebAPI", "${model.configuration?.name}\\${model.configuration?.name}.WebAPI\\${model.configuration?.name}.WebAPI.csproj", "{WEB-GUID}"
 	EndProject
-	Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{7964FDCD-F692-4B1B-9FB7-C8281A41717D}"
+	Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{COMPOSE-GUID}"
 	EndProject
 	Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "${model.configuration?.name}.Test", "${model.configuration?.name}\\${model.configuration?.name}.Test\\${model.configuration?.name}.Test.csproj", "{TEST-GUID}"
 	EndProject

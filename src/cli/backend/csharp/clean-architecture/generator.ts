@@ -8,22 +8,22 @@ import { generate as generateApplication } from "./Application/generate.js"
 
 export function generate(model: Model, target_folder: string) : void {
     
-    const target_folder_application = target_folder + `/${model.configuration?.name}.Application`
-    const target_folder_domain = target_folder + `/${model.configuration?.name}.Domain`
-    const target_folder_test = target_folder + `/${model.configuration?.name}.Test`
-    const target_folder_webapi = target_folder + `/${model.configuration?.name}.WebAPI`
-    const target_folder_infra = target_folder + `/${model.configuration?.name}.Infrastructure`
+    const application_folder = target_folder + `/${model.configuration?.name}.Application`
+    const domain_folder = target_folder + `/${model.configuration?.name}.Domain`
+    const test_folder = target_folder + `/${model.configuration?.name}.Test`
+    const webApi_folder = target_folder + `/${model.configuration?.name}.WebAPI`
+    const infrastructure_folder = target_folder + `/${model.configuration?.name}.Infrastructure`
 
-    fs.mkdirSync(target_folder_application, {recursive: true})
-    fs.mkdirSync(target_folder_domain, {recursive: true})
-    fs.mkdirSync(target_folder_test, {recursive: true})
-    fs.mkdirSync(target_folder_webapi, {recursive: true})
-    fs.mkdirSync(target_folder_infra, {recursive: true})
+    fs.mkdirSync(application_folder, {recursive: true})
+    fs.mkdirSync(domain_folder, {recursive: true})
+    fs.mkdirSync(test_folder, {recursive: true})
+    fs.mkdirSync(webApi_folder, {recursive: true})
+    fs.mkdirSync(infrastructure_folder, {recursive: true})
     
-    generateInfra(model, target_folder_infra);
-    generateTest(model, target_folder_test);
-    generateWeb(model, target_folder_webapi);
-    generateDomain(model, target_folder_domain);
-    generateApplication(model, target_folder_application);
+    generateInfra(model, infrastructure_folder);
+    generateTest(model, test_folder);
+    generateWeb(model, webApi_folder);
+    generateDomain(model, domain_folder);
+    generateApplication(model, application_folder);
 
 }

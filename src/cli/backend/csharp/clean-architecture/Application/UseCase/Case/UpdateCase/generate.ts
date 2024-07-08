@@ -55,6 +55,7 @@ using ${model.configuration?.name}.Domain.Enums;
 namespace ${model.configuration?.name}.Application.UseCase.Entities.${cls.name}Case.Update
 {
     public record Update${cls.name}Command(
+      Guid Id,
       ${slicer(cls, relations).slice(0, slicer(cls, relations).lastIndexOf(','))}
     ) : IRequest<ApiResponse>;
 }`

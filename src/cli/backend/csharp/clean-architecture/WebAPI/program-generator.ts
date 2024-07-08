@@ -10,7 +10,7 @@ export function generate(model: Model, target_folder: string) : void {
 }
 function generateProgram(model: Model) : string {
     return expandToString`
-using ${model.configuration?.name}.Application.Configuration;
+using ${model.configuration?.name}.Application.Services;
 using ${model.configuration?.name}.Infrastructure;
 using ${model.configuration?.name}.Infrastructure.Context;
 using ${model.configuration?.name}.WebApi.Extensions;
@@ -18,7 +18,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
+//builder.AddServiceDefaults();
 // Add services to the container.
 builder.Services.ConfigurePersistenceApp(builder.Configuration);
 builder.Services.ConfigureApplicationApp();
@@ -32,19 +32,19 @@ builder.Services.AddSwaggerGen();
 builder.Services.ODataConfiguration();
 
 #region Adição do Serilog
-Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .WriteTo.Console()
-            .WriteTo.File("logs/myapp.txt", rollingInterval: RollingInterval.Day)
-            .CreateLogger();
-builder.Host.UseSerilog(Log.Logger);
+//Log.Logger = new LoggerConfiguration()
+//            .MinimumLevel.Debug()
+//            .WriteTo.Console()
+//            .WriteTo.File("logs/myapp.txt", rollingInterval: RollingInterval.Day)
+//            .CreateLogger();
+//builder.Host.UseSerilog(Log.Logger);
 #endregion
 
 var app = builder.Build();
 
 CreateDatabase(app);
 
-app.MapDefaultEndpoints();
+//app.MapDefaultEndpoints();
 
 // Configure the HTTP Command pipeline.
 if (app.Environment.IsDevelopment())
