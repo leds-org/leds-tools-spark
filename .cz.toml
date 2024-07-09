@@ -4,7 +4,7 @@ tag_format = "v$version"
 
 version_scheme = "semver"
 
-version = "0.4.0"
+version = "0.8.1"
 
 update_changelog_on_bump = true
 
@@ -13,8 +13,7 @@ major_version_zero = true
 version_files = [
     ".cz.toml:version",
     "package.json:version",
-    "README.MD:version",
-    "EXTENSION_VERSION:EXTENSION_VERSION"
+    "README.MD:version",    
 ]
 style = [
     ["qmark", "fg:#ff9d00 bold"],
@@ -30,7 +29,7 @@ style = [
 ]
 
 [tool.commitizen.customize]
-message_template = "{{change_type}}(R2D2-{{issue_key}}): #comment {{message}} {% if workflow_transition %} #{{workflow_transition_stage}} {% endif %}"
+message_template = "{{change_type}}(GESTAO-{{issue_key}}): #comment {{message}} {%if workflow_transition %} #{{workflow_transition_stage}} {% endif %}"
 schema = "<type>: <body>"
 schema_pattern = "(feature|fix|doc|refactor|ci|test|build):(\\s.*)"
 
