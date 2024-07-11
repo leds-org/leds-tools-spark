@@ -3,7 +3,7 @@ import { GenerateOptions } from './main.js';
 import { generate as pyhtonGenerate } from './backend/python/generator.js';
 import { generate as javaGenerate } from './backend/java/generator.js';
 import { generate as docGenerate} from './documentation/generator.js';
-;
+import { generate as vueVitegenerate} from './frontend/vue-vite/generate.js';
 import { generate as csharp} from './backend/csharp/generator.js';
 
 import path from 'path';
@@ -24,6 +24,8 @@ export function generate(model: Model,  filePath: string, destination: string | 
     
 
     docGenerate (model, final_destination)
+
+    vueVitegenerate(model, final_destination)
     
     return final_destination ;
 }
