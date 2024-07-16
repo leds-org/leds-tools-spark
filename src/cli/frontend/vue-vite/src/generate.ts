@@ -8,6 +8,11 @@ import { generate as generateLayouts } from "./layouts/generate.js";
 import { generate as generatePlugins } from "./plugins/generate.js";
 import { generate as generateScss } from "./scss/generate.js";
 import { generate as generateServices } from "./services/generate.js";
+import { generate as generateTheme } from "./theme/generate.js";
+import { generate as generateRouter } from "./router/generate.js";
+import { generate as genrateUtils } from "./utils/generate.js";
+import { generate as generateStores } from "./stores/generate.js";
+import { generate as generateViews } from "./views/generate.js";
 
 export function generate(model: Model, target_folder: string) : void {
 
@@ -19,6 +24,11 @@ export function generate(model: Model, target_folder: string) : void {
     const plugins_folder = createPath(src_folder, "plugins")
     const scss_folder = createPath(src_folder, "scss")
     const services_folder = createPath(src_folder, "services")
+    const themes_folder = createPath(src_folder, "theme")
+    const router_folder = createPath(src_folder, "router")
+    const util_folder = createPath(src_folder, "utils")
+    const stores_folder = createPath(src_folder, "stores")
+    const views_folder = createPath(src_folder, "views")
 
     fs.mkdirSync(src_folder, {recursive:true})
     fs.mkdirSync(assets_folder, {recursive:true})
@@ -28,6 +38,11 @@ export function generate(model: Model, target_folder: string) : void {
     fs.mkdirSync(plugins_folder, {recursive:true})
     fs.mkdirSync(scss_folder, {recursive:true})
     fs.mkdirSync(services_folder, {recursive:true})
+    fs.mkdirSync(themes_folder, {recursive:true})
+    fs.mkdirSync(router_folder, {recursive:true})
+    fs.mkdirSync(util_folder, {recursive:true})
+    fs.mkdirSync(stores_folder, {recursive:true})
+    fs.mkdirSync(views_folder, {recursive:true})
 
     fs.writeFileSync(path.join(src_folder, 'App.vue'), generateApp());
     fs.writeFileSync(path.join(src_folder, 'config.ts'), generateConfig());
@@ -38,6 +53,11 @@ export function generate(model: Model, target_folder: string) : void {
     generatePlugins(model, plugins_folder)
     generateScss(model, scss_folder)
     generateServices(model, services_folder)
+    generateTheme(model, themes_folder)
+    generateRouter(model, router_folder)
+    genrateUtils(model, util_folder)
+    generateStores(model, stores_folder)
+    generateViews(model, views_folder)
 
 }  
 

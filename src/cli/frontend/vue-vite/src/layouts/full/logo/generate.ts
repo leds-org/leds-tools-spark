@@ -55,8 +55,7 @@ function generateLogoDark(): string {
     return expandToString`
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
-//import logo from '@/assets/images/logos/logo_fapes.png';
-import logo from '@/assets/images/logos/logo_fapes.svg';
+//import logo from '@/assets/images/logos/logo.png';
 </script>
 <template>
     <div class="logo">
@@ -71,7 +70,6 @@ function generateLogoLight(): string {
     return expandToString`
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
-import Darklogo from '@/assets/images/logos/logo-white.svg';
 </script>
 <template>
     <div class="logo">
@@ -86,7 +84,6 @@ function generateRtlLogoDark(): string {
     return expandToString`
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
-import logo from '@/assets/images/logos/rtl-logo-dark.svg';
 </script>
 <template>
     <div class="logo">
@@ -101,7 +98,6 @@ function generateRtlLogoLight(): string {
     return expandToString`
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
-import logo from '@/assets/images/logos/rtl-logo-white.svg';
 </script>
 <template>
     <div class="logo">

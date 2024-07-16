@@ -16,10 +16,10 @@ export function generate(target_folder: string) : void {
 
     fs.writeFileSync(path.join(target_folder, 'Icon.vue'), generateIcon());
     fs.writeFileSync(path.join(target_folder, 'VerticalSidebar.vue'), generateVerticalSidebar());
-    fs.writeFileSync(path.join(NavCollapse_folder, 'sidebarItem.ts'), generateSidebarItem());
+    fs.writeFileSync(path.join(target_folder, 'sidebarItem.ts'), generateSidebarItem());
     fs.writeFileSync(path.join(NavGroup_folder, 'index.vue'), generateNavGroup());
     fs.writeFileSync(path.join(NavItem_folder, 'index.vue'), generateNavItem());
-    fs.writeFileSync(path.join(NavItem_folder, 'NavCollapse.vue'), genenrateNavCollapse());
+    fs.writeFileSync(path.join(NavCollapse_folder, 'NavCollapse.vue'), genenrateNavCollapse());
 
 }  
 

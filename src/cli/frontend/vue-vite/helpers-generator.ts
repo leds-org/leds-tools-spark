@@ -2,11 +2,9 @@ import { Model } from "../../../language/generated/ast.js"
 import fs from "fs";
 import { expandToString } from "langium/generate";
 import path from "path";
-import { generatePackageLock } from "./packageLock.js"
 
 export function generate(model: Model, target_folder: string) : void {
 
-    generatePackageLock(target_folder)
     fs.writeFileSync(path.join(target_folder, 'vite.config.ts'),generateViteConfig());
     fs.writeFileSync(path.join(target_folder, 'package.json'),generatePackage());
     fs.writeFileSync(path.join(target_folder, 'tsconfig.json'),generateTsConfig());
@@ -57,35 +55,78 @@ export default defineConfig({
 function generatePackage(): string {
     return expandToString`
 {
-  "extends": "@vue/tsconfig/tsconfig.web.json",
-  "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "src/**/*.js"],
-  "compilerOptions": {
-    "preserveValueImports": false,
-    "importsNotUsedAsValues": "remove",
-    "verbatimModuleSyntax": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
+    "name": "flexy",
+    "version": "3.0.0",
+    "scripts": {
+        "dev": "vite",
+        "build": "vue --noEmit && vite build",
+        "preview": "vite preview --port 5050",
+        "typecheck": "vue-tsc --noEmit",
+        "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
     },
-    "allowJs": true,
-    "checkJs": true,
-    "target": "esnext",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "strict": true,
-    "jsx": "preserve",
-    "importHelpers": true,
-    "lib": ["esnext", "dom"],
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "sourceMap": true
-  },
-  "references": [
-    {
-      "path": "./tsconfig.vite-config.json"
+    "dependencies": {
+        "@fullcalendar/core": "6.1.10",
+        "@fullcalendar/daygrid": "6.1.10",
+        "@fullcalendar/interaction": "6.1.10",
+        "@fullcalendar/timegrid": "6.1.10",
+        "@fullcalendar/vue3": "6.1.10",
+        "@tiptap/pm": "2.2.2",
+        "@tiptap/starter-kit": "2.2.2",
+        "@tiptap/vue-3": "2.2.2",
+        "@types/aos": "3.0.7",
+        "aos": "2.3.4",
+        "apexcharts": "3.45.2",
+        "axios": "1.6.7",
+        "axios-mock-adapter": "1.22.0",
+        "chance": "^1.1.8",
+        "date-fns": "^2.29.3",
+        "dayjs": "^1.11.11",
+        "lodash": "^4.17.21",
+        "maska": "^1.5.0",
+        "pinia": "2.1.7",
+        "remixicon": "4.1.0",
+        "svgmap": "^2.10.1",
+        "sweetalert2": "^11.12.2",
+        "vee-validate": "4.6.7",
+        "vite-plugin-vuetify": "2.0.1",
+        "vue": "3.4.17",
+        "vue-clipboard3": "2.0.0",
+        "vue-draggable-next": "2.2.1",
+        "vue-i18n": "^9.2.2",
+        "vue-router": "4.0.12",
+        "vue-scrollto": "2.20.0",
+        "vue-tabler-icons": "^2.21.0",
+        "vue3-apexcharts": "1.5.2",
+        "vue3-carousel": "0.3.1",
+        "vue3-easy-data-table": "1.5.47",
+        "vue3-perfect-scrollbar": "^2.0.0",
+        "vue3-print-nb": "0.1.4",
+        "vuedraggable": "2.24.3",
+        "vuetify": "3.5.3",
+        "yup": "1.3.3"
+    },
+    "devDependencies": {
+        "@mdi/font": "7.4.47",
+        "@rushstack/eslint-patch": "1.7.2",
+        "@types/chance": "^1.1.6",
+        "@types/lodash": "^4.14.202",
+        "@types/node": "20.11.17",
+        "@vitejs/plugin-vue": "5.0.4",
+        "@vue/eslint-config-prettier": "^9.0.0",
+        "@vue/eslint-config-typescript": "^12.0.0",
+        "@vue/tsconfig": "^0.1.3",
+        "esbuild": "^0.20.2",
+        "eslint": "^8.5.0",
+        "eslint-plugin-vue": "^9.21.1",
+        "prettier": "3.2.5",
+        "sass": "1.70.0",
+        "sass-loader": "14.1.0",
+        "typescript": "^5.3.3",
+        "vite": "^5.1.1",
+        "vue-cli-plugin-vuetify": "2.5.8",
+        "vue-tsc": "^2.0.26",
+        "vuetify-loader": "1.9.2"
     }
-  ]
 }`
 }
 

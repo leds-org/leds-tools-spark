@@ -10,7 +10,7 @@ import { generate as generatePages } from "./pages/generate.js";
 export function generate(model: Model, target_folder: string) : void {
     
     const components_folder = createPath(target_folder, "components")
-    const layouts_folder = createPath(target_folder, "layouts")
+    const layouts_folder = createPath(target_folder, "layout")
     const pages_folder = createPath(target_folder, "pages")
 
     fs.mkdirSync(pages_folder, {recursive:true})
@@ -18,8 +18,8 @@ export function generate(model: Model, target_folder: string) : void {
     fs.mkdirSync(components_folder, {recursive:true})
 
     fs.writeFileSync(path.join(target_folder, 'style.scss'), generateStyle());
-    fs.writeFileSync(path.join(layouts_folder, '_variables.scss'), generateVariables());
-    fs.writeFileSync(path.join(layouts_folder, '_override.scss'), generateOverride());
+    fs.writeFileSync(path.join(target_folder, '_variables.scss'), generateVariables());
+    fs.writeFileSync(path.join(target_folder, '_override.scss'), generateOverride());
 
     generateComponents(components_folder);
     generateLayout(layouts_folder);

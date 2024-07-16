@@ -5,12 +5,12 @@ import path from "path";
 export function generate(target_folder: string) : void {
 
     fs.writeFileSync(path.join(target_folder, '_VAlert.scss'), generateValert());
-    fs.writeFileSync(path.join(target_folder, '_VBreadcrumbs.scss'), generateVBreadcrumbs());
+    fs.writeFileSync(path.join(target_folder, '_VBreadcrumb.scss'), generateVBreadcrumbs());
     fs.writeFileSync(path.join(target_folder, '_VButtons.scss'), generateVButtons());
     fs.writeFileSync(path.join(target_folder, '_VCard.scss'), generateVcard());
     fs.writeFileSync(path.join(target_folder, '_VCarousel.scss'), generateVCarousel());
-    fs.writeFileSync(path.join(target_folder, '_VDataTable.scss'), generateVDatable());
-    fs.writeFileSync(path.join(target_folder, '_VExpansionPanel.scss'), generateVExpansionpanel());
+    fs.writeFileSync(path.join(target_folder, '_VDatatable.scss'), generateVDatable());
+    fs.writeFileSync(path.join(target_folder, '_VExpansionpanel.scss'), generateVExpansionpanel());
     fs.writeFileSync(path.join(target_folder, '_VField.scss'), generateVField());
     fs.writeFileSync(path.join(target_folder, '_VInput.scss'), genrateVInput());
     fs.writeFileSync(path.join(target_folder, '_VList.scss'), generateVList());

@@ -14,7 +14,7 @@ export function generate(target_folder: string) : void {
     const itemto = "`\${item.to}`"
     const ddmenu = "`ddMenu ddLevel-${level + 1}`"
 
-    fs.writeFileSync(path.join(target_folder, 'HorizontalSideBar.vue'), generateHorizontalSideBar());
+    fs.writeFileSync(path.join(target_folder, 'HorizontalSidebar.vue'), generateHorizontalSideBar());
     fs.writeFileSync(path.join(target_folder, 'horizontalItems.ts'), generateHorizontalItems());
     fs.writeFileSync(path.join(NavItem_folder, 'Index.vue'), generateNavItem(itemto));
     fs.writeFileSync(path.join(NavCollapse_folder, 'Index.vue'), generateNavCollapse(ddmenu));

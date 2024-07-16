@@ -4,15 +4,15 @@ import path from "path";
 
 export function generate(target_folder: string) : void {
 
-    fs.writeFileSync(path.join(target_folder, 'AppLink.vue'), generateAppLink());
+    fs.writeFileSync(path.join(target_folder, 'AppsLink.vue'), generateAppLink());
     fs.writeFileSync(path.join(target_folder, 'LanguageDD.vue'), generatelanguageDD());
     fs.writeFileSync(path.join(target_folder, 'MessagesDD.vue'), generateMessagesDD());
     fs.writeFileSync(path.join(target_folder, 'Navigations.vue'), generateNavigations());
-    fs.writeFileSync(path.join(target_folder, 'NotificationsDD.vue'), generateNotificationDD());
+    fs.writeFileSync(path.join(target_folder, 'NotificationDD.vue'), generateNotificationDD());
     fs.writeFileSync(path.join(target_folder, 'ProfileDD.vue'), generateProfileDD());
     fs.writeFileSync(path.join(target_folder, 'QuickLinks.vue'), generateQuickLinks());
     fs.writeFileSync(path.join(target_folder, 'RightMobileSidebar.vue'), generateRightMobileSidebar());
-    fs.writeFileSync(path.join(target_folder, 'SearchBar.vue'), generateSearchbar());
+    fs.writeFileSync(path.join(target_folder, 'Searchbar.vue'), generateSearchbar());
     fs.writeFileSync(path.join(target_folder, 'VerticalHeader.vue'), generateVerticalHeader());
 
 }  
@@ -20,7 +20,6 @@ export function generate(target_folder: string) : void {
 function generateAppLink(): string {
     return expandToString`
 <script setup lang="ts">
-import {appsLink} from '@/_mockApis/headerData';
 </script>
 <template>
     <!-- ---------------------------------------------- -->
@@ -48,11 +47,6 @@ function generatelanguageDD(): string {
     return expandToString`
 <script setup lang="ts">
 import { ref } from 'vue';
-import { languageDD } from '@/_mockApis/headerData';
-import flag1 from '@/assets/images/flag/icon-flag-en.svg';
-import flag2 from '@/assets/images/flag/icon-flag-ro.svg';
-import flag3 from '@/assets/images/flag/icon-flag-zh.svg';
-import flag4 from '@/assets/images/flag/icon-flag-fr.svg';
 </script>
 <template>
     <!-- ---------------------------------------------- -->
@@ -98,7 +92,6 @@ import flag4 from '@/assets/images/flag/icon-flag-fr.svg';
 function generateMessagesDD(): string {
     return expandToString`
 <script setup lang="ts">
-import {notifications} from '@/_mockApis/headerData';
 </script>
 <template>
     <!-- ---------------------------------------------- -->
@@ -199,7 +192,6 @@ import { HelpIcon,ChevronDownIcon } from 'vue-tabler-icons';
 function generateNotificationDD(): string {
     return expandToString`
 <script setup lang="ts">
-import {notifications} from '@/_mockApis/headerData';
 </script>
 <template>
     <!-- ---------------------------------------------- -->
@@ -248,7 +240,6 @@ function generateProfileDD(): string {
     return expandToString`
 <script setup lang="ts">
 import { MailIcon } from 'vue-tabler-icons';
-import { profileDD } from '@/_mockApis/headerData';
 
 import { useAuthStore } from '@/stores/auth';
 
@@ -263,7 +254,6 @@ const authStore = useAuthStore();
         <template v-slot:activator="{ props }">
             <v-btn class="custom-hover-primary" variant="text" v-bind="props" icon>
                 <v-avatar size="35">
-                    <img src="@/assets/images/profile/user2.jpg" width="35" alt="Julia" />
                 </v-avatar>
             </v-btn>
         </template>
@@ -272,7 +262,6 @@ const authStore = useAuthStore();
                 <h6 class="text-h5 font-weight-medium">User Profile</h6>
                 <div class="d-flex align-center mt-4 pb-6">
                     <v-avatar size="80">
-                        <img src="@/assets/images/profile/user2.jpg" width="80" />
                     </v-avatar>
                     <div class="ml-3">
                         <h6 class="text-h6 mb-n1">Julia Roberts</h6>
@@ -307,7 +296,6 @@ const authStore = useAuthStore();
                         Access
                     </h5>
                     <v-btn variant="flat" color="primary" class="mt-3">Upgrade</v-btn>
-                    <img src="@/assets/images/backgrounds/unlimited-bg.png" alt="bg-img" class="right-pos-img" />
                 </div>
             </div>
             <div class="pt-4 pb-6 px-8 text-center">
@@ -321,7 +309,6 @@ const authStore = useAuthStore();
 function generateQuickLinks(): string {
     return expandToString`
 <script setup lang="ts">
-import {quickLink} from '@/_mockApis/headerData';
 </script>
 
 <template>
@@ -402,7 +389,6 @@ function generateSearchbar(): string {
     return expandToString`
 <script setup>
 import { SearchIcon } from 'vue-tabler-icons';
-import { searchSugg } from '@/_mockApis/headerData';
 </script>
 
 <template>
