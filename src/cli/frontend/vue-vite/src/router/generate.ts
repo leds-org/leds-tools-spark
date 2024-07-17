@@ -14,18 +14,18 @@ export function generate(model: Model, target_folder: string) : void {
     for(const mod of modules) {
         for(const cls of mod.elements.filter(isLocalEntity)) {
             paths += `
-// {
+{
 
-//     name: '${cls.name}',
-//     path: '/${cls.name}/Index${cls.name}',
-//     component: () => import('@/views/${model.configuration?.name}/${cls.name}/Index${cls.name}.vue'),
-// },
-// {
-//     name: 'Detalhes${cls.name}',
-//     path: '/${cls.name}/Details${cls.name}/:id?',
-//     component: () => import('@/views/${model.configuration?.name}/${cls.name}/Details${cls.name}.vue'),
-//     props: true
-// },
+    name: '${cls.name}',
+    path: '/${cls.name}/Index${cls.name}',
+    component: () => import('@/views/${model.configuration?.name}/${cls.name}/Index${cls.name}.vue'),
+},
+{
+    name: 'Detalhes${cls.name}',
+    path: '/${cls.name}/Details${cls.name}/:id?',
+    component: () => import('@/views/${model.configuration?.name}/${cls.name}/Details${cls.name}.vue'),
+    props: true
+},
 {
     name: 'Cadastro${cls.name}',
     path: '/${cls.name}/form${cls.name}/:id?/:${cls.name}?',

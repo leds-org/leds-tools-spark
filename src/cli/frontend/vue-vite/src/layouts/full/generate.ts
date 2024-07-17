@@ -33,7 +33,7 @@ export function generate(model: Model, target_folder: string) : void {
     generateHorizontalSideBar(horizontal_sidebar_folder)
     generateLogo(logo_folder)
     generateVerticalHeader(vertical_header_folder)
-    generateVerticalSidebar(vertical_sidebar_folder)
+    generateVerticalSidebar(model, vertical_sidebar_folder)
     
 }  
 

@@ -13,6 +13,7 @@ import { generate as generateRouter } from "./router/generate.js";
 import { generate as genrateUtils } from "./utils/generate.js";
 import { generate as generateStores } from "./stores/generate.js";
 import { generate as generateViews } from "./views/generate.js";
+import { generate as generateComposition } from "./composition/generate.js";
 
 export function generate(model: Model, target_folder: string) : void {
 
@@ -29,6 +30,7 @@ export function generate(model: Model, target_folder: string) : void {
     const util_folder = createPath(src_folder, "utils")
     const stores_folder = createPath(src_folder, "stores")
     const views_folder = createPath(src_folder, "views")
+    const composition_folder = createPath(src_folder, "composition")
 
     fs.mkdirSync(src_folder, {recursive:true})
     fs.mkdirSync(assets_folder, {recursive:true})
@@ -43,6 +45,7 @@ export function generate(model: Model, target_folder: string) : void {
     fs.mkdirSync(util_folder, {recursive:true})
     fs.mkdirSync(stores_folder, {recursive:true})
     fs.mkdirSync(views_folder, {recursive:true})
+    fs.mkdirSync(composition_folder, {recursive:true})
 
     fs.writeFileSync(path.join(src_folder, 'App.vue'), generateApp());
     fs.writeFileSync(path.join(src_folder, 'config.ts'), generateConfig());
@@ -58,6 +61,7 @@ export function generate(model: Model, target_folder: string) : void {
     genrateUtils(model, util_folder)
     generateStores(model, stores_folder)
     generateViews(model, views_folder)
+    generateComposition(model, composition_folder)
 
 }  
 
