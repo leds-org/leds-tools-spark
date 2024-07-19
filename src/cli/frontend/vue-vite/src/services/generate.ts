@@ -23,7 +23,7 @@ function generateApi(): string {
 import axios, { type AxiosInstance } from 'axios';
 
 const api: AxiosInstance = axios.create({
-  baseURL: 'http://34.228.30.227:8080'
+  baseURL: 'https://localhost:8081'
 })
 
 export default api;`
@@ -35,7 +35,7 @@ import api from 'axios'
 import useApi from '../../composition/UseApi'
 
 export default function serviceFactory(apiUrl: string, listUrl?: string) {
-  const { list, post, update, remove, getById, activate } = useApi(apiUrl)
+  const { list, post, update, remove, getById } = useApi(apiUrl)
 
   let customList
 
@@ -51,8 +51,7 @@ export default function serviceFactory(apiUrl: string, listUrl?: string) {
     post,
     update,
     remove,
-    getById,
-    activate
+    getById
   }
 }`
 }

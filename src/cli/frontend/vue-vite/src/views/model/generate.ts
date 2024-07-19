@@ -1,44 +1,48 @@
-import { isLocalEntity, isModule, LocalEntity, Model } from "../../../../../../language/generated/ast.js"
+import { EnumEntityAtribute, EnumX, isEnumX, isLocalEntity, isModule, LocalEntity, Model } from "../../../../../../language/generated/ast.js"
 import fs from "fs";
 import { expandToString } from "langium/generate";
 import path from "path";
-import { createPath } from "../../../../../util/generator-utils.js";
+import { capitalizeString, createPath } from "../../../../../util/generator-utils.js";
 
 export function generate(model: Model, target_folder: string) : void {
 
     const modules =  model.abstractElements.filter(isModule);
     
     for(const mod of modules) {
-        for(const cls of mod.elements.filter(isLocalEntity)) {
+      const enumx = mod.elements.filter(isEnumX)
+      for(const cls of mod.elements.filter(isLocalEntity)) {
 
-            const cls_folder = createPath(target_folder, `${cls.name}`)
+          const cls_folder = createPath(target_folder, `${cls.name}`)
 
-            fs.mkdirSync(cls_folder, {recursive:true})
+          fs.mkdirSync(cls_folder, {recursive:true})
 
-            fs.writeFileSync(path.join(cls_folder, `Form${cls.name}.vue`), generateForms(cls))
-            fs.writeFileSync(path.join(cls_folder, `Index${cls.name}.vue`), generateIndex(cls))
-            fs.writeFileSync(path.join(cls_folder, `Details${cls.name}.vue`), generateDetails(cls))
-        }
+          fs.writeFileSync(path.join(cls_folder, `Form${cls.name}.vue`), generateForms(cls, enumx))
+          fs.writeFileSync(path.join(cls_folder, `Index${cls.name}.vue`), generateIndex(cls))
+          fs.writeFileSync(path.join(cls_folder, `Details${cls.name}.vue`), generateDetails(cls))
+      }
         
     }
 }  
 
-function generateForms(cls: LocalEntity): string {
+function generateForms(cls: LocalEntity, enumx: EnumX[]): string {
     let forms = ""
     let formattr = ""
+
+    formattr += `${cls.enumentityatributes.map(enumEntityAtribute => `${enumEntityAtribute.type.ref?.name}: '', \n`)}`
+    
     for(const attr of cls.attributes) {
-        formattr += `${attr.name}: '', \n`
-        forms += `
+      formattr += `${capitalizeString(attr.name)}: '', \n`
+      forms += `
 <v-col cols="12">
     <v-label class="font-weight-medium mb-2">${attr.name}</v-label>
     <VTextField  type="text" placeholder="${attr.name} ${attr.type}" hide-details v-model='form.${attr.name}' required></VTextField>
 </v-col>`
     }
-    const form = generateFormExport(cls, forms, formattr);
+    const form = generateFormExport(cls, forms, formattr, enumx);
     return form
 }
 
-function generateFormExport(cls: LocalEntity, forms: string, formattr: string): string {
+function generateFormExport(cls: LocalEntity, forms: string, formattr: string, enumx: EnumX[]): string {
     return expandToString`
 <template>
     <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
@@ -47,6 +51,7 @@ function generateFormExport(cls: LocalEntity, forms: string, formattr: string): 
             <v-card-text class="pa-sm-6 pa-3 pb-sm-6 pb-6">
                 <v-row >
                     ${forms}
+                    ${generateEnum(cls)}
                     <v-col cols="12" class="d-flex justify-end">
                         <v-btn type="button" color="primary" variant="outlined" class="mr-3" @click='navigateBack'>Voltar</v-btn>
                         <v-btn type="submit" color="primary" flat>{{ submitButtonText }}</v-btn>
@@ -146,31 +151,27 @@ const navigateBack = () => {
     router.push({ path: '/${cls.name}/Index${cls.name}' });
 };
 
+${generateEnumValue(cls,enumx)}
+
 </script>`
 }
 
 function generateIndex(cls: LocalEntity): string {
-    const regtext = `'^(https?:\\\\/\\\\/)?' + 
-    '((([a-z\\\\d]([a-z\\\\d-]*[a-z\\\\d])*)\\\\.?)+[a-z]{2,}|' + 
-    '((\\\\d{1,3}\\\\.){3}\\\\d{1,3}))' + 
-    '(\\\\:\\\\d+)?(\\\\/[-a-z\\\\d%_.~+]*)*' + 
-    '(\\\\?[;&a-z\\\\d%_.~+=-]*)?' + 
-    '(\\\\#[-a-z\\\\d_]*)?$', 'i'`
-    const path_form = "`/${cls.name}/form${cls.name}/${id}`"
-    const path_details = "`/${cls.name}/details${cls.name}/${id}`"
+    const path_form =  "`" + `/${cls.name}/form${cls.name}/\${id}` +  "`"
+    const path_details = "`" + `/${cls.name}/details${cls.name}/\${id}` + "`" 
 
     let headers = ""
     for(const attr of cls.attributes) {
         headers += `
-{ title: '${attr.name}', sortable: false, key: '${attr.name.toLowerCase()}' },`
+{ title: '${attr.name}', sortable: false, key: '${capitalizeString(attr.name)}' },`
     }
-    const index = generateIndexText(cls,path_form, path_details, regtext, headers);
+    const index = generateIndexText(cls,path_form, path_details, headers);
     return index
     
 
 }
 
-function generateIndexText(cls: LocalEntity, path_form: string, path_details: string, regtext: string, headers: string): string {
+function generateIndexText(cls: LocalEntity, path_form: string, path_details: string, headers: string): string {
     return expandToString`
 <template>
     <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs" />
@@ -211,7 +212,7 @@ function generateIndexText(cls: LocalEntity, path_form: string, path_details: st
             </v-dialog>
           </template>
           <template v-slot:item.actions="{ item }">
-            <v-icon class="mdi mdi-link me-2" color="primary" size="small" @click="linkAcess(item.Link)" />
+            <v-icon class="mdi mdi-eye me-2" color="primary" size="small" @click="goToDetail(item.Id)" />
             <v-icon color="primary" size="small" class="me-2" @click="editItem(item.Id)">
               mdi-pencil
             </v-icon>
@@ -248,6 +249,7 @@ const router = useRouter();
 const dialogDelete = ref(false);
 const headers = ref([
   ${headers}
+  { title: 'Ações', key: 'actions' },
 ]);
 const ${cls.name} = ref([]);
 const filtered${cls.name} = ref([]);
@@ -303,21 +305,6 @@ const deleteItem = async () => {
 function confirmDeleteItem(item) {
   itemToDelete.value = item;
   dialogDelete.value = true;
-}
-
-function linkAcess(link: string) {
-  const urlPattern = new RegExp(${regtext}); 
-
-  if (urlPattern.test(link)) {
-    window.location.href = link;
-  } else {
-    Swal.fire({
-      icon: 'error',
-      title: 'Link inválido',
-      text: 'O link fornecido não é válido.',
-      confirmButtonColor: '#D3D3D3'
-    });
-  }
 }
 
 function add${cls.name}() {
@@ -389,16 +376,16 @@ watch(dialogDelete, val => {
 
 function generateDetails(cls: LocalEntity): string {
 
-    const path_formid = "`/${cls.name}/form${cls.name}/${id}`"
+    const path_formid =  "`" + `/${cls.name}/form${cls.name}/\${id}` +  "`"
     let formattr = ""
     let forms = ""
 
     for(const attr of cls.attributes) {
-        formattr += `${attr.name}: '', \n`
+        formattr += `${capitalizeString(attr.name)}: '', \n`
         forms += `
         <v-col cols="12">
             <v-label class="font-weight-medium mb-2">${attr.name}</v-label>
-            <VTextField  type="text" placeholder="${attr.name} ${attr.type}" hide-details v-model='form.${attr.name}' required></VTextField>
+            <VTextField  type="text" placeholder="${attr.name} ${attr.type}" hide-details v-model='form.${capitalizeString(attr.name)}' required></VTextField>
         </v-col>`
     }
     const index = generateDetailsText(cls,path_formid, formattr, forms);
@@ -423,6 +410,8 @@ function generateDetailsText(cls: LocalEntity, path_formid: string, formattr: st
                         <v-row>
                             ${forms}
                         </v-row>
+                    </v-col>
+                </v-row>
             </v-card-text>
         </v-card>
     </form>
@@ -459,10 +448,11 @@ const form = reactive({
     ${formattr.slice(0, formattr.lastIndexOf(','))}
 });
 
-// @ts-ignore
 const getPost = async (id) => {
     try {
+        const response = await getById(id);
         Object.assign(form, response.value[0]);
+        console.log(response.value)
     } catch (error) {
         console.error(error);
     }
@@ -529,4 +519,54 @@ const deleta${cls.name} = async () => {
     }
 };
 </script>`
+}
+
+function generateEnumValue(cls: LocalEntity, enumx: EnumX[]): string {
+  return expandToString`
+${cls.enumentityatributes.map(enumEntityAtribute =>createEnumValue(enumEntityAtribute, enumx)).join("\n")}`
+}
+
+function createEnumValue(Enum: EnumEntityAtribute, Enumx: EnumX[]): string {
+  let EnumText = "";
+  let count = 0;
+  for (const enumx of Enumx){
+    if(Enum.type.ref?.name == enumx.name){
+      for (const a of enumx.attributes){
+        EnumText += `
+{
+    tipo: '${a.name}',
+    value: ${count}
+},`
+        count++;
+      }
+      return expandToString`
+      const ${Enum.type.ref?.name} = ref([
+          ${EnumText.slice(0, EnumText.lastIndexOf(','))}
+      ]);`
+    }
+  }
+  return ""
+}
+
+function generateEnum (cls: LocalEntity):string {
+  return expandToString`
+${cls.enumentityatributes.map(enumEntityAtribute =>createEnum(enumEntityAtribute)).join("\n")}`
+}
+
+function createEnum(Enum: EnumEntityAtribute): string {
+  return expandToString`
+<v-col cols="12">
+    <v-label class="font-weight-medium mb-2">${Enum.type.ref?.name} *</v-label>
+    <v-select
+        :items="${capitalizeString(Enum.type.ref?.name || "")}"
+        item-title="tipo"
+        item-value="value"
+        placeholder="Selecione ${Enum.type.ref?.name}"
+        hide-details
+        required
+        v-model="form.${capitalizeString(Enum.type.ref?.name || "")}"
+    >
+    </v-select>
+</v-col>
+`
 }
