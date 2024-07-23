@@ -1,5 +1,5 @@
 import { expandToString } from "langium/generate"
-import { LocalEntity } from "../../../../../../language/generated/ast.js"
+import { EnumEntityAtribute, LocalEntity } from "../../../../../../language/generated/ast.js"
 import { capitalizeString } from "../../../../../util/generator-utils.js"
 
 export function generate(cls: LocalEntity): string {
@@ -8,13 +8,22 @@ export function generate(cls: LocalEntity): string {
     let formattr = ""
     let forms = ""
 
+    formattr += `${cls.enumentityatributes.map(enumEntityAtribute => `${enumEntityAtribute.type.ref?.name.toLowerCase()}: '', \n`)}`
+
     for(const attr of cls.attributes) {
         formattr += `${capitalizeString(attr.name)}: '', \n`
         forms += `
         <v-col cols="12">
             <v-label class="font-weight-medium mb-2">${attr.name}</v-label>
-            <VTextField  type="text" placeholder="${attr.name} ${attr.type}" hide-details v-model='form.${capitalizeString(attr.name)}' required></VTextField>
+            <VTextField  type="text" placeholder="${attr.name} ${attr.type}" hide-details v-model='form.${capitalizeString(attr.name)}' disabled></VTextField>
         </v-col>`
+    }
+    for(const rel of cls.relations){
+        forms += `
+<v-col cols="12">
+    <v-label class="font-weight-medium mb-2">${capitalizeString(rel.type.ref?.name || '')}</v-label>
+    <v-select :items="${capitalizeString(rel.type.ref?.name || '')}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(rel.type.ref?.name || '')}" hide-details v-model="form.${capitalizeString(rel.type.ref?.name || '')}" disabled></v-select>
+</v-col>`
     }
     const index = generateDetailsText(cls,path_formid, formattr, forms);
     return index
@@ -37,6 +46,7 @@ function generateDetailsText(cls: LocalEntity, path_formid: string, formattr: st
                     <v-col cols="12">
                         <v-row>
                             ${forms}
+                            ${generateEnum(cls)}
                         </v-row>
                     </v-col>
                 </v-row>
@@ -147,4 +157,28 @@ const deleta${cls.name} = async () => {
     }
 };
 </script>`
+}
+
+function generateEnum (cls: LocalEntity):string {
+    return expandToString`
+  ${cls.enumentityatributes.map(enumEntityAtribute =>createEnum(enumEntityAtribute)).join("\n")}`
+}
+  
+function createEnum(Enum: EnumEntityAtribute): string {
+return expandToString`
+<v-col cols="12">
+    <v-label class="font-weight-medium mb-2">${Enum.type.ref?.name} *</v-label>
+    <v-select
+        :items="${capitalizeString(Enum.type.ref?.name || "")}"
+        item-title="tipo"
+        item-value="value"
+        placeholder="Selecione ${Enum.type.ref?.name}"
+        hide-details
+        required
+        disabled
+        v-model="form.${Enum.type.ref?.name.toLowerCase() || ""}"
+    >
+    </v-select>
+</v-col>
+`
 }

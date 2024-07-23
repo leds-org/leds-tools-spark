@@ -7,10 +7,15 @@ export function generate(cls: LocalEntity): string {
     const path_details = "`" + `/${cls.name}/details${cls.name}/\${id}` + "`" 
 
     let headers = ""
+
     for(const attr of cls.attributes) {
         headers += `
 { title: '${attr.name}', sortable: false, key: '${capitalizeString(attr.name)}' },`
     }
+
+    headers += cls.relations.map(relations => `{ title: '${relations.type.ref?.name}', sortable: false, key: '${relations.type.ref?.name.toLowerCase()}Id' },`).join('\n')+'\n'
+    headers += `${cls.enumentityatributes.map(enumEntityAtribute => `{ title: '${enumEntityAtribute.type.ref?.name}', sortable: false, key: '${enumEntityAtribute.type.ref?.name.toLowerCase()}' },\n`)}`
+
     const index = generateIndexText(cls,path_form, path_details, headers);
     return index
     
