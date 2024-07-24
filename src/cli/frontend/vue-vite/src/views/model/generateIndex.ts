@@ -1,8 +1,9 @@
 import { expandToString } from "langium/generate";
 import { LocalEntity } from "../../../../../../language/generated/ast.js";
 import { capitalizeString } from "../../../../../util/generator-utils.js";
+import { RelationInfo } from "../../../../../util/relations.js";
 
-export function generate(cls: LocalEntity): string {
+export function generate(cls: LocalEntity, relations: RelationInfo[]): string {
     const path_form =  "`" + `/${cls.name}/form${cls.name}/\${id}` +  "`"
     const path_details = "`" + `/${cls.name}/details${cls.name}/\${id}` + "`" 
 
@@ -12,8 +13,7 @@ export function generate(cls: LocalEntity): string {
         headers += `
 { title: '${attr.name}', sortable: false, key: '${capitalizeString(attr.name)}' },`
     }
-
-    headers += cls.relations.map(relations => `{ title: '${relations.type.ref?.name}', sortable: false, key: '${relations.type.ref?.name.toLowerCase()}Id' },`).join('\n')+'\n'
+    relations.map(rel => headers +=  generateRelation(cls, rel))
     headers += `${cls.enumentityatributes.map(enumEntityAtribute => `{ title: '${enumEntityAtribute.type.ref?.name}', sortable: false, key: '${enumEntityAtribute.type.ref?.name.toLowerCase()}' },\n`)}`
 
     const index = generateIndexText(cls,path_form, path_details, headers);
@@ -192,8 +192,8 @@ const filter${cls.name} = () => {
     filtered${cls.name}.value = ${cls.name}.value;
   } else {
     const searchQuery = search.value.toLowerCase();
-    filtered${cls.name}.value = ${cls.name}.value.filter(item => 
-      item.Numero.toString().toLowerCase().includes(searchQuery)
+    filtered${cls.name}.value = ${cls.name}.value.filter(item =>
+      item.Nome.toLowerCase().includes(searchQuery)
     );
   }
 };
@@ -223,4 +223,26 @@ watch(dialogDelete, val => {
   width: 200px;
 }
 </style>`
+}
+
+function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : string {
+  let headersGenerated = ""
+  switch(card) {
+  case "OneToOne":
+    if(owner) {
+      headersGenerated += `{ title: '${tgt.name}', sortable: false, key: '${tgt.name.toLowerCase()}Id' }, \n`
+    }
+  case "OneToMany":
+    if(owner) {
+      headersGenerated += `{ title: '${tgt.name}', sortable: false, key: '${tgt.name.toLowerCase()}Id' }, \n`
+    }
+  case "ManyToOne":
+    if(owner) {
+      }
+  case "ManyToMany":
+    if(owner) {
+      headersGenerated += `{ title: '${tgt.name}', sortable: false, key: '${tgt.name.toLowerCase()}Id' }, \n`
+    }
+  }
+  return headersGenerated
 }

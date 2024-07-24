@@ -1,10 +1,11 @@
 import { expandToString } from "langium/generate"
 import { EnumEntityAtribute, EnumX, LocalEntity } from "../../../../../../language/generated/ast.js"
 import { capitalizeString } from "../../../../../util/generator-utils.js"
+import { RelationInfo } from "../../../../../util/relations.js"
 //import { processRelations } from "../../../../../util/relations.js"
 
 
-export function generate(cls: LocalEntity, enumx: EnumX[]): string {
+export function generate(cls: LocalEntity, enumx: EnumX[], relations: RelationInfo[]): string {
     let imports = ""
     let forms = ""
     let formattr = ""
@@ -12,34 +13,24 @@ export function generate(cls: LocalEntity, enumx: EnumX[]): string {
     let relationOptions = ""
     let OnMounted = ""
 
-    relationOptions += cls.relations.map(relations => `const ${relations.type.ref?.name}Options = ref([]);`).join('\n')+'\n'
-    formattr += cls.relations.map(relations => `${relations.type.ref?.name}: '',`).join('\n')+'\n'
     formattr += `${cls.enumentityatributes.map(enumEntityAtribute => `${enumEntityAtribute.type.ref?.name}: '', \n`)}`
 
     for(const attr of cls.attributes) {
-        
       formattr += `${capitalizeString(attr.name)}: '', \n`
-
       forms += `
 <v-col cols="12">
     <v-label class="font-weight-medium mb-2">${attr.name}</v-label>
-    <VTextField  type="text" placeholder="${attr.name} ${attr.type}" hide-details v-model='form.${attr.name}' required></VTextField>
+    <VTextField  type="text" placeholder="${attr.name} ${attr.type}" hide-details v-model='form.${capitalizeString(attr.name)}'></VTextField>
 </v-col>`
     }
-
-    for(const rel of cls.relations){
-        forms += `
-<v-col cols="12">
-    <v-label class="font-weight-medium mb-2">${capitalizeString(rel.type.ref?.name || '')}</v-label>
-    <v-select :items="${capitalizeString(rel.type.ref?.name || '')}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(rel.type.ref?.name || '')}" hide-details v-model="form.${capitalizeString(rel.type.ref?.name || '')}" required></v-select>
-</v-col>`
-        if(rel.type.ref?.name != cls.name) {
-        imports += `import ${rel.type.ref?.name}Service from '../../../services/requires/${rel.type.ref?.name}Requires'; \n`
-        relationGet += `const { list: list${rel.type.ref?.name} } = ${rel.type.ref?.name}Service(); \n`
-        OnMounted += `
-response = await list${rel.type.ref?.name}();
-${rel.type.ref?.name}Options.value = response.value;`
-        }
+    for(const rel of relations){
+        const {formattrGenerated, formsGenerated, importsGenerated, relationGetGenerated, OnMountedGenerated, relationOptionsGenerated} = generateRelation(cls, rel)
+        formattr += formattrGenerated
+        forms += formsGenerated
+        imports += importsGenerated
+        relationGet += relationGetGenerated
+        OnMounted += OnMountedGenerated
+        relationOptions += relationOptionsGenerated
     }
     
     const form = generateFormExport(cls, forms, formattr, enumx, imports, relationGet, relationOptions, OnMounted);
@@ -205,7 +196,7 @@ return expandToString`
         item-value="value"
         placeholder="Selecione ${Enum.type.ref?.name}"
         hide-details
-        required
+    
         v-model="form.${capitalizeString(Enum.type.ref?.name || "")}"
     >
     </v-select>
@@ -221,3 +212,69 @@ ${OnMounted}`
     }
     return ''
 }
+
+  function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : {formattrGenerated: string, formsGenerated: string, importsGenerated: string, relationGetGenerated: string, OnMountedGenerated: string, relationOptionsGenerated: string} {
+    let formsGenerated = ""
+    let importsGenerated = ""
+    let relationGetGenerated = ""
+    let OnMountedGenerated = ""
+    let relationOptionsGenerated = ""
+    let formattrGenerated = ""
+    switch(card) {
+    case "OneToOne":
+      if(owner) {
+        formsGenerated +=`
+<v-col cols="12">
+    <v-label class="font-weight-medium mb-2">${capitalizeString(tgt.name)}</v-label>
+    <v-select :items="${capitalizeString(tgt.name)}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(tgt.name)}" hide-details v-model="form.${capitalizeString(tgt.name)}Id"></v-select>
+</v-col>`
+        relationOptionsGenerated +=  `const ${tgt.name}Options = ref([]); \n`
+        formattrGenerated =  `${capitalizeString(tgt.name)}Id: '', \n`
+        if(tgt.name != cls.name) {
+            importsGenerated += `import ${tgt.name}Service from '../../../services/requires/${tgt.name}Requires'; \n`
+            relationGetGenerated += `const { list: list${tgt.name} } = ${tgt.name}Service(); \n`
+            OnMountedGenerated += `
+response = await list${tgt.name}();
+${tgt.name}Options.value = response.value;`
+        }
+      }
+    case "OneToMany":
+      if(owner) {
+        formsGenerated +=`
+<v-col cols="12">
+    <v-label class="font-weight-medium mb-2">${capitalizeString(tgt.name)}</v-label>
+    <v-select :items="${capitalizeString(tgt.name)}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(tgt.name)}" hide-details v-model="form.${capitalizeString(tgt.name)}Id"></v-select>
+</v-col>`
+        relationOptionsGenerated +=  `const ${tgt.name}Options = ref([]); \n`
+        formattrGenerated =  `${capitalizeString(tgt.name)}Id: '', \n`
+        if(tgt.name != cls.name) {
+            importsGenerated += `import ${tgt.name}Service from '../../../services/requires/${tgt.name}Requires'; \n`
+            relationGetGenerated += `const { list: list${tgt.name} } = ${tgt.name}Service(); \n`
+            OnMountedGenerated += `
+response = await list${tgt.name}();
+${tgt.name}Options.value = response.value;`
+        }
+      }
+    case "ManyToOne":
+      if(owner) {
+        }
+    case "ManyToMany":
+      if(owner) {
+        formsGenerated +=`
+<v-col cols="12">
+    <v-label class="font-weight-medium mb-2">${capitalizeString(tgt.name)}</v-label>
+    <v-select :items="${capitalizeString(tgt.name)}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(tgt.name)}" hide-details v-model="form.${capitalizeString(tgt.name)}Id"></v-select>
+</v-col>`
+        relationOptionsGenerated +=  `const ${tgt.name}Options = ref([]); \n`
+        formattrGenerated =  `${capitalizeString(tgt.name)}Id: '', \n`
+        if(tgt.name != cls.name) {
+            importsGenerated += `import ${tgt.name}Service from '../../../services/requires/${tgt.name}Requires'; \n`
+            relationGetGenerated += `const { list: list${tgt.name} } = ${tgt.name}Service(); \n`
+            OnMountedGenerated += `
+response = await list${tgt.name}();
+${tgt.name}Options.value = response.value;`
+        }
+      }
+    }
+    return {formattrGenerated, formsGenerated, importsGenerated, relationGetGenerated, OnMountedGenerated, relationOptionsGenerated}
+  }

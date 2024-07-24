@@ -1,8 +1,9 @@
 import { expandToString } from "langium/generate"
 import { EnumEntityAtribute, LocalEntity } from "../../../../../../language/generated/ast.js"
 import { capitalizeString } from "../../../../../util/generator-utils.js"
+import { RelationInfo } from "../../../../../util/relations.js"
 
-export function generate(cls: LocalEntity): string {
+export function generate(cls: LocalEntity, relations: RelationInfo[]): string {
 
     const path_formid =  "`" + `/${cls.name}/form${cls.name}/\${id}` +  "`"
     let formattr = ""
@@ -18,12 +19,10 @@ export function generate(cls: LocalEntity): string {
             <VTextField  type="text" placeholder="${attr.name} ${attr.type}" hide-details v-model='form.${capitalizeString(attr.name)}' disabled></VTextField>
         </v-col>`
     }
-    for(const rel of cls.relations){
-        forms += `
-<v-col cols="12">
-    <v-label class="font-weight-medium mb-2">${capitalizeString(rel.type.ref?.name || '')}</v-label>
-    <v-select :items="${capitalizeString(rel.type.ref?.name || '')}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(rel.type.ref?.name || '')}" hide-details v-model="form.${capitalizeString(rel.type.ref?.name || '')}" disabled></v-select>
-</v-col>`
+    for(const rel of relations){
+        const {formattrGenerated, formsGenerated} = generateRelation(cls, rel)
+        formattr += formattrGenerated
+        forms += formsGenerated
     }
     const index = generateDetailsText(cls,path_formid, formattr, forms);
     return index
@@ -182,3 +181,41 @@ return expandToString`
 </v-col>
 `
 }
+
+function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : {formattrGenerated: string, formsGenerated: string} {
+    let formsGenerated = ""
+    let formattrGenerated = ""
+    switch(card) {
+    case "OneToOne":
+      if(owner) {
+        formsGenerated +=`
+<v-col cols="12">
+    <v-label class="font-weight-medium mb-2">${capitalizeString(tgt.name)}</v-label>
+    <v-select :items="${capitalizeString(tgt.name)}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(tgt.name)}" hide-details disabled v-model="form.${tgt.name.toLowerCase()}Id"></v-select>
+</v-col>`
+        formattrGenerated =  `${capitalizeString(tgt.name)}Id: '', \n`
+      }
+    case "OneToMany":
+      if(owner) {
+        formsGenerated +=`
+<v-col cols="12">
+    <v-label class="font-weight-medium mb-2">${capitalizeString(tgt.name)}</v-label>
+    <v-select :items="${capitalizeString(tgt.name)}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(tgt.name)}" hide-details disabled v-model="form.${tgt.name.toLowerCase()}Id"></v-select>
+</v-col>`
+        formattrGenerated =  `${capitalizeString(tgt.name)}Id: '', \n`
+      }
+    case "ManyToOne":
+      if(owner) {
+        }
+    case "ManyToMany":
+      if(owner) {
+        formsGenerated +=`
+<v-col cols="12">
+    <v-label class="font-weight-medium mb-2">${capitalizeString(tgt.name)}</v-label>
+    <v-select :items="${capitalizeString(tgt.name)}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(tgt.name)}" hide-details disabled v-model="form.${tgt.name.toLowerCase()}Id"></v-select>
+</v-col>`
+        formattrGenerated =  `${capitalizeString(tgt.name)}Id: '', \n`
+      }
+    }
+    return {formattrGenerated, formsGenerated}
+  }
