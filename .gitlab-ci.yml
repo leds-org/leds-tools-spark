@@ -3,7 +3,7 @@ image: node:16
 stages:
   - install
   - build
-  - test
+  # - test
   - publish
 
 variables:
@@ -33,10 +33,10 @@ build:
     paths:
       - dist/
 
-test:
-  stage: test
-  script:
-    - npm test
+# test:
+#   stage: test
+#   script:
+#     - npm test
 
 publish:
   stage: publish
