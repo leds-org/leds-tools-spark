@@ -27,6 +27,7 @@ install:
 build:
   stage: build
   script:
+    - npm run langium:generate
     - npm run build
   artifacts:
     paths:
