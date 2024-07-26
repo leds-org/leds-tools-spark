@@ -1,7 +1,7 @@
 
 ![Logo](images/icon.png)
 
-# R2D2
+# Spark
 ### Gerador de código Backend, documentação e diagramas uml. Utilizando linguagem de programação própria feita em Langium, aqui explicaremos sua utilização e sintaxe.
 ## Instalação:
 
@@ -9,9 +9,9 @@ Instale a extensão pelo [Visual Studio Marketplace](https://marketplace.visuals
 
 ## Utilização:
 
-Para utilizar o R2D2, crie seu arquivo `.r2d2`, programe a estrutura desejada e depois clique com o botão direito e escolha o que você deseja gerar.
+Para utilizar o Spark, crie seu arquivo `.Spark`, programe a estrutura desejada e depois clique com o botão direito e escolha o que você deseja gerar.
 
-![Right Click Menu](images/right-click-R2D2.png)
+![Right Click Menu](images/right-click.png)
 ## Componentes da linguagem
 
 ### Configuration:
@@ -26,7 +26,7 @@ Configuration {
     package_path: LANGUAGETYPE
 }
 ```
-A variável LANGUAGETYPE pode ser: `python, java`.
+A variável LANGUAGETYPE pode ser: `python, java, csharp-minimal-api, csharp-clean-architecture`.
 
 ### Módulos:
 Definição dos módulos, apenas o nome do módulo e definição de seus elementos, dentro de um módulo podemos ter outros módulos ou entidades.
