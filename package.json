@@ -1,5 +1,5 @@
 {
-    "name": "r2d2",
+    "name": "spark-leds",
     "description": "A code generator that speeds up development by creating code in Django, Java, and C#.",
     "version": "0.0.3",
     "icon": "images/icon.png",
@@ -80,7 +80,10 @@
                     "r-2-d-2"
                 ],
                 "extensions": [
-                    ".r2d2"
+                    ".Spark", 
+                    ".spark", 
+                    ".SPARK", 
+                    ".spk"
                 ],
                 "configuration": "./language-configuration.json"
             }
