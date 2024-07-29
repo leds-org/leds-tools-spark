@@ -9,7 +9,7 @@ stages:
 variables:
   NPM_CONFIG_CACHE: "$CI_PROJECT_DIR/.npm"
   VSCODE_PUBLISHER: "ledsifes"
-  VSCODE_TOKEN: "$VSCODE_TOKEN" 
+  VSCODE_TOKEN: "$VSCODE_TOKEN"
 
 cache:
   paths:
@@ -17,7 +17,7 @@ cache:
     - node_modules/
 
 before_script:
-  - npm install -g vsce
+  - npm install -g @vscode/vsce
 
 install:
   stage: install
@@ -31,7 +31,9 @@ build:
     - npm run build
   artifacts:
     paths:
-      - dist/
+      - src/
+      - out/ 
+      - syntaxes/
 
 # test:
 #   stage: test
@@ -40,6 +42,8 @@ build:
 
 publish:
   stage: publish
+  dependencies:
+    - build  
   script:
     - |
       if [ "$CI_COMMIT_BRANCH" == "main" ]; then
@@ -49,3 +53,8 @@ publish:
       fi
   only:
     - main
+  artifacts:
+    paths:
+      - src/  
+      - out/
+      - syntaxes/
