@@ -43,7 +43,7 @@ publish:
   script:
     - |
       if [ "$CI_COMMIT_BRANCH" == "main" ]; then
-        vsce publish --packagePath ./dist --pat $VSCODE_TOKEN
+        vsce publish --pat $VSCODE_TOKEN
       else
         echo "Not on main branch, skipping publish."
       fi
