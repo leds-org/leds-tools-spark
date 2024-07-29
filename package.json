@@ -8,11 +8,6 @@
         "name": "LEDS-IFES",
         "email": "ledsifes@gmail.com"
     },
-    "files": [
-        "bin",
-        "out",
-        "src"
-    ],
     "publisher": "ledsifes",
     "repository": {
         "type": "git",
