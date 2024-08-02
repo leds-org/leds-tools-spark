@@ -1,14 +1,14 @@
 import { type Module, inject } from 'langium';
 import { createDefaultModule, createDefaultSharedModule, type DefaultSharedModuleContext, type LangiumServices, type LangiumSharedServices, type PartialLangiumServices } from 'langium/lsp';
-import { R2D2GeneratedModule, R2D2GeneratedSharedModule } from './generated/module.js';
-import { R2D2Validator, registerValidationChecks } from './r-2-d-2-validator.js';
+import { SPARKGeneratedModule, SPARKGeneratedSharedModule } from './generated/module.js';
+import { SPARKValidator, registerValidationChecks } from './s-p-a-r-k-validator.js';
 import { CustomScopeComputation } from './r-2-d-3-scope.js';
 /**
  * Declaration of custom services - add your own service classes here.
  */
-export type R2D2AddedServices = {
+export type SPARKAddedServices = {
     validation: {
-        R2D2Validator: R2D2Validator
+        SPARKValidator: SPARKValidator
     }
 }
 
@@ -16,19 +16,19 @@ export type R2D2AddedServices = {
  * Union of Langium default services and your custom services - use this as constructor parameter
  * of custom service classes.
  */
-export type R2D2Services = LangiumServices & R2D2AddedServices
+export type SPARKServices = LangiumServices & SPARKAddedServices
 
 /**
  * Dependency injection module that overrides Langium default services and contributes the
  * declared custom services. The Langium defaults can be partially specified to override only
  * selected services, while the custom services must be fully specified.
  */
-export const R2D2Module: Module<R2D2Services, PartialLangiumServices & R2D2AddedServices> = {
+export const SPARKModule: Module<SPARKServices, PartialLangiumServices & SPARKAddedServices> = {
     references:{
         ScopeComputation: (services) => new CustomScopeComputation(services)
     },
     validation: {
-        R2D2Validator: () => new R2D2Validator()
+        SPARKValidator: () => new SPARKValidator()
     }
 };
 
@@ -47,20 +47,20 @@ export const R2D2Module: Module<R2D2Services, PartialLangiumServices & R2D2Added
  * @param context Optional module context with the LSP connection
  * @returns An object wrapping the shared services and the language-specific services
  */
-export function createR2D2Services(context: DefaultSharedModuleContext): {
+export function createSPARKServices(context: DefaultSharedModuleContext): {
     shared: LangiumSharedServices,
-    R2D2: R2D2Services
+    SPARK: SPARKServices
 } {
     const shared = inject(
         createDefaultSharedModule(context),
-        R2D2GeneratedSharedModule
+        SPARKGeneratedSharedModule
     );
-    const R2D2 = inject(
+    const SPARK = inject(
         createDefaultModule({ shared }),
-        R2D2GeneratedModule,
-        R2D2Module
+        SPARKGeneratedModule,
+        SPARKModule
     );
-    shared.ServiceRegistry.register(R2D2);
-    registerValidationChecks(R2D2);
-    return { shared, R2D2 };
+    shared.ServiceRegistry.register(SPARK);
+    registerValidationChecks(SPARK);
+    return { shared, SPARK };
 }

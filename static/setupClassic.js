@@ -1,5 +1,5 @@
 import { addMonacoStyles, defineUserServices, MonacoEditorLanguageClientWrapper } from './bundle/index.js';
-import monarchSyntax from "../syntaxes/r-2-d-2.monarch.js";
+import monarchSyntax from "../syntaxes/s-p-a-r-k.monarch.js";
 import { configureWorker } from './setup.js';
 
 addMonacoStyles('monaco-editor-styles');
@@ -10,7 +10,7 @@ export const setupConfigClassic = () => {
             serviceConfig: defineUserServices(),
             editorAppConfig: {
                 $type: 'classic',
-                languageId: 'r-2-d-2',
+                languageId: 's-p-a-r-k',
                 code: `// r2d2 is running in the web!`,
                 useDiffEditor: false,
                 languageExtensionConfig: { id: 'langium' },

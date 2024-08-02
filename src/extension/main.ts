@@ -9,7 +9,7 @@ let outputChannel: vscode.OutputChannel
 
 // This function is called when the extension is activated.
 export function activate(context: vscode.ExtensionContext): void {
-    outputChannel = vscode.window.createOutputChannel("R2D2", 'r-2-d-2')
+    outputChannel = vscode.window.createOutputChannel("SPARK", 's-p-a-r-k')
     
     registerGenerateCommands(context)
 
@@ -40,12 +40,12 @@ function startLanguageClient(context: vscode.ExtensionContext): LanguageClient {
 
     // Options to control the language client
     const clientOptions: LanguageClientOptions = {
-        documentSelector: [{ scheme: 'file', language: 'r-2-d-2' }]
+        documentSelector: [{ scheme: 'file', language: 's-p-a-r-k' }]
     };
 
     // Create the language client and start the client.
     const client = new LanguageClient(
-        'r-2-d-2',
+        's-p-a-r-k',
         'r2d2',
         serverOptions,
         clientOptions
@@ -70,18 +70,18 @@ function registerGenerateCommands(context: vscode.ExtensionContext) : void {
     }
 
     const generateBack = build_generate_functions({ only_back: true })
-    context.subscriptions.push(vscode.commands.registerCommand("r-2-d-2.generateBack", generateBack))
+    context.subscriptions.push(vscode.commands.registerCommand("s-p-a-r-k.generateBack", generateBack))
 
     const generateFront = build_generate_functions({ only_front: true })
-    context.subscriptions.push(vscode.commands.registerCommand("r-2-d-2.generateFront", generateFront))
+    context.subscriptions.push(vscode.commands.registerCommand("s-p-a-r-k.generateFront", generateFront))
 
     const generateBoth = build_generate_functions({ all: true })
-    context.subscriptions.push(vscode.commands.registerCommand("r-2-d-2.generateBoth", generateBoth))
+    context.subscriptions.push(vscode.commands.registerCommand("s-p-a-r-k.generateBoth", generateBoth))
     
     const generateDocumentation = build_generate_functions({ only_Documentation: true })
-    context.subscriptions.push(vscode.commands.registerCommand("r-2-d-2.generateDocumentation", generateDocumentation))
+    context.subscriptions.push(vscode.commands.registerCommand("s-p-a-r-k.generateDocumentation", generateDocumentation))
 
     const generateBacklog = build_generate_functions({ only_Backlog: true })
-    context.subscriptions.push(vscode.commands.registerCommand("r-2-d-2.generateBacklog", generateBacklog))
+    context.subscriptions.push(vscode.commands.registerCommand("s-p-a-r-k.generateBacklog", generateBacklog))
 
 }

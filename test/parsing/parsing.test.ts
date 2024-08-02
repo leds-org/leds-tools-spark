@@ -2,16 +2,16 @@ import { beforeAll, describe, expect, test } from "vitest";
 import { EmptyFileSystem, type LangiumDocument } from "langium";
 import { expandToString as s } from "langium/generate";
 import { parseHelper } from "langium/test";
-import { createR2D2Services } from "../../src/language/r-2-d-2-module.js";
+import { createSPARKServices } from "../../src/language/s-p-a-r-k-module.js";
 import { Model, isModel } from "../../src/language/generated/ast.js";
 
-let services: ReturnType<typeof createR2D2Services>;
+let services: ReturnType<typeof createSPARKServices>;
 let parse:    ReturnType<typeof parseHelper<Model>>;
 let document: LangiumDocument<Model> | undefined;
 
 beforeAll(async () => {
-    services = createR2D2Services(EmptyFileSystem);
-    parse = parseHelper<Model>(services.R2D2);
+    services = createSPARKServices(EmptyFileSystem);
+    parse = parseHelper<Model>(services.SPARK);
 
     // activate the following if your linking test requires elements from a built-in library, for example
     // await services.shared.workspace.WorkspaceManager.initializeWorkspace([]);
