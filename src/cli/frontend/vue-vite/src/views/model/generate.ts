@@ -4,7 +4,6 @@ import path from "path";
 import { createPath } from "../../../../../util/generator-utils.js";
 import { generate as generateForms } from "./generateForms.js";
 import { generate as generateIndex } from "./generateIndex.js";
-import { generate as generateDetails } from "./generateDetails.js";
 import { processRelations, RelationInfo } from "../../../../../util/relations.js";
 
 export function generate(model: Model, target_folder: string) : void {
@@ -25,7 +24,6 @@ export function generate(model: Model, target_folder: string) : void {
 
           fs.writeFileSync(path.join(cls_folder, `Form${cls.name}.vue`), generateForms(cls, enumx, relations))
           fs.writeFileSync(path.join(cls_folder, `Index${cls.name}.vue`), generateIndex(cls, relations))
-          fs.writeFileSync(path.join(cls_folder, `Details${cls.name}.vue`), generateDetails(cls, relations))
       }
         
     }

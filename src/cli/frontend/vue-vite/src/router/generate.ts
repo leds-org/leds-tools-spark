@@ -21,12 +21,6 @@ export function generate(model: Model, target_folder: string) : void {
     component: () => import('@/views/${model.configuration?.name}/${cls.name}/Index${cls.name}.vue'),
 },
 {
-    name: 'Detalhes${cls.name}',
-    path: '/${cls.name}/Details${cls.name}/:id?',
-    component: () => import('@/views/${model.configuration?.name}/${cls.name}/Details${cls.name}.vue'),
-    props: true
-},
-{
     name: 'Cadastro${cls.name}',
     path: '/${cls.name}/form${cls.name}/:id?/:${cls.name}?',
     component: () => import('@/views/${model.configuration?.name}/${cls.name}/Form${cls.name}.vue'),
@@ -83,6 +77,11 @@ const MainRoutes = {
     redirect: '/main',
     component: () => import('@/layouts/full/FullLayout.vue'),
     children: [
+    {
+    name: 'Index',
+    path: '/',
+    component: () => import('@/views/index.vue'),
+    },
     ${paths}
     ]
 };

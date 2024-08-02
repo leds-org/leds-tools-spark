@@ -5,7 +5,6 @@ import { RelationInfo } from "../../../../../util/relations.js";
 
 export function generate(cls: LocalEntity, relations: RelationInfo[]): string {
     const path_form =  "`" + `/${cls.name}/form${cls.name}/\${id}` +  "`"
-    const path_details = "`" + `/${cls.name}/details${cls.name}/\${id}` + "`" 
 
     let headers = ""
 
@@ -16,13 +15,13 @@ export function generate(cls: LocalEntity, relations: RelationInfo[]): string {
     relations.map(rel => headers +=  generateRelation(cls, rel))
     headers += `${cls.enumentityatributes.map(enumEntityAtribute => `{ title: '${enumEntityAtribute.type.ref?.name}', sortable: false, key: '${enumEntityAtribute.type.ref?.name.toLowerCase()}' },\n`)}`
 
-    const index = generateIndexText(cls,path_form, path_details, headers);
+    const index = generateIndexText(cls,path_form, headers);
     return index
     
 
 }
 
-function generateIndexText(cls: LocalEntity, path_form: string, path_details: string, headers: string): string {
+function generateIndexText(cls: LocalEntity, path_form: string, headers: string): string {
     return expandToString`
 <template>
     <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs" />
@@ -63,7 +62,6 @@ function generateIndexText(cls: LocalEntity, path_form: string, path_details: st
             </v-dialog>
           </template>
           <template v-slot:item.actions="{ item }">
-            <v-icon class="mdi mdi-eye me-2" color="primary" size="small" @click="goToDetail(item.Id)" />
             <v-icon color="primary" size="small" class="me-2" @click="editItem(item.Id)">
               mdi-pencil
             </v-icon>
@@ -177,10 +175,6 @@ function close() {
     editedItem.value = Object.assign({}, defaultItem.value);
     editedIndex.value = -1;
   });
-}
-
-function goToDetail(id: any) {
-  router.push({ path: ${path_details} });
 }
 
 const search${cls.name} = () => {
