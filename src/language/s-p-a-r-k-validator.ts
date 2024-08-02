@@ -1,15 +1,15 @@
 import type { NamedAstNode, ValidationAcceptor, ValidationChecks } from 'langium';
-import { isLocalEntity, type LocalEntity, type R2D2AstType } from './generated/ast.js';
-import type { R2D2Services } from './r-2-d-2-module.js';
+import { isLocalEntity, type LocalEntity, type SPARKAstType } from './generated/ast.js';
+import type { SPARKServices } from './s-p-a-r-k-module.js';
 import { cycleFinder } from '../cli/util/generator-utils.js';
 
 /**
  * Register custom validation checks.
  */
-export function registerValidationChecks(services: R2D2Services) {
+export function registerValidationChecks(services: SPARKServices) {
     const registry = services.validation.ValidationRegistry;
-    const validator = services.validation.R2D2Validator;
-    const checks: ValidationChecks<R2D2AstType> = {
+    const validator = services.validation.SPARKValidator;
+    const checks: ValidationChecks<SPARKAstType> = {
         Module: validator.checkNameIsCamelCase,
         LocalEntity: [
             validator.checkNameIsCamelCase,
@@ -26,7 +26,7 @@ export function registerValidationChecks(services: R2D2Services) {
 /**
  * Implementation of custom validations.
  */
-export class R2D2Validator {
+export class SPARKValidator {
     checkNameIsCamelCase(n: NamedAstNode, accept: ValidationAcceptor) : void {
         if(!n.name.match(/^[A-Z]\w*$/)) {
             accept('warning', "This name should be in CamelCase", { node: n, property: 'name' })

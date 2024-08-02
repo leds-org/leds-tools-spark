@@ -1,14 +1,14 @@
 {
-    "projectName": "R2D2",
+    "projectName": "SPARK",
     "languages": [{
-        "id": "r-2-d-2",
-        "grammar": "src/language/r-2-d-2.langium",
+        "id": "s-p-a-r-k",
+        "grammar": "src/language/s-p-a-r-k.langium",
         "fileExtensions": [".Spark",".spark", ".SPARK", ".spk"],
         "textMate": {
-            "out": "syntaxes/r-2-d-2.tmLanguage.json"
+            "out": "syntaxes/s-p-a-r-k.tmLanguage.json"
         },
         "monarch": {
-            "out": "syntaxes/r-2-d-2.monarch.ts"
+            "out": "syntaxes/s-p-a-r-k.monarch.ts"
         }
     }],
     "out": "src/language/generated"

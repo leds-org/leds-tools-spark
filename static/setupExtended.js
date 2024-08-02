@@ -6,21 +6,21 @@ addMonacoStyles('monaco-editor-styles');
 export const setupConfigExtended = () => {
     const extensionFilesOrContents = new Map();
     const languageConfigUrl = new URL('../language-configuration.json', window.location.href);
-    const textmateConfigUrl = new URL('../syntaxes/r-2-d-2.tmLanguage.json', window.location.href);
+    const textmateConfigUrl = new URL('../syntaxes/s-p-a-r-k.tmLanguage.json', window.location.href);
     extensionFilesOrContents.set('/language-configuration.json', languageConfigUrl);
-    extensionFilesOrContents.set('/r-2-d-2-grammar.json', textmateConfigUrl);
+    extensionFilesOrContents.set('/s-p-a-r-k-grammar.json', textmateConfigUrl);
 
     return {
         wrapperConfig: {
             serviceConfig: defineUserServices(),
             editorAppConfig: {
                 $type: 'extended',
-                languageId: 'r-2-d-2',
+                languageId: 's-p-a-r-k',
                 code: `// r2d2 is running in the web!`,
                 useDiffEditor: false,
                 extensions: [{
                     config: {
-                        name: 'r-2-d-2-web',
+                        name: 's-p-a-r-k-web',
                         publisher: 'generator-langium',
                         version: '1.0.0',
                         engines: {
@@ -28,16 +28,16 @@ export const setupConfigExtended = () => {
                         },
                         contributes: {
                             languages: [{
-                                id: 'r-2-d-2',
+                                id: 's-p-a-r-k',
                                 extensions: [
-                                    '.r-2-d-2'
+                                    '.s-p-a-r-k'
                                 ],
                                 configuration: './language-configuration.json'
                             }],
                             grammars: [{
-                                language: 'r-2-d-2',
-                                scopeName: 'source.r-2-d-2',
-                                path: './r-2-d-2-grammar.json'
+                                language: 's-p-a-r-k',
+                                scopeName: 'source.s-p-a-r-k',
+                                path: './s-p-a-r-k-grammar.json'
                             }]
                         }
                     },

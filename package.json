@@ -1,7 +1,7 @@
 {
     "name": "spark-leds",
     "description": "A code generator that speeds up development by creating code in Django, Java, and C#.",
-    "version": "0.0.1",
+    "version": "0.1.1",
     "icon": "images/icon.png",
     "license": "Apache-2.0",
     "author": {
@@ -25,7 +25,7 @@
         "build:web": "npm run build && npm run prepare:static && npm run build:monarch && npm run build:worker && npm run build:bundle",
         "build:monarch": "tsc -b tsconfig.monarch.json",
         "build:bundle": "vite --config ./vite.bundle.config.ts build",
-        "build:worker": "esbuild --minify ./out/language/main-browser.js --bundle --format=iife --outfile=./static/worker/r-2-d-2-server-worker.js",
+        "build:worker": "esbuild --minify ./out/language/main-browser.js --bundle --format=iife --outfile=./static/worker/s-p-a-r-k-server-worker.js",
         "dev": "vite",
         "dev:debug": "vite --debug --force",
         "serve": "npm run dev",
@@ -69,10 +69,10 @@
     "contributes": {
         "languages": [
             {
-                "id": "r-2-d-2",
+                "id": "s-p-a-r-k",
                 "aliases": [
                     "r2d2",
-                    "r-2-d-2"
+                    "s-p-a-r-k"
                 ],
                 "extensions": [
                     ".Spark", 
@@ -85,91 +85,91 @@
         ],
         "grammars": [
             {
-                "language": "r-2-d-2",
-                "scopeName": "source.r-2-d-2",
-                "path": "syntaxes/r-2-d-2.tmLanguage.json"
+                "language": "s-p-a-r-k",
+                "scopeName": "source.s-p-a-r-k",
+                "path": "syntaxes/s-p-a-r-k.tmLanguage.json"
             }
         ],
         "commands": [
             {
-                "command": "r-2-d-2.generateBack",
+                "command": "s-p-a-r-k.generateBack",
                 "title": "Generate Backend"
             },
             {
-                "command": "r-2-d-2.generateFront",
+                "command": "s-p-a-r-k.generateFront",
                 "title": "Generate Frontend"
             },
             {
-                "command": "r-2-d-2.generateBoth",
+                "command": "s-p-a-r-k.generateBoth",
                 "title": "Generate All"
             },
             {
-                "command": "r-2-d-2.generateDocumentation",
+                "command": "s-p-a-r-k.generateDocumentation",
                 "title": "Generate Project Documentation"
             },
             {
-                "command": "r-2-d-2.generateBacklog",
+                "command": "s-p-a-r-k.generateBacklog",
                 "title": "Generate Backlog "
             }
         ],
         "menus": {
             "commandPalette": [
                 {
-                    "command": "r-2-d-2.generateBack",
-                    "when": "editorLangId == r-2-d-2"
+                    "command": "s-p-a-r-k.generateBack",
+                    "when": "editorLangId == s-p-a-r-k"
                 },
                 {
-                    "command": "r-2-d-2.generateFront",
-                    "when": "editorLangId == r-2-d-2"
+                    "command": "s-p-a-r-k.generateFront",
+                    "when": "editorLangId == s-p-a-r-k"
                 },
                 {
-                    "command": "r-2-d-2.generateBoth",
-                    "when": "editorLangId == r-2-d-2"
+                    "command": "s-p-a-r-k.generateBoth",
+                    "when": "editorLangId == s-p-a-r-k"
                 },
                 {
-                    "command": "r-2-d-2.generateDocumentation",
-                    "when": "editorLangId == r-2-d-2"
+                    "command": "s-p-a-r-k.generateDocumentation",
+                    "when": "editorLangId == s-p-a-r-k"
                 },
                 {
-                    "command": "r-2-d-2.generateBacklog",
-                    "when": "editorLangId == r-2-d-2"
+                    "command": "s-p-a-r-k.generateBacklog",
+                    "when": "editorLangId == s-p-a-r-k"
                 }
             ],
             "editor/context": [
                 {
-                    "command": "r-2-d-2.generateBack",
+                    "command": "s-p-a-r-k.generateBack",
                     "group": "z_commands",
-                    "when": "editorLangId == r-2-d-2"
+                    "when": "editorLangId == s-p-a-r-k"
                 },
                 {
-                    "command": "r-2-d-2.generateFront",
+                    "command": "s-p-a-r-k.generateFront",
                     "group": "z_commands",
-                    "when": "editorLangId == r-2-d-2"
+                    "when": "editorLangId == s-p-a-r-k"
                 },
                 {
-                    "command": "r-2-d-2.generateBoth",
+                    "command": "s-p-a-r-k.generateBoth",
                     "group": "z_commands",
-                    "when": "editorLangId == r-2-d-2"
+                    "when": "editorLangId == s-p-a-r-k"
                 },
                 {
-                    "command": "r-2-d-2.generateDocumentation",
+                    "command": "s-p-a-r-k.generateDocumentation",
                     "group": "z_commands",
-                    "when": "editorLangId == r-2-d-2"
+                    "when": "editorLangId == s-p-a-r-k"
                 },
                 {
-                    "command": "r-2-d-2.generateBacklog",
+                    "command": "s-p-a-r-k.generateBacklog",
                     "group": "z_commands",
-                    "when": "editorLangId == r-2-d-2"
+                    "when": "editorLangId == s-p-a-r-k"
                 }
             ]
         }
     },
     "activationEvents": [
-        "onLanguage:r-2-d-2"
+        "onLanguage:s-p-a-r-k"
     ],
     "main": "./out/extension/main.cjs",
     "bin": {
-        "r-2-d-2-cli": "./bin/cli.js"
+        "s-p-a-r-k-cli": "./bin/cli.js"
     },
     "overrides": {
         "monaco-editor": "$monaco-editor",

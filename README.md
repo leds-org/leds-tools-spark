@@ -5,7 +5,7 @@
 ### Gerador de código Backend, documentação e diagramas uml. Utilizando linguagem de programação própria feita em Langium, aqui explicaremos sua utilização e sintaxe.
 ## Instalação:
 
-Instale a extensão pelo [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=ledsifes.r2d2), ou clone o repositório, crie a package da extensão, e instale.
+Instale a extensão pelo [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=LEDSIFES.spark-leds), ou clone o repositório, crie a package da extensão, e instale.
 
 ## Utilização:
 
