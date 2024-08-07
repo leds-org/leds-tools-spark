@@ -6,22 +6,27 @@ import { RelationInfo } from "../../../../../util/relations.js";
 export function generate(cls: LocalEntity, relations: RelationInfo[]): string {
     const path_form =  "`" + `/${cls.name}/form${cls.name}/\${id}` +  "`"
 
+    let interfaces = ""
     let headers = ""
 
     for(const attr of cls.attributes) {
         headers += `
 { title: '${attr.name}', sortable: false, key: '${capitalizeString(attr.name)}' },`
+        interfaces += `
+${capitalizeString(attr.name)}: string;`
     }
-    relations.map(rel => headers +=  generateRelation(cls, rel))
-    headers += `${cls.enumentityatributes.map(enumEntityAtribute => `{ title: '${enumEntityAtribute.type.ref?.name}', sortable: false, key: '${enumEntityAtribute.type.ref?.name.toLowerCase()}' },\n`)}`
+    headers+="\n"
 
-    const index = generateIndexText(cls,path_form, headers);
+    relations.map(rel => headers +=  generateRelation(cls, rel))
+    headers += `${cls.enumentityatributes.map(enumEntityAtribute => `{ title: '${enumEntityAtribute.type.ref?.name}', sortable: false, key: '${enumEntityAtribute.type.ref?.name.toLowerCase()}' }`).join(", \n")}`
+
+    const index = generateIndexText(cls,path_form, headers, interfaces);
     return index
     
 
 }
 
-function generateIndexText(cls: LocalEntity, path_form: string, headers: string): string {
+function generateIndexText(cls: LocalEntity, path_form: string, headers: string, interfaces: string): string {
     return expandToString`
 <template>
     <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs" />
@@ -78,7 +83,7 @@ function generateIndexText(cls: LocalEntity, path_form: string, headers: string)
   </template>
   
   
-  <script setup lang="ts">
+<script setup lang="ts">
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import dayjs from 'dayjs';
 import Swal from 'sweetalert2';
@@ -105,8 +110,16 @@ const filtered${cls.name} = ref([]);
 const editedIndex = ref(-1);
 const editedItem = ref({}); 
 const defaultItem = ref({}); 
-const itemToDelete = ref(null);
+const itemToDelete = ref<itemToDeleteInterface>();
 const search = ref('');
+
+interface ${cls.name}Interface {
+${interfaces}
+}
+
+interface itemToDeleteInterface {
+  Id: string;
+}
 
 const formTitle = computed(() => {
   return editedIndex.value === -1 ? 'New Item' : 'Edit Item';
@@ -119,7 +132,7 @@ onMounted(() => {
 const getPosts = async () => {
   try {
     const data = await list();
-    data.value.forEach((element) => {
+    data.value.forEach((element: any) => {
       element.Data = dayjs(element.Data).format('DD/MM/YYYY');
     });
     ${cls.name}.value = data.value;
@@ -226,17 +239,21 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
     if(owner) {
       headersGenerated += `{ title: '${tgt.name}', sortable: false, key: '${tgt.name.toLowerCase()}Id' }, \n`
     }
+    break;
   case "OneToMany":
     if(owner) {
       headersGenerated += `{ title: '${tgt.name}', sortable: false, key: '${tgt.name.toLowerCase()}Id' }, \n`
     }
+    break;
   case "ManyToOne":
     if(owner) {
       }
+    break;
   case "ManyToMany":
     if(owner) {
       headersGenerated += `{ title: '${tgt.name}', sortable: false, key: '${tgt.name.toLowerCase()}Id' }, \n`
     }
+    break;
   }
   return headersGenerated
 }

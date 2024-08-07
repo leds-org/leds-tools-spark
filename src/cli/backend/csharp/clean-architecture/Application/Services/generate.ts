@@ -78,14 +78,14 @@ namespace ${model.configuration?.name}.Application.Services
 
         public virtual async Task<IQueryable<Response>> GetAll()
         {
-            var result = await _repository.GetAll();
+            var result = _repository.GetAll();
             var response = result.ProjectTo<Response>(_mapper.ConfigurationProvider);
             return response;
         }
 
         public virtual async Task<IQueryable<Response>> GetById(Guid id)
         {
-            var result = await _repository.GetById(id);
+            var result = _repository.GetById(id);
             var response = result.ProjectTo<Response>(_mapper.ConfigurationProvider);
             return response;
         }
@@ -99,7 +99,7 @@ namespace ${model.configuration?.name}.Application.Services
 
         public virtual async Task<ApiResponse> Delete(Guid id, CancellationToken cancellationToken)
         {
-            var entity = await _repository.GetById(id).Result.FirstOrDefaultAsync();
+            var entity = await _repository.GetById(id).FirstOrDefaultAsync();
             await _repository.Delete(entity);
             return new ApiResponse(200, "item deletado com sucesso!");
         }
@@ -108,7 +108,7 @@ namespace ${model.configuration?.name}.Application.Services
         {
             var entity = _mapper.Map<Entity>(request);
 
-            var result = await _repository.GetById(entity.Id).Result.FirstOrDefaultAsync();
+            var result = await _repository.GetById(entity.Id).FirstOrDefaultAsync();
             result.Update(entity);
 
             await _repository.Update(result);

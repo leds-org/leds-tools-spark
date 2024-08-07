@@ -120,6 +120,9 @@ function generateTypeAttribute(attribute:Attribute): Generated{
   if (attribute.type.toString().toLowerCase() === "date"){
     return "DateTime"
   }
+  if (attribute.type.toString().toLowerCase() === "boolean"){
+    return "bool"
+  }
   if (attribute.type.toString().toLowerCase() === "cpf"){
     return "String"
   }
@@ -252,7 +255,7 @@ function generateRelationParameterText(cls: LocalEntity, {tgt, card, owner}: Rel
 }
 
 function generateEnumParameter (cls: LocalEntity):string {
-  return expandToString`${cls.enumentityatributes.map(enumEntityAtribute =>createEnumParameter(enumEntityAtribute))}`
+  return expandToString`${cls.enumentityatributes.map(enumEntityAtribute =>createEnumParameter(enumEntityAtribute)).join('')}`
 }
 
 function createEnumParameter(enumEntityAtribute: EnumEntityAtribute):string {
@@ -300,7 +303,7 @@ function generateRelationSendParameterText(cls: LocalEntity, {tgt, card, owner}:
 }
 
 function generateEnumSendParameter (cls: LocalEntity):string {
-  return expandToString`${cls.enumentityatributes.map(enumEntityAtribute =>createEnumSendParameter(enumEntityAtribute))}`
+  return expandToString`${cls.enumentityatributes.map(enumEntityAtribute =>createEnumSendParameter(enumEntityAtribute)).join('')}`
 }
 
 function createEnumSendParameter(enumEntityAtribute: EnumEntityAtribute):string {

@@ -82,6 +82,9 @@ function generateTypeAttribute(attribute:Attribute): string | undefined {
     if (attribute.type.toString().toLowerCase() === "cpf"){
         return "String"
     }
+    if (attribute.type.toString().toLowerCase() === "boolean"){
+      return "bool"
+    }
     if (attribute.type.toString().toLowerCase() === "email"){
         return "String"
     }
