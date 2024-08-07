@@ -14,7 +14,7 @@
         "forceConsistentCasingInFileNames": true
     },
     "include": [
-        "syntaxes/r-2-d-2.monarch.ts"
+        "syntaxes/s-p-a-r-k.monarch.ts"
     ],
     "exclude": ["out", "node_modules"]
 }

@@ -1,4 +1,4 @@
-grammar R2D2
+grammar SPARK
 
 import 'config'
 import 'entities'
