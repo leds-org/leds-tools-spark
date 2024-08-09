@@ -18,7 +18,7 @@ ${capitalizeString(attr.name)}: string;`
     headers+="\n"
 
     relations.map(rel => headers +=  generateRelation(cls, rel))
-    headers += `${cls.enumentityatributes.map(enumEntityAtribute => `{ title: '${enumEntityAtribute.type.ref?.name}', sortable: false, key: '${enumEntityAtribute.type.ref?.name.toLowerCase()}' }`).join(", \n")}`
+    headers += `${cls.enumentityatributes.map(enumEntityAtribute => `{ title: '${enumEntityAtribute.type.ref?.name}', sortable: false, key: '${enumEntityAtribute.type.ref?.name.toLowerCase()}' }`).join(", \n")}, \n`
 
     const index = generateIndexText(cls,path_form, headers, interfaces);
     return index
