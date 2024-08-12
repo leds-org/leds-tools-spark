@@ -15,10 +15,11 @@ export function generate(cls: LocalEntity, relations: RelationInfo[]): string {
         interfaces += `
 ${capitalizeString(attr.name)}: string;`
     }
-    headers+="\n"
-
+    headers += "\n"
+    headers += cls.enumentityatributes.length > 0 
+    ? `${cls.enumentityatributes.map(enumEntityAtribute => `{ title: '${enumEntityAtribute.type.ref?.name}', sortable: false, key: '${enumEntityAtribute.type.ref?.name.toLowerCase()}' }`).join(", \n")}, \n` 
+    : '';
     relations.map(rel => headers +=  generateRelation(cls, rel))
-    headers += `${cls.enumentityatributes.map(enumEntityAtribute => `{ title: '${enumEntityAtribute.type.ref?.name}', sortable: false, key: '${enumEntityAtribute.type.ref?.name.toLowerCase()}' }`).join(", \n")}, \n`
 
     const index = generateIndexText(cls,path_form, headers, interfaces);
     return index
@@ -103,7 +104,7 @@ const router = useRouter();
 const dialogDelete = ref(false);
 const headers = ref([
   ${headers}
-  { title: 'Ações', key: 'actions' },
+  { title: 'Ações', key: 'actions' }
 ]);
 const ${cls.name} = ref([]);
 const filtered${cls.name} = ref([]);
@@ -233,27 +234,32 @@ watch(dialogDelete, val => {
 }
 
 function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : string {
-  let headersGenerated = ""
+  let headersGenerated = "";
+  
   switch(card) {
-  case "OneToOne":
-    if(owner) {
-      headersGenerated += `{ title: '${tgt.name}', sortable: false, key: '${tgt.name.toLowerCase()}Id' }, \n`
-    }
-    break;
-  case "OneToMany":
-    if(owner) {
-      headersGenerated += `{ title: '${tgt.name}', sortable: false, key: '${tgt.name.toLowerCase()}Id' }, \n`
-    }
-    break;
-  case "ManyToOne":
-    if(owner) {
+    case "OneToOne":
+      if(owner) {
+        headersGenerated += `{ title: '${tgt.name}', sortable: false, key: '${tgt.name.toLowerCase()}Id' }, \n`;
       }
-    break;
-  case "ManyToMany":
-    if(owner) {
-      headersGenerated += `{ title: '${tgt.name}', sortable: false, key: '${tgt.name.toLowerCase()}Id' }, \n`
-    }
-    break;
+      break;
+
+    case "OneToMany":
+      if(owner) {
+        headersGenerated += `{ title: '${tgt.name}', sortable: false, key: '${tgt.name.toLowerCase()}Id' }, \n`;
+      }
+      break;
+
+    case "ManyToOne":
+      if(owner) {
+      }
+      break;
+
+    case "ManyToMany":
+      if(owner) {
+        headersGenerated += `{ title: '${tgt.name}', sortable: false, key: '${tgt.name.toLowerCase()}Id' }, \n`;
+      }
+      break;
   }
-  return headersGenerated
+  
+  return headersGenerated;
 }

@@ -13,7 +13,10 @@ export function generate(cls: LocalEntity, enumx: EnumX[], relations: RelationIn
     let relationOptions = ""
     let OnMounted = ""
 
-    formattr += `${cls.enumentityatributes.map(enumEntityAtribute => `${enumEntityAtribute.type.ref?.name}: ''`).join(", \n")}, \n`
+    formattr += cls.enumentityatributes.length > 0 
+    ? `${cls.enumentityatributes.map(enumEntityAtribute => `${enumEntityAtribute.type.ref?.name}: ''`).join(", \n")}, \n` 
+    : '';
+
 
     for(const attr of cls.attributes) {
       formattr += `${capitalizeString(attr.name)}: '', \n`
@@ -273,9 +276,22 @@ ${tgt.name}Options.value = response.value;`;
             
         case "ManyToOne":
             if(owner) {
+                formsGenerated +=`
+                <v-col cols="12">
+                    <v-label class="font-weight-medium mb-2">${capitalizeString(tgt.name)}</v-label>
+                    <v-select :items="${capitalizeString(tgt.name)}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(tgt.name)}" hide-details v-model="form.${capitalizeString(tgt.name)}Id"></v-select>
+                </v-col>`;
+                                relationOptionsGenerated +=  `const ${tgt.name}Options = ref([]); \n`;
+                                formattrGenerated =  `${capitalizeString(tgt.name)}Id: '', \n`;
+                                if(tgt.name != cls.name) {
+                                    importsGenerated += `import ${tgt.name}Service from '../../../services/requires/${tgt.name}Requires'; \n`;
+                                    relationGetGenerated += `const { list: list${tgt.name} } = ${tgt.name}Service(); \n`;
+                                    OnMountedGenerated += `
+                response = await list${tgt.name}();
+                ${tgt.name}Options.value = response.value;`;
             }
             break;
-            
+        }
         case "ManyToMany":
             if(owner) {
                 formsGenerated +=`
@@ -293,7 +309,7 @@ response = await list${tgt.name}();
 ${tgt.name}Options.value = response.value;`;
                 }
             }
-            break; 
+            break;
     }
     
     return {formattrGenerated, formsGenerated, importsGenerated, relationGetGenerated, OnMountedGenerated, relationOptionsGenerated};

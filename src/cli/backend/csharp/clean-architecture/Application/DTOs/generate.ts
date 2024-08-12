@@ -151,7 +151,7 @@ function generateRelationsResponse(cls: LocalEntity, relations: RelationInfo[]) 
       if(owner) {
         return expandToString`
           public virtual ${tgt.name}ResponseDTO ${tgt.name} { get; set; }
-          public Guid ${tgt.name.toLowerCase()}Id { get; set; }`
+          public Guid ${capitalizeString(tgt.name)}Id { get; set; }`
       } else {
         return ''
       }
