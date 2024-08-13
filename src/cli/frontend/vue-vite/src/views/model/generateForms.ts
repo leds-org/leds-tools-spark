@@ -12,10 +12,14 @@ export function generate(cls: LocalEntity, enumx: EnumX[], relations: RelationIn
     let relationGet = ""
     let relationOptions = ""
     let OnMounted = ""
+    let factoryEnum = ""
+    let factory = ""
 
-    formattr += cls.enumentityatributes.length > 0 
-    ? `${cls.enumentityatributes.map(enumEntityAtribute => `${enumEntityAtribute.type.ref?.name}: ''`).join(", \n")}, \n` 
-    : '';
+    for(const enumy of cls.enumentityatributes){
+        formattr += `${capitalizeString(enumy.type.ref?.name || "")}: '', \n`
+        factoryEnum += `form.${capitalizeString(enumy.type.ref?.name || "")} = factory${capitalizeString(enumy.type.ref?.name || "")}(form.${capitalizeString(enumy.type.ref?.name || "")}); \n`
+        factory += generateFactory(enumy, enumx)
+    }
 
 
     for(const attr of cls.attributes) {
@@ -36,11 +40,11 @@ export function generate(cls: LocalEntity, enumx: EnumX[], relations: RelationIn
         relationOptions += relationOptionsGenerated
     }
     
-    const form = generateFormExport(cls, forms, formattr, enumx, imports, relationGet, relationOptions, OnMounted);
+    const form = generateFormExport(cls, forms, formattr, enumx, imports, relationGet, relationOptions, OnMounted, factoryEnum, factory);
     return form
 }
 
-function generateFormExport(cls: LocalEntity, forms: string, formattr: string, enumx: EnumX[], imports: string, relationGet: String, relationOptions: string, OnMounted: String): string {
+function generateFormExport(cls: LocalEntity, forms: string, formattr: string, enumx: EnumX[], imports: string, relationGet: String, relationOptions: string, OnMounted: string, factoryEnum: string, factory: string): string {
     return expandToString`  
 <template>
     <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
@@ -96,6 +100,7 @@ const getPost = async (id: any) => {
     try {
         let response = await getById(id);
         Object.assign(form, response.value[0]);
+        ${factoryEnum}
     } catch (error) {
         console.error(error);
     }
@@ -165,6 +170,7 @@ const navigateBack = () => {
 
 ${generateEnumValue(cls,enumx)}
 
+${factory}
 </script>`
 }
 
@@ -313,4 +319,23 @@ ${tgt.name}Options.value = response.value;`;
     }
     
     return {formattrGenerated, formsGenerated, importsGenerated, relationGetGenerated, OnMountedGenerated, relationOptionsGenerated};
+}
+
+function generateFactory(Enum: EnumEntityAtribute, Enumx: EnumX[]): string {
+    let EnumText = "";
+    let count = 0;
+    for (const enumx of Enumx){
+      if(Enum.type.ref?.name == enumx.name){
+        for (const a of enumx.attributes){
+          EnumText += `
+if(${capitalizeString(Enum.type.ref?.name)} == '${a.name}') return ${count};`
+          count++;
+        }
+        return expandToString`
+        const factory${capitalizeString(Enum.type.ref?.name)} = (${capitalizeString(Enum.type.ref?.name)}: string) => {
+            ${EnumText}
+        }\n`
+      }
+    }
+    return ""
 }

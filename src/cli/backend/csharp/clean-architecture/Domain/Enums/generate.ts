@@ -2,6 +2,7 @@ import { expandToString } from "langium/generate";
 import { EnumX, Model, isEnumX, isModule } from "../../../../../../language/generated/ast.js";
 import path from "path";
 import fs from "fs";
+import { capitalizeString } from "../../../../../util/generator-utils.js";
 
 export function generate(model: Model, target_folder: string) {
     const modules =  model.abstractElements.filter(isModule);
@@ -19,7 +20,7 @@ function createEnum(enumx:EnumX, package_name: string) : string {
 namespace ${package_name}.Domain.Enums
 {
     public enum ${enumx.name} {
-        ${enumx.attributes.map(a => `${a.name.toUpperCase()}` ).join(",\n")}
+        ${enumx.attributes.map(a => `${capitalizeString(a.name)}` ).join(",\n")}
     }
 }
 `

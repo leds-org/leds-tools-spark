@@ -17,7 +17,7 @@ ${capitalizeString(attr.name)}: string;`
     }
     headers += "\n"
     headers += cls.enumentityatributes.length > 0 
-    ? `${cls.enumentityatributes.map(enumEntityAtribute => `{ title: '${enumEntityAtribute.type.ref?.name}', sortable: false, key: '${enumEntityAtribute.type.ref?.name.toLowerCase()}' }`).join(", \n")}, \n` 
+    ? `${cls.enumentityatributes.map(enumEntityAtribute => `{ title: '${enumEntityAtribute.type.ref?.name}', sortable: false, key: '${capitalizeString(enumEntityAtribute.type.ref?.name || "")}' }`).join(", \n")}, \n` 
     : '';
     relations.map(rel => headers +=  generateRelation(cls, rel))
 
@@ -239,13 +239,13 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
   switch(card) {
     case "OneToOne":
       if(owner) {
-        headersGenerated += `{ title: '${tgt.name}', sortable: false, key: '${tgt.name.toLowerCase()}Id' }, \n`;
+        headersGenerated += `{ title: '${tgt.name}', sortable: false, key: '${capitalizeString(tgt.name)}Id' }, \n`;
       }
       break;
 
     case "OneToMany":
       if(owner) {
-        headersGenerated += `{ title: '${tgt.name}', sortable: false, key: '${tgt.name.toLowerCase()}Id' }, \n`;
+        headersGenerated += `{ title: '${tgt.name}', sortable: false, key: '${capitalizeString(tgt.name)}Id' }, \n`;
       }
       break;
 
@@ -256,7 +256,7 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
 
     case "ManyToMany":
       if(owner) {
-        headersGenerated += `{ title: '${tgt.name}', sortable: false, key: '${tgt.name.toLowerCase()}Id' }, \n`;
+        headersGenerated += `{ title: '${tgt.name}', sortable: false, key: '${capitalizeString(tgt.name)}Id' }, \n`;
       }
       break;
   }
