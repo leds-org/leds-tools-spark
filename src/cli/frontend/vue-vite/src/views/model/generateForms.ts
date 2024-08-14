@@ -12,8 +12,15 @@ export function generate(cls: LocalEntity, enumx: EnumX[], relations: RelationIn
     let relationGet = ""
     let relationOptions = ""
     let OnMounted = ""
+    let factoryEnum = ""
+    let factory = ""
 
-    formattr += `${cls.enumentityatributes.map(enumEntityAtribute => `${enumEntityAtribute.type.ref?.name}: '', \n`)}`
+    for(const enumy of cls.enumentityatributes){
+        formattr += `${capitalizeString(enumy.type.ref?.name || "")}: '', \n`
+        factoryEnum += `form.${capitalizeString(enumy.type.ref?.name || "")} = factory${capitalizeString(enumy.type.ref?.name || "")}(form.${capitalizeString(enumy.type.ref?.name || "")}); \n`
+        factory += generateFactory(enumy, enumx)
+    }
+
 
     for(const attr of cls.attributes) {
       formattr += `${capitalizeString(attr.name)}: '', \n`
@@ -33,12 +40,12 @@ export function generate(cls: LocalEntity, enumx: EnumX[], relations: RelationIn
         relationOptions += relationOptionsGenerated
     }
     
-    const form = generateFormExport(cls, forms, formattr, enumx, imports, relationGet, relationOptions, OnMounted);
+    const form = generateFormExport(cls, forms, formattr, enumx, imports, relationGet, relationOptions, OnMounted, factoryEnum, factory);
     return form
 }
 
-function generateFormExport(cls: LocalEntity, forms: string, formattr: string, enumx: EnumX[], imports: string, relationGet: String, relationOptions: string, OnMounted: String): string {
-    return expandToString`
+function generateFormExport(cls: LocalEntity, forms: string, formattr: string, enumx: EnumX[], imports: string, relationGet: String, relationOptions: string, OnMounted: string, factoryEnum: string, factory: string): string {
+    return expandToString`  
 <template>
     <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
     <form @submit.prevent="onSubmit">
@@ -57,7 +64,7 @@ function generateFormExport(cls: LocalEntity, forms: string, formattr: string, e
     </form>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import Swal from 'sweetalert2';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
@@ -75,13 +82,25 @@ const router = useRouter();
 
 ${relationOptions}
 const form = reactive({
+    id: '',
     ${formattr.slice(0, formattr.lastIndexOf(','))}
 });
 
-const getPost = async (id) => {
+
+const verificaArrayParams = () => {
+    if (typeof params.id === 'string') {
+        return params.id;
+    } else if (Array.isArray(params.id)) {
+        return params.id[0];
+    }
+    return '';
+};
+
+const getPost = async (id: any) => {
     try {
         let response = await getById(id);
         Object.assign(form, response.value[0]);
+        ${factoryEnum}
     } catch (error) {
         console.error(error);
     }
@@ -91,7 +110,7 @@ const onSubmit = async () => {
     try {
         if (params.id) {
         
-            form.id = params.id
+            form.id = verificaArrayParams()
         
             await update(form);
         } else {
@@ -151,6 +170,7 @@ const navigateBack = () => {
 
 ${generateEnumValue(cls,enumx)}
 
+${factory}
 </script>`
 }
 
@@ -213,68 +233,109 @@ ${OnMounted}`
     return ''
 }
 
-  function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : {formattrGenerated: string, formsGenerated: string, importsGenerated: string, relationGetGenerated: string, OnMountedGenerated: string, relationOptionsGenerated: string} {
-    let formsGenerated = ""
-    let importsGenerated = ""
-    let relationGetGenerated = ""
-    let OnMountedGenerated = ""
-    let relationOptionsGenerated = ""
-    let formattrGenerated = ""
+function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : {formattrGenerated: string, formsGenerated: string, importsGenerated: string, relationGetGenerated: string, OnMountedGenerated: string, relationOptionsGenerated: string} {
+    let formsGenerated = "";
+    let importsGenerated = "";
+    let relationGetGenerated = "";
+    let OnMountedGenerated = "";
+    let relationOptionsGenerated = "";
+    let formattrGenerated = "";
+    
     switch(card) {
-    case "OneToOne":
-      if(owner) {
-        formsGenerated +=`
+        case "OneToOne":
+            if(owner) {
+                formsGenerated +=`
 <v-col cols="12">
     <v-label class="font-weight-medium mb-2">${capitalizeString(tgt.name)}</v-label>
     <v-select :items="${capitalizeString(tgt.name)}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(tgt.name)}" hide-details v-model="form.${capitalizeString(tgt.name)}Id"></v-select>
-</v-col>`
-        relationOptionsGenerated +=  `const ${tgt.name}Options = ref([]); \n`
-        formattrGenerated =  `${capitalizeString(tgt.name)}Id: '', \n`
-        if(tgt.name != cls.name) {
-            importsGenerated += `import ${tgt.name}Service from '../../../services/requires/${tgt.name}Requires'; \n`
-            relationGetGenerated += `const { list: list${tgt.name} } = ${tgt.name}Service(); \n`
-            OnMountedGenerated += `
+</v-col>`;
+                relationOptionsGenerated +=  `const ${tgt.name}Options = ref([]); \n`;
+                formattrGenerated =  `${capitalizeString(tgt.name)}Id: '', \n`;
+                if(tgt.name != cls.name) {
+                    importsGenerated += `import ${tgt.name}Service from '../../../services/requires/${tgt.name}Requires'; \n`;
+                    relationGetGenerated += `const { list: list${tgt.name} } = ${tgt.name}Service(); \n`;
+                    OnMountedGenerated += `
 response = await list${tgt.name}();
-${tgt.name}Options.value = response.value;`
-        }
-      }
-    case "OneToMany":
-      if(owner) {
-        formsGenerated +=`
+${tgt.name}Options.value = response.value;`;
+                }
+            }
+            break;
+            
+        case "OneToMany":
+            if(owner) {
+                formsGenerated +=`
 <v-col cols="12">
     <v-label class="font-weight-medium mb-2">${capitalizeString(tgt.name)}</v-label>
     <v-select :items="${capitalizeString(tgt.name)}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(tgt.name)}" hide-details v-model="form.${capitalizeString(tgt.name)}Id"></v-select>
-</v-col>`
-        relationOptionsGenerated +=  `const ${tgt.name}Options = ref([]); \n`
-        formattrGenerated =  `${capitalizeString(tgt.name)}Id: '', \n`
-        if(tgt.name != cls.name) {
-            importsGenerated += `import ${tgt.name}Service from '../../../services/requires/${tgt.name}Requires'; \n`
-            relationGetGenerated += `const { list: list${tgt.name} } = ${tgt.name}Service(); \n`
-            OnMountedGenerated += `
+</v-col>`;
+                relationOptionsGenerated +=  `const ${tgt.name}Options = ref([]); \n`;
+                formattrGenerated =  `${capitalizeString(tgt.name)}Id: '', \n`;
+                if(tgt.name != cls.name) {
+                    importsGenerated += `import ${tgt.name}Service from '../../../services/requires/${tgt.name}Requires'; \n`;
+                    relationGetGenerated += `const { list: list${tgt.name} } = ${tgt.name}Service(); \n`;
+                    OnMountedGenerated += `
 response = await list${tgt.name}();
-${tgt.name}Options.value = response.value;`
+${tgt.name}Options.value = response.value;`;
+                }
+            }
+            break;
+            
+        case "ManyToOne":
+            if(owner) {
+                formsGenerated +=`
+                <v-col cols="12">
+                    <v-label class="font-weight-medium mb-2">${capitalizeString(tgt.name)}</v-label>
+                    <v-select :items="${capitalizeString(tgt.name)}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(tgt.name)}" hide-details v-model="form.${capitalizeString(tgt.name)}Id"></v-select>
+                </v-col>`;
+                                relationOptionsGenerated +=  `const ${tgt.name}Options = ref([]); \n`;
+                                formattrGenerated =  `${capitalizeString(tgt.name)}Id: '', \n`;
+                                if(tgt.name != cls.name) {
+                                    importsGenerated += `import ${tgt.name}Service from '../../../services/requires/${tgt.name}Requires'; \n`;
+                                    relationGetGenerated += `const { list: list${tgt.name} } = ${tgt.name}Service(); \n`;
+                                    OnMountedGenerated += `
+                response = await list${tgt.name}();
+                ${tgt.name}Options.value = response.value;`;
+            }
+            break;
         }
-      }
-    case "ManyToOne":
-      if(owner) {
-        }
-    case "ManyToMany":
-      if(owner) {
-        formsGenerated +=`
+        case "ManyToMany":
+            if(owner) {
+                formsGenerated +=`
 <v-col cols="12">
     <v-label class="font-weight-medium mb-2">${capitalizeString(tgt.name)}</v-label>
     <v-select :items="${capitalizeString(tgt.name)}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(tgt.name)}" hide-details v-model="form.${capitalizeString(tgt.name)}Id"></v-select>
-</v-col>`
-        relationOptionsGenerated +=  `const ${tgt.name}Options = ref([]); \n`
-        formattrGenerated =  `${capitalizeString(tgt.name)}Id: '', \n`
-        if(tgt.name != cls.name) {
-            importsGenerated += `import ${tgt.name}Service from '../../../services/requires/${tgt.name}Requires'; \n`
-            relationGetGenerated += `const { list: list${tgt.name} } = ${tgt.name}Service(); \n`
-            OnMountedGenerated += `
+</v-col>`;
+                relationOptionsGenerated +=  `const ${tgt.name}Options = ref([]); \n`;
+                formattrGenerated =  `${capitalizeString(tgt.name)}Id: '', \n`;
+                if(tgt.name != cls.name) {
+                    importsGenerated += `import ${tgt.name}Service from '../../../services/requires/${tgt.name}Requires'; \n`;
+                    relationGetGenerated += `const { list: list${tgt.name} } = ${tgt.name}Service(); \n`;
+                    OnMountedGenerated += `
 response = await list${tgt.name}();
-${tgt.name}Options.value = response.value;`
+${tgt.name}Options.value = response.value;`;
+                }
+            }
+            break;
+    }
+    
+    return {formattrGenerated, formsGenerated, importsGenerated, relationGetGenerated, OnMountedGenerated, relationOptionsGenerated};
+}
+
+function generateFactory(Enum: EnumEntityAtribute, Enumx: EnumX[]): string {
+    let EnumText = "";
+    let count = 0;
+    for (const enumx of Enumx){
+      if(Enum.type.ref?.name == enumx.name){
+        for (const a of enumx.attributes){
+          EnumText += `
+if(${capitalizeString(Enum.type.ref?.name)} == '${a.name}') return ${count};`
+          count++;
         }
+        return expandToString`
+        const factory${capitalizeString(Enum.type.ref?.name)} = (${capitalizeString(Enum.type.ref?.name)}: string) => {
+            ${EnumText}
+        }\n`
       }
     }
-    return {formattrGenerated, formsGenerated, importsGenerated, relationGetGenerated, OnMountedGenerated, relationOptionsGenerated}
-  }
+    return ""
+}

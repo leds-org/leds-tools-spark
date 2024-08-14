@@ -95,6 +95,9 @@ function generateTypeAttribute(attribute:Attribute): string | undefined {
     if (attribute.type.toString().toLowerCase() === "cpf"){
         return "String"
     }
+    if (attribute.type.toString().toLowerCase() === "boolean"){
+      return "bool"
+    } 
     if (attribute.type.toString().toLowerCase() === "email"){
         return "String"
     }
@@ -133,7 +136,7 @@ function generateRelationsResponse(cls: LocalEntity, relations: RelationInfo[]) 
     case "OneToOne":
       if(owner) {
         return expandToString`
-          public Guid ${tgt.name.toLowerCase()}Id { get; set; }
+          public Guid ${capitalizeString(tgt.name)}Id { get; set; }
           public virtual ${tgt.name}ResponseDTO ${tgt.name} { get; set; }`
       } else {
         return ''
@@ -148,7 +151,7 @@ function generateRelationsResponse(cls: LocalEntity, relations: RelationInfo[]) 
       if(owner) {
         return expandToString`
           public virtual ${tgt.name}ResponseDTO ${tgt.name} { get; set; }
-          public Guid ${tgt.name.toLowerCase()}Id { get; set; }`
+          public Guid ${capitalizeString(tgt.name)}Id { get; set; }`
       } else {
         return ''
       }
@@ -185,7 +188,7 @@ function getAttrsAndRelations(cls: LocalEntity, relation_map: Map<LocalEntity, R
 
   function createEnum(enumEntityAtribute: EnumEntityAtribute):string {
     return expandToString`
-    public ${enumEntityAtribute.type.ref?.name} ${enumEntityAtribute.type.ref?.name.toLowerCase()} { get; set; }
+    public ${enumEntityAtribute.type.ref?.name} ${capitalizeString(enumEntityAtribute.type.ref?.name || "")} { get; set; }
     `
   }
   
@@ -211,7 +214,7 @@ function getAttrsAndRelations(cls: LocalEntity, relation_map: Map<LocalEntity, R
     case "OneToOne":
       if(owner) {
         return expandToString`
-          public Guid ${tgt.name.toLowerCase()}Id { get; set; }`
+          public Guid ${capitalizeString(tgt.name)}Id { get; set; }`
       } else {
         return ''
       }
@@ -224,7 +227,7 @@ function getAttrsAndRelations(cls: LocalEntity, relation_map: Map<LocalEntity, R
     case "ManyToOne":
       if(owner) {
         return expandToString`
-          public Guid ${tgt.name.toLowerCase()}Id { get; set; }`
+          public Guid ${capitalizeString(tgt.name)}Id { get; set; }`
       } else {
         return ''
       }

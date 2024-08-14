@@ -1,10 +1,10 @@
 import type { Model } from '../language/generated/ast.js';
 import { GenerateOptions } from './main.js';
-import { generate as pyhtonGenerate } from './backend/python/generator.js';
+import { generate as pythonGenerate } from './backend/python/generator.js';
 import { generate as javaGenerate } from './backend/java/generator.js';
 import { generate as docGenerate} from './documentation/generator.js';
 import { generate as vueVitegenerate} from './frontend/vue-vite/generate.js';
-import { generate as csharp} from './backend/csharp/generator.js';
+import { generate as csharpGenerator} from './backend/csharp/generator.js';
 
 import path from 'path';
 import chalk from 'chalk';
@@ -13,13 +13,13 @@ export function generate(model: Model,  filePath: string, destination: string | 
     
     const final_destination  = extractDestination(filePath, destination);
     if (opts.only_back){
-        if (model.configuration?.language == 'python'){
-            pyhtonGenerate(model,final_destination )
+        if (model.configuration?.language === 'python'){
+            pythonGenerate(model,final_destination )
         }
         if (model.configuration?.language?.startsWith("csharp")){
-            csharp(model,final_destination)
+            csharpGenerator(model,final_destination)
         }
-        else{
+        if (model.configuration?.language === "java"){
             javaGenerate (model,final_destination )
         }
         return final_destination;
@@ -38,12 +38,12 @@ export function generate(model: Model,  filePath: string, destination: string | 
     }
     else {
         if (model.configuration?.language == 'python'){
-            pyhtonGenerate(model,final_destination )
+            pythonGenerate(model,final_destination )
         }
         if (model.configuration?.language?.startsWith("csharp")){
-            csharp(model,final_destination)
+            csharpGenerator(model,final_destination)
         }
-        else{
+        if (model.configuration?.language == 'java'){
             javaGenerate (model,final_destination )
         }
     

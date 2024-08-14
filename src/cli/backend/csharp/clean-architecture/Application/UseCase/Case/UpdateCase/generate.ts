@@ -82,6 +82,9 @@ function generateTypeAttribute(attribute:Attribute): string | undefined {
     if (attribute.type.toString().toLowerCase() === "cpf"){
         return "String"
     }
+    if (attribute.type.toString().toLowerCase() === "boolean"){
+      return "bool"
+    }
     if (attribute.type.toString().toLowerCase() === "email"){
         return "String"
     }
@@ -119,9 +122,10 @@ function generateRelationsRequest(cls: LocalEntity, relations: RelationInfo[]) :
     case "OneToOne":
       if(owner) {
         return expandToString`
-            Guid ${tgt.name.toLowerCase()},`
+            Guid ${capitalizeString(tgt.name)}Id,`
       } else {
-        return ''
+        return expandToString`
+            Guid ${capitalizeString(tgt.name)}Id,`
       }
     case "OneToMany":
       if(owner) {
@@ -132,13 +136,14 @@ function generateRelationsRequest(cls: LocalEntity, relations: RelationInfo[]) :
     case "ManyToOne":
       if(owner) {
         return expandToString`
-            Guid ${tgt.name.toLowerCase()},`
+            Guid ${capitalizeString(tgt.name)}Id,`
       } else {
         return ''
       }
     case "ManyToMany":
       if(owner) {
-        return ''
+        return expandToString`
+            Guid ${capitalizeString(tgt.name)}Id,`
       } else {
         return ''
       }

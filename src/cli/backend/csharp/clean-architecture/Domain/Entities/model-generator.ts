@@ -120,6 +120,9 @@ function generateTypeAttribute(attribute:Attribute): Generated{
   if (attribute.type.toString().toLowerCase() === "date"){
     return "DateTime"
   }
+  if (attribute.type.toString().toLowerCase() === "boolean"){
+    return "bool"
+  }
   if (attribute.type.toString().toLowerCase() === "cpf"){
     return "String"
   }
@@ -160,13 +163,13 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
   switch(card) {
   case "OneToOne":
     if(owner) {
-      return expandToStringWithNL`
-        //OneToOne
-        public Guid? ${tgt.name}Id {get; set; }
-        public ${tgt.name}? ${tgt.name} { get; set; }
-      `
+      return `
+public Guid? ${tgt.name}Id {get; set; }
+public ${tgt.name}? ${tgt.name} { get; set; }`
     } else {
-      return expandToString``
+      return expandToString`
+public Guid? ${tgt.name}Id {get; set; }
+public ${tgt.name}? ${tgt.name} { get; set; }`
     }
   case "OneToMany":
     if(owner) {
@@ -228,7 +231,7 @@ function generateRelationParameterText(cls: LocalEntity, {tgt, card, owner}: Rel
     if(owner) {
       return expandToString`Guid? ${tgt.name.toLowerCase()}Id,`
     } else {
-      return expandToString``
+      return expandToString`Guid? ${tgt.name.toLowerCase()}Id,`
     }
   case "OneToMany":
     if(owner) {
@@ -252,7 +255,7 @@ function generateRelationParameterText(cls: LocalEntity, {tgt, card, owner}: Rel
 }
 
 function generateEnumParameter (cls: LocalEntity):string {
-  return expandToString`${cls.enumentityatributes.map(enumEntityAtribute =>createEnumParameter(enumEntityAtribute))}`
+  return expandToString`${cls.enumentityatributes.map(enumEntityAtribute =>createEnumParameter(enumEntityAtribute)).join('')}`
 }
 
 function createEnumParameter(enumEntityAtribute: EnumEntityAtribute):string {
@@ -276,7 +279,7 @@ function generateRelationSendParameterText(cls: LocalEntity, {tgt, card, owner}:
     if(owner) {
       return expandToString`${tgt.name.toLowerCase()}Id,`
     } else {
-      return expandToString``
+      return expandToString`${tgt.name.toLowerCase()}Id,`
     }
   case "OneToMany":
     if(owner) {
@@ -300,7 +303,7 @@ function generateRelationSendParameterText(cls: LocalEntity, {tgt, card, owner}:
 }
 
 function generateEnumSendParameter (cls: LocalEntity):string {
-  return expandToString`${cls.enumentityatributes.map(enumEntityAtribute =>createEnumSendParameter(enumEntityAtribute))}`
+  return expandToString`${cls.enumentityatributes.map(enumEntityAtribute =>createEnumSendParameter(enumEntityAtribute)).join('')}`
 }
 
 function createEnumSendParameter(enumEntityAtribute: EnumEntityAtribute):string {

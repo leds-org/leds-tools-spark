@@ -87,6 +87,9 @@ function generateTypeAttribute(attribute:Attribute): string | undefined {
     if (attribute.type.toString().toLowerCase() === "email"){
         return "String"
     }
+    if (attribute.type.toString().toLowerCase() === "boolean"){
+      return "bool"
+    }
     if (attribute.type.toString().toLowerCase() === "file"){
         return "Byte[]"
     }
@@ -147,11 +150,12 @@ function generateRelationsRequest(cls: LocalEntity, relations: RelationInfo[]) :
     }
   }
 
-  function generateEnum (cls: LocalEntity):string {
+  function generateEnum(cls: LocalEntity): string {
     return expandToString`
-    ${cls.enumentityatributes.map(enumEntityAtribute =>createEnum(enumEntityAtribute)).join(", \n")}
-    `
-  }
+${cls.enumentityatributes.map(enumEntityAtribute => createEnum(enumEntityAtribute)).join("\n")}
+`;
+}
+
 
   function createEnum(enumEntityAtribute: EnumEntityAtribute):string {
     return expandToString`

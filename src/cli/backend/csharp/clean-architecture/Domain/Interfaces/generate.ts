@@ -64,7 +64,7 @@ namespace ${model.configuration?.name}.Domain.Interfaces.Common
 
 function generateBaseRepository(model: Model): string {
     return expandToStringWithNL`
-﻿using ${model.configuration?.name}.Domain.Common;
+using ${model.configuration?.name}.Domain.Common;
 
 namespace ${model.configuration?.name}.Domain.Interfaces.Common
 {
@@ -73,11 +73,12 @@ namespace ${model.configuration?.name}.Domain.Interfaces.Common
         Task Create(T entity);
         Task Update(T entity);
         Task Delete(T entity);
-        Task<IQueryable<T>> GetById(Guid id);
-        Task<IQueryable<T>> GetByEntityId(T entity);
-        Task<IQueryable<T>> GetAll();
+        Task<bool> Any(Guid id);
+        IQueryable<T> GetById(Guid id);
+        IQueryable<T> GetAll();
+        void AddRange(ICollection<T> entities);
+        void DeleteRange(ICollection<T> entities);
     }
 }
-
 `
 }

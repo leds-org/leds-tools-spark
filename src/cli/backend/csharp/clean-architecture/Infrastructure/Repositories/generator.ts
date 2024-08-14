@@ -25,7 +25,7 @@ export function generate(model: Model, target_folder: string) : void {
 
 function generateBase (model: Model): string {
     return expandToStringWithNL`
-﻿using ${model.configuration?.name}.Domain.Common;
+using ${model.configuration?.name}.Domain.Common;
 using ${model.configuration?.name}.Domain.Interfaces.Common;
 using ${model.configuration?.name}.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -42,36 +42,44 @@ namespace ${model.configuration?.name}.Infrastructure.Repositories.Common
 
         public async Task Create(T entity)
         {
-            entity.Create();
             await Context.AddAsync(entity);
         }
 
         public async Task Delete(T entity)
         {
             entity.Delete();
-            Context.Remove(entity);
+            await Task.Run(() => Context.Remove(entity), new CancellationToken());
         }
 
         public async Task Update(T entity)
         {
-            //entity.Update(entity);
-            Context.Update(entity);
+            await Task.Run(() => Context.Update(entity), new CancellationToken());
         }
 
-        public async Task<IQueryable<T>> GetAll()
+        public IQueryable<T> GetAll()
         {
-            return Context.Set<T>().ToList().AsQueryable();
+            return Context.Set<T>()
+                 .AsSplitQuery().AsQueryable();
         }
 
-        public async Task<IQueryable<T>> GetByEntityId(T entity)
-        {
-            if (entity.Id.Equals(null)) return null;
-            return Context.Set<T>().Where(x => x.Id == entity.Id).AsNoTracking().AsQueryable();
-        }
-
-        public async Task<IQueryable<T>> GetById(Guid id)
+        public IQueryable<T> GetById(Guid id)
         {
             return Context.Set<T>().Where(x => x.Id == id).AsNoTracking().AsQueryable();
+        }
+
+        public async Task<bool> Any(Guid id)
+        {
+            return await Context.Set<T>().AnyAsync(x => x.Id.Equals(id));
+        }
+
+        public void DeleteRange(ICollection<T> entities)
+        {
+            Context.Set<T>().RemoveRange(entities);
+        }
+
+        public void AddRange(ICollection<T> entities)
+        {
+            Context.Set<T>().AddRange(entities);
         }
     }
 }`

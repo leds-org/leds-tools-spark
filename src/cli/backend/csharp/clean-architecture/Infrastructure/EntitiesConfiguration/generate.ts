@@ -76,13 +76,13 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
     switch(card) {
     case "OneToOne":
       if(owner) {
-        return ""
-      } else {
         return expandToStringWithNL`
-            builder
-                .HasOne<${tgt.name}>(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${tgt.name}s) 
-                .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
-                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name}Id);`
+        builder
+            .HasOne<${tgt.name}>(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${tgt.name}) 
+            .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
+            .HasForeignKey<${tgt.name}>(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name}Id);`
+      } else {
+        return ""
       }
     case "OneToMany":
       if(owner) {
