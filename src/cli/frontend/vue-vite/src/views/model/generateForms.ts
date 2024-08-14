@@ -1,5 +1,5 @@
 import { expandToString } from "langium/generate"
-import { EnumEntityAtribute, EnumX, LocalEntity } from "../../../../../../language/generated/ast.js"
+import { Attribute, EnumEntityAtribute, EnumX, LocalEntity } from "../../../../../../language/generated/ast.js"
 import { capitalizeString } from "../../../../../util/generator-utils.js"
 import { RelationInfo } from "../../../../../util/relations.js"
 //import { processRelations } from "../../../../../util/relations.js"
@@ -27,7 +27,7 @@ export function generate(cls: LocalEntity, enumx: EnumX[], relations: RelationIn
       forms += `
 <v-col cols="12">
     <v-label class="font-weight-medium mb-2">${attr.name}</v-label>
-    <VTextField  type="text" placeholder="${attr.name} ${attr.type}" hide-details v-model='form.${capitalizeString(attr.name)}'></VTextField>
+    <VTextField  type="${generateTypeAttribute(attr)}" placeholder="${attr.name} ${attr.type}" hide-details v-model='form.${capitalizeString(attr.name)}'></VTextField>
 </v-col>`
     }
     for(const rel of relations){
@@ -334,8 +334,29 @@ if(${capitalizeString(Enum.type.ref?.name)} == '${a.name}') return ${count};`
         return expandToString`
         const factory${capitalizeString(Enum.type.ref?.name)} = (${capitalizeString(Enum.type.ref?.name)}: string) => {
             ${EnumText}
-        }\n`
+        } \n \n`
       }
     }
     return ""
 }
+
+function generateTypeAttribute(attribute:Attribute): string{
+
+    if (attribute.type.toString().toLowerCase() === "date"){
+      return "date"
+    }
+    if (attribute.type.toString().toLowerCase() === "datetime"){
+        return "datetime"
+    }
+    if (attribute.type.toString().toLowerCase() === "integer"){
+      return "number"
+    }
+    if (attribute.type.toString().toLowerCase() === "decimal"){
+        return "number"
+    }
+    if (attribute.type.toString().toLowerCase() === "boolean"){
+        return "checkbox"
+    }
+    return "text"
+  
+  }
