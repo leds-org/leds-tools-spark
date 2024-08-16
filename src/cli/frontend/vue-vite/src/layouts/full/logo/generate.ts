@@ -14,24 +14,16 @@ export function generate(target_folder: string) : void {
 function generateLogo(): string {
     return expandToString`
 <script setup>
+import config from '@/config';
 import { computed } from "vue";
-import LogoLight from "./LogoLight.vue";
 import LogoDark from "./LogoDark.vue";
-import RtlLogoDark from "./RtlLogoDark.vue";
-import RtlLogoLight from "./RtlLogoLight.vue";
-import { useCustomizerStore } from "@/stores/customizer";
-
-const customizer = useCustomizerStore();
+import LogoLight from "./LogoLight.vue";
 
 //const dark = ref(false);
 const dark = computed(() => {
   if (
-    customizer.actTheme === "DARK_BLUE_THEME" ||
-    customizer.actTheme === "DARK_RED_THEME" ||
-    customizer.actTheme === "DARK_ORANGE_THEME" ||
-    customizer.actTheme === "DARK_PURPLE_THEME" ||
-    customizer.actTheme === "DARK_GREEN_THEME" ||
-    customizer.actTheme === "DARK_INDIGO_THEME"
+    config.actTheme === "DARK_BLUE_THEME" 
+
   ) {
     return true;
   } else {
@@ -40,11 +32,7 @@ const dark = computed(() => {
 });
 </script>
 <template>
-  <v-locale-provider v-if="customizer.setRTLLayout" rtl>
-    <RtlLogoLight v-if="dark" />
-    <RtlLogoDark v-else />
-  </v-locale-provider>
-  <v-locale-provider v-else>
+  <v-locale-provider v-if="!config.setRTLLayout">
     <LogoLight v-if="dark" />
     <LogoDark v-else />
   </v-locale-provider>
@@ -53,9 +41,8 @@ const dark = computed(() => {
 
 function generateLogoDark(): string {
     return expandToString`
-<script setup lang="ts">
+<script async setup lang="ts">
 import { RouterLink } from 'vue-router';
-//import logo from '@/assets/images/logos/logo.png';
 </script>
 <template>
     <div class="logo">

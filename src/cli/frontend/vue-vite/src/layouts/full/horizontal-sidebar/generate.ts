@@ -23,30 +23,23 @@ export function generate(target_folder: string) : void {
 
 function generateHorizontalSideBar(): string {
     return expandToString`
-<script setup lang="ts">
-import { ref, shallowRef } from 'vue';
+<script async setup lang="ts">
+import config from '@/config';
+import { shallowRef } from 'vue';
 import { useDisplay } from 'vuetify';
-import { useCustomizerStore } from '@/stores/customizer';
-import HorizontalItems from './horizontalItems';
-import NavItem from './NavItem/Index.vue';
-import NavCollapse from './NavCollapse/Index.vue';
 import VerticalSidebar from '../vertical-sidebar/VerticalSidebar.vue';
+import HorizontalItems from './horizontalItems';
+import NavCollapse from './NavCollapse/Index.vue';
+import NavItem from './NavItem/Index.vue';
 
-const customizer = useCustomizerStore();
 const sidebarMenu = shallowRef(HorizontalItems);
 const { mdAndUp } = useDisplay();
-// function subIsActive(input: any) {
-//     const paths = Array.isArray(input) ? input : [input];
-//     return paths.some((path) => {
-//         return; //$route.path.indexOf(path) === 0; // current path starts with this path string
-//     });
-// }
 </script>
 
 <template>
     <template v-if="mdAndUp">
         <div class="horizontalMenu  border-bottom bg-surface position-relative">
-            <div :class="customizer.boxed ? 'maxWidth' : 'px-6'">
+            <div :class="config.boxed ? 'maxWidth' : 'px-6'">
                 <ul class="gap-1 horizontal-navbar mx-lg-0 mx-3">
                     <!---Menu Loop -->
                     <li v-for="(item, i) in sidebarMenu" :key="i" class="navItem">
@@ -64,7 +57,8 @@ const { mdAndUp } = useDisplay();
         <VerticalSidebar />
     </div>
 </template>
-<style lang="scss"></style>`
+<style async lang="scss"></style>
+`
 }
 
 function generateHorizontalItems(): string {
@@ -647,7 +641,7 @@ export default horizontalItems;`
 
 function generateNavItem(itemto: string): string {
     return expandToString`
-<script setup>
+<script async setup>
 import Icon from '../../vertical-sidebar/Icon.vue';
 const props = defineProps({ item: Object, level: Number });
 </script>
@@ -675,14 +669,15 @@ const props = defineProps({ item: Object, level: Number });
             </v-chip>
         </template>
     </router-link>
-</template>`
+</template>
+`
 }
 
 function generateNavCollapse(ddmenu: string): string {
     return expandToString`
-<script setup>
-import NavItem from '../NavItem/Index.vue';
+<script async setup>
 import Icon from '../../vertical-sidebar/Icon.vue';
+import NavItem from '../NavItem/Index.vue';
 const props = defineProps({ item: Object, level: Number });
 </script>
 

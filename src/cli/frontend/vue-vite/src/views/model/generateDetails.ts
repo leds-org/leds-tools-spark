@@ -6,6 +6,8 @@ import { RelationInfo } from "../../../../../util/relations.js"
 
 
 export function generate(cls: LocalEntity, enumx: EnumX[], relations: RelationInfo[]): string {
+    const path_form =  "`" + `/${cls.name}/form${cls.name}/\${id}` +  "`"
+
     let imports = ""
     let forms = ""
     let formattr = ""
@@ -14,6 +16,7 @@ export function generate(cls: LocalEntity, enumx: EnumX[], relations: RelationIn
     let OnMounted = ""
     let factoryEnum = ""
     let factory = ""
+    let attrFactory = ""
 
     for(const enumy of cls.enumentityatributes){
         formattr += `${capitalizeString(enumy.type.ref?.name || "")}: '', \n`
@@ -29,6 +32,12 @@ export function generate(cls: LocalEntity, enumx: EnumX[], relations: RelationIn
     <v-label class="font-weight-medium mb-2">${attr.name}</v-label>
     <VTextField  type="${generateTypeAttribute(attr)}" placeholder="${attr.name} ${attr.type}" hide-details v-model='form.${capitalizeString(attr.name)}' disabled></VTextField>
 </v-col>`
+        if (attr.type === 'date'){
+            attrFactory += `
+if (form.${capitalizeString(attr.name)}) {
+    form.${capitalizeString(attr.name)} = dayjs(form.${capitalizeString(attr.name)}).format('YYYY-MM-DD');
+}`
+        }
     }
     for(const rel of relations){
         const {formattrGenerated, formsGenerated, importsGenerated, relationGetGenerated, OnMountedGenerated, relationOptionsGenerated} = generateRelation(cls, rel)
@@ -40,17 +49,17 @@ export function generate(cls: LocalEntity, enumx: EnumX[], relations: RelationIn
         relationOptions += relationOptionsGenerated
     }
     
-    const form = generateFormExport(cls, forms, formattr, enumx, imports, relationGet, relationOptions, OnMounted, factoryEnum, factory);
+    const form = generateFormExport(cls, forms, formattr, enumx, imports, relationGet, relationOptions, OnMounted, factoryEnum, factory, path_form, attrFactory);
     return form
 }
 
-function generateFormExport(cls: LocalEntity, forms: string, formattr: string, enumx: EnumX[], imports: string, relationGet: String, relationOptions: string, OnMounted: string, factoryEnum: string, factory: string): string {
-    return expandToString`
+function generateFormExport(cls: LocalEntity, forms: string, formattr: string, enumx: EnumX[], imports: string, relationGet: String, relationOptions: string, OnMounted: string, factoryEnum: string, factory: string, path_formid: string, attrFactory: string): string {
+    return expandToString`  
+<template>
 <v-row justify="end" class="pa-3">
 <v-btn color="error" class="ma-2" variant="outlined" @click="confirmDelete">Excluir ${cls.name}</v-btn>
 <v-btn color="primary" class="ma-2" @click="edita${cls.name}(form.Id)">Editar ${cls.name}</v-btn>
-</v-row>  
-<template>
+</v-row>
     <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
     <form @submit.prevent="onSubmit">
         <v-card elevation="10" class="" rounded="md">
@@ -58,24 +67,25 @@ function generateFormExport(cls: LocalEntity, forms: string, formattr: string, e
                 <v-row >
                     ${forms}
                     ${generateEnum(cls)}
-                    <v-col cols="12" class="d-flex justify-end">
-                        <v-btn type="button" color="primary" variant="outlined" class="mr-3" @click='navigateBack'>Voltar</v-btn>
-                        <v-btn type="submit" color="primary" flat>{{ submitButtonText }}</v-btn>
-                    </v-col>
                 </v-row>
             </v-card-text>
         </v-card>
     </form>
-<!-- Diálogo de Confirmação de Exclusão -->
+    <!-- Diálogo de Confirmação de Exclusão -->
     <v-dialog v-model="dialogDelete" persistent max-width="290">
         <v-card>
-          <v-card-title class="headline">Confirmar Exclusão</v-card-title>
+            <v-card-title class="headline">Confirmar Exclusão</v-card-title>
             <v-card-text>Tem certeza de que deseja excluir esta ${cls.name}?</v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="dialogDelete = false">Cancelar</v-btn>
+                <v-btn color="blue darken-1" text @click="deleta${cls.name}">Confirmar</v-btn>
+            </v-card-actions>
         </v-card>
     </v-dialog>
 </template>
 
-<script setup lang="ts">
+<script async setup lang="ts">
 import { ref } from 'vue';
 import Swal from 'sweetalert2';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
@@ -86,10 +96,11 @@ ${imports}
 import dayjs from 'dayjs';
 
 ${relationGet}
-const { list, post, getById, update } = ${cls.name}Service();
+const { list, remove, getById } = ${cls.name}Service();
 const route = useRoute();
 const params = route.params;
 const router = useRouter();
+const dialogDelete = ref(false);
 
 ${relationOptions}
 const form = reactive({
@@ -111,51 +122,21 @@ const getPost = async (id: any) => {
     try {
         let response = await getById(id);
         Object.assign(form, response.value[0]);
+        ${attrFactory}
         ${factoryEnum}
     } catch (error) {
         console.error(error);
     }
 };
 
-const onSubmit = async () => {
-    try {
-        if (params.id) {
-        
-            form.id = verificaArrayParams()
-        
-            await update(form);
-        } else {
-        
-            await post(form);
-        }
-        Swal.fire({
-            title: "Salvo com sucesso!",
-            icon: "success",
-            confirmButtonColor: "#D3D3D3"
-        }).then(()=>{
-            router.push({ path: '/${cls.name}/Index${cls.name}' });
-        }
-        );
-        
-    } catch (error) {
-        console.error(error);
-        Swal.fire({
-            icon: "error",
-            title: "Erro ao salvar!",
-            confirmButtonColor: "#D3D3D3"
-        });
-    }
-};
 
-const page = ref({ title: 'Cadastrar ${cls.name}' });
-const submitButtonText = ref('Cadastrar ${cls.name}');
+const page = ref({ title: 'Detalhes ${cls.name}' });
 
 onMounted(async () => {
     if (params.id) {
         await getPost(params.id);
-        page.value.title = 'Editar ${cls.name}';
-        breadcrumbs.value[1].text = page.value.title;
-        submitButtonText.value = 'Editar ${cls.name}';        
+        page.value.title = 'Detalhes ${cls.name}';
+        breadcrumbs.value[1].text = page.value.title;      
     }
     
     ${onMountedRelations(OnMounted)}
@@ -177,6 +158,34 @@ const breadcrumbs = ref([
 
 const navigateBack = () => {
     router.push({ path: '/${cls.name}/Index${cls.name}' });
+};
+
+function edita${cls.name}(id) {
+    router.push({ path: ${path_formid} });
+}
+
+function confirmDelete() {
+    dialogDelete.value = true;
+}
+
+const deleta${cls.name} = async () => {
+    try {
+        await remove(form.Id);
+        Swal.fire({
+        title: "Deletado com sucesso!",
+        icon: "success",
+        confirmButtonColor: "#D3D3D3"
+      });
+      router.push({ path: '/${cls.name}/Index${cls.name}' });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Erro ao salvar!",
+        text: "Não foi possível apagar."
+      });
+    } finally {
+        dialogDelete.value = false;
+    }
 };
 
 ${generateEnumValue(cls,enumx)}

@@ -14,6 +14,7 @@ export function generate(cls: LocalEntity, enumx: EnumX[], relations: RelationIn
     let OnMounted = ""
     let factoryEnum = ""
     let factory = ""
+    let attrFactory = ""
 
     for(const enumy of cls.enumentityatributes){
         formattr += `${capitalizeString(enumy.type.ref?.name || "")}: '', \n`
@@ -23,6 +24,11 @@ export function generate(cls: LocalEntity, enumx: EnumX[], relations: RelationIn
 
 
     for(const attr of cls.attributes) {
+        if (attr.type === 'date'){
+            attrFactory += `
+if (form.${capitalizeString(attr.name)}) {
+    form.${capitalizeString(attr.name)} = dayjs(form.${capitalizeString(attr.name)}).format('YYYY-MM-DD');
+}`}
       formattr += `${capitalizeString(attr.name)}: '', \n`
       forms += `
 <v-col cols="12">
@@ -40,11 +46,11 @@ export function generate(cls: LocalEntity, enumx: EnumX[], relations: RelationIn
         relationOptions += relationOptionsGenerated
     }
     
-    const form = generateFormExport(cls, forms, formattr, enumx, imports, relationGet, relationOptions, OnMounted, factoryEnum, factory);
+    const form = generateFormExport(cls, forms, formattr, enumx, imports, relationGet, relationOptions, OnMounted, factoryEnum, factory, attrFactory);
     return form
 }
 
-function generateFormExport(cls: LocalEntity, forms: string, formattr: string, enumx: EnumX[], imports: string, relationGet: String, relationOptions: string, OnMounted: string, factoryEnum: string, factory: string): string {
+function generateFormExport(cls: LocalEntity, forms: string, formattr: string, enumx: EnumX[], imports: string, relationGet: String, relationOptions: string, OnMounted: string, factoryEnum: string, factory: string, attrFactory: string): string {
     return expandToString`  
 <template>
     <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
@@ -64,7 +70,7 @@ function generateFormExport(cls: LocalEntity, forms: string, formattr: string, e
     </form>
 </template>
 
-<script setup lang="ts">
+<script async setup lang="ts">
 import { ref } from 'vue';
 import Swal from 'sweetalert2';
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
@@ -100,6 +106,7 @@ const getPost = async (id: any) => {
     try {
         let response = await getById(id);
         Object.assign(form, response.value[0]);
+        ${attrFactory}
         ${factoryEnum}
     } catch (error) {
         console.error(error);

@@ -21,10 +21,9 @@ export function generate(model: Model, target_folder: string) : void {
 function generateBlankLayout(): string {
     return expandToString`
 // ===============================|| Blank Layout ||=============================== //
-<script setup lang="ts">
+<script async setup lang="ts">
+import config from '@/config';
 import { RouterView } from "vue-router";
-import { useCustomizerStore } from '../../stores/customizer';
-const customizer = useCustomizerStore();
 
 </script>
 <template>
