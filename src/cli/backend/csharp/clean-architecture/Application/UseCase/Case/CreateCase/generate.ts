@@ -124,7 +124,7 @@ function generateRelationsRequest(cls: LocalEntity, relations: RelationInfo[]) :
     case "OneToOne":
       if(owner) {
         return expandToString`
-            Guid ${tgt.name.toLowerCase()}Id,`
+            Guid ${capitalizeString(tgt.name)}Id,`
       } else {
         return ''
       }
@@ -137,7 +137,7 @@ function generateRelationsRequest(cls: LocalEntity, relations: RelationInfo[]) :
     case "ManyToOne":
       if(owner) {
         return expandToString`
-            Guid ${tgt.name.toLowerCase()}Id,`
+            Guid ${capitalizeString(tgt.name)}Id,`
       } else {
         return ''
       }

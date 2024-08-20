@@ -136,7 +136,7 @@ function generateRelationsResponse(cls: LocalEntity, relations: RelationInfo[]) 
     case "OneToOne":
       if(owner) {
         return expandToString`
-          public Guid ${capitalizeString(tgt.name)}Id { get; set; }
+          public Guid ${cls.name}${capitalizeString(tgt.name)}Id { get; set; }
           public virtual ${tgt.name}ResponseDTO ${tgt.name} { get; set; }`
       } else {
         return ''
@@ -151,7 +151,7 @@ function generateRelationsResponse(cls: LocalEntity, relations: RelationInfo[]) 
       if(owner) {
         return expandToString`
           public virtual ${tgt.name}ResponseDTO ${tgt.name} { get; set; }
-          public Guid ${capitalizeString(tgt.name)}Id { get; set; }`
+          public Guid ${cls.name}${capitalizeString(tgt.name)}Id { get; set; }`
       } else {
         return ''
       }
@@ -214,7 +214,7 @@ function getAttrsAndRelations(cls: LocalEntity, relation_map: Map<LocalEntity, R
     case "OneToOne":
       if(owner) {
         return expandToString`
-          public Guid ${capitalizeString(tgt.name)}Id { get; set; }`
+          public Guid ${cls.name}${capitalizeString(tgt.name)}Id { get; set; }`
       } else {
         return ''
       }
@@ -227,7 +227,7 @@ function getAttrsAndRelations(cls: LocalEntity, relation_map: Map<LocalEntity, R
     case "ManyToOne":
       if(owner) {
         return expandToString`
-          public Guid ${capitalizeString(tgt.name)}Id { get; set; }`
+          public Guid ${cls.name}${capitalizeString(tgt.name)}Id { get; set; }`
       } else {
         return ''
       }

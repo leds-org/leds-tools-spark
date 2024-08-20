@@ -85,12 +85,12 @@ function generateImportEntity (entity: Entity, importedEntities: Map<ImportedEnt
 function generateAttribute(attribute:Attribute, is_abstract:Boolean): Generated{
   return expandToString`
   ${generateUniqueCollumn(attribute)}
-  ${is_abstract? `protected`: `public`} ${toString(generateTypeAttribute(attribute) ?? 'NOTYPE')}? ${capitalizeString(attribute.name)} { get; set; }`
+  ${is_abstract? `protected`: `public`} ${toString(generateTypeAttribute(attribute) ?? 'NOTYPE')} ${capitalizeString(attribute.name)} { get; set; }`
 }
 
 function generateAttParameters(attribute:Attribute, is_abstract:Boolean): Generated{
   return expandToString`
-${toString(generateTypeAttribute(attribute) ?? 'NOTYPE')}? ${attribute.name.toLowerCase()}`
+${toString(generateTypeAttribute(attribute) ?? 'NOTYPE')} ${attribute.name.toLowerCase()}`
 }
 
 function generateAttSendParameters(attribute:Attribute, is_abstract:Boolean): Generated{
@@ -164,11 +164,11 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
   case "OneToOne":
     if(owner) {
       return `
-public Guid? ${tgt.name}Id {get; set; }
+public Guid ${cls.name}${tgt.name}Id {get; set; }
 public ${tgt.name}? ${tgt.name} { get; set; }`
     } else {
       return expandToString`
-public Guid? ${tgt.name}Id {get; set; }
+public Guid ${cls.name}${tgt.name}Id {get; set; }
 public ${tgt.name}? ${tgt.name} { get; set; }`
     }
   case "OneToMany":
@@ -185,7 +185,7 @@ public ${tgt.name}? ${tgt.name} { get; set; }`
       return expandToStringWithNL`
         //ManyToOne
         public ${tgt.name}? ${tgt.name} { get; set; }
-        public Guid? ${tgt.name}Id {get; set; }
+        public Guid ${cls.name}${tgt.name}Id {get; set; }
       `
     } else {
       return ''
@@ -229,9 +229,9 @@ function generateRelationParameterText(cls: LocalEntity, {tgt, card, owner}: Rel
   switch(card) {
   case "OneToOne":
     if(owner) {
-      return expandToString`Guid? ${tgt.name.toLowerCase()}Id,`
+      return expandToString`Guid ${tgt.name.toLowerCase()}Id,`
     } else {
-      return expandToString`Guid? ${tgt.name.toLowerCase()}Id,`
+      return expandToString`Guid ${tgt.name.toLowerCase()}Id,`
     }
   case "OneToMany":
     if(owner) {
@@ -241,7 +241,7 @@ function generateRelationParameterText(cls: LocalEntity, {tgt, card, owner}: Rel
     }
   case "ManyToOne":
     if(owner) {
-      return expandToString`Guid? ${tgt.name.toLowerCase()}Id,`
+      return expandToString`Guid ${tgt.name.toLowerCase()}Id,`
     } else {
       return ''
     }
@@ -373,7 +373,7 @@ function generateSetRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo)
   switch(card) {
   case "OneToOne":
     if(owner) {
-      return expandToStringWithNL`${tgt.name.toLowerCase()}Id = ${tgt.name.toLowerCase()}Id;`
+      return expandToStringWithNL`${cls.name}${tgt.name}Id = ${tgt.name.toLowerCase()}Id;`
     } else {
       return expandToString``
     }
@@ -386,7 +386,7 @@ function generateSetRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo)
   case "ManyToOne":
     if(owner) {
       return expandToStringWithNL`
-        ${tgt.name}Id = ${tgt.name.toLowerCase()}Id;
+        ${cls.name}${tgt.name}Id = ${tgt.name.toLowerCase()}Id;
       `
     } else {
       return ''
