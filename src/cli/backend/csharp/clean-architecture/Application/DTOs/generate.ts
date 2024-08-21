@@ -291,12 +291,12 @@ function generateResponseBase(model: Model){
 {
     public class ResponseBase
     {
-        public int EstadoCode { get; set; }
+        public int StatusCode { get; set; }
 
         public ResponseBase() { }
         public ResponseBase(int Estado)
         {
-            EstadoCode = Estado;
+            StatusCode = Estado;
         }
     }
 }`

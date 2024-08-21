@@ -80,7 +80,8 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
         builder
             .HasOne<${tgt.name}>(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${tgt.name}) 
             .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
-            .HasForeignKey<${tgt.name}>(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${tgt.name}${cls.name}Id);`
+            .HasForeignKey<${tgt.name}>(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${tgt.name}${cls.name}Id)
+            .IsRequired(false);`
       } else {
         return ""
       }
