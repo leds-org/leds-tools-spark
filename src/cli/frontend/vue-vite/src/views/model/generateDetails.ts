@@ -30,7 +30,7 @@ export function generate(cls: LocalEntity, enumx: EnumX[], relations: RelationIn
       forms += `
 <v-col cols="12">
     <v-label class="font-weight-medium mb-2">${attr.name}</v-label>
-    <VTextField  type="${generateTypeAttribute(attr)}" placeholder="${attr.name} ${attr.type}" hide-details v-model='form.${capitalizeString(attr.name)}' disabled></VTextField>
+    <VTextField  type="${generateTypeAttribute(attr)}" placeholder="${attr.name} ${attr.type}" hide-details v-model='form.${capitalizeString(attr.name)}' disabled name="${capitalizeString(attr.name)}"></VTextField>
 </v-col>`
         if (attr.type === 'date'){
             attrFactory += `
@@ -57,8 +57,8 @@ function generateFormExport(cls: LocalEntity, forms: string, formattr: string, e
     return expandToString`  
 <template>
 <v-row justify="end" class="pa-3">
-<v-btn color="error" class="ma-2" variant="outlined" @click="confirmDelete">Excluir ${cls.name}</v-btn>
-<v-btn color="primary" class="ma-2" @click="edita${cls.name}(form.Id)">Editar ${cls.name}</v-btn>
+<v-btn color="error" class="ma-2" variant="outlined" @click="confirmDelete" name="DeleteButton">Excluir ${cls.name}</v-btn>
+<v-btn color="primary" class="ma-2" @click="edita${cls.name}(form.Id)" name="EditButton">Editar ${cls.name}</v-btn>
 </v-row>
     <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb>
     <form @submit.prevent="onSubmit">
@@ -79,7 +79,7 @@ function generateFormExport(cls: LocalEntity, forms: string, formattr: string, e
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" text @click="dialogDelete = false">Cancelar</v-btn>
-                <v-btn color="blue darken-1" text @click="deleta${cls.name}">Confirmar</v-btn>
+                <v-btn color="blue darken-1" text @click="deleta${cls.name}" name="confirmDeleteButton">Confirmar</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -237,6 +237,7 @@ return expandToString`
         placeholder="Selecione ${Enum.type.ref?.name}"
         hide-details
         disabled
+        name = "${capitalizeString(Enum.type.ref?.name || "")}"
         v-model="form.${capitalizeString(Enum.type.ref?.name || "")}"
     >
     </v-select>
@@ -267,7 +268,7 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
                 formsGenerated +=`
 <v-col cols="12">
     <v-label class="font-weight-medium mb-2">${capitalizeString(tgt.name)}</v-label>
-    <v-select :items="${capitalizeString(tgt.name)}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(tgt.name)}" hide-details v-model="form.${capitalizeString(tgt.name)}Id" disabled></v-select>
+    <v-select :items="${capitalizeString(tgt.name)}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(tgt.name)}" hide-details v-model="form.${capitalizeString(tgt.name)}Id" disabled name="${capitalizeString(tgt.name)}"></v-select>
 </v-col>`;
                 relationOptionsGenerated +=  `const ${tgt.name}Options = ref([]); \n`;
                 formattrGenerated =  `${capitalizeString(tgt.name)}Id: '', \n`;
@@ -286,7 +287,7 @@ ${tgt.name}Options.value = response.value;`;
                 formsGenerated +=`
 <v-col cols="12">
     <v-label class="font-weight-medium mb-2">${capitalizeString(tgt.name)}</v-label>
-    <v-select :items="${capitalizeString(tgt.name)}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(tgt.name)}" hide-details v-model="form.${capitalizeString(tgt.name)}Id" disabled></v-select>
+    <v-select :items="${capitalizeString(tgt.name)}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(tgt.name)}" hide-details v-model="form.${capitalizeString(tgt.name)}Id" disabled name="${capitalizeString(tgt.name)}"></v-select>
 </v-col>`;
                 relationOptionsGenerated +=  `const ${tgt.name}Options = ref([]); \n`;
                 formattrGenerated =  `${capitalizeString(tgt.name)}Id: '', \n`;
@@ -305,7 +306,7 @@ ${tgt.name}Options.value = response.value;`;
                 formsGenerated +=`
                 <v-col cols="12">
                     <v-label class="font-weight-medium mb-2">${capitalizeString(tgt.name)}</v-label>
-                    <v-select :items="${capitalizeString(tgt.name)}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(tgt.name)}" hide-details v-model="form.${capitalizeString(tgt.name)}Id" disabled></v-select>
+                    <v-select :items="${capitalizeString(tgt.name)}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(tgt.name)}" hide-details v-model="form.${capitalizeString(tgt.name)}Id" disabled name="${capitalizeString(tgt.name)}"></v-select>
                 </v-col>`;
                                 relationOptionsGenerated +=  `const ${tgt.name}Options = ref([]); \n`;
                                 formattrGenerated =  `${capitalizeString(tgt.name)}Id: '', \n`;
@@ -323,7 +324,7 @@ ${tgt.name}Options.value = response.value;`;
                 formsGenerated +=`
 <v-col cols="12">
     <v-label class="font-weight-medium mb-2">${capitalizeString(tgt.name)}</v-label>
-    <v-select :items="${capitalizeString(tgt.name)}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(tgt.name)}" hide-details v-model="form.${capitalizeString(tgt.name)}Id" disabled></v-select>
+    <v-select :items="${capitalizeString(tgt.name)}Options" item-title="Id" item-value="Id" placeholder="Select ${capitalizeString(tgt.name)}" hide-details v-model="form.${capitalizeString(tgt.name)}Id" disabled name="${capitalizeString(tgt.name)}"></v-select>
 </v-col>`;
                 relationOptionsGenerated +=  `const ${tgt.name}Options = ref([]); \n`;
                 formattrGenerated =  `${capitalizeString(tgt.name)}Id: '', \n`;
