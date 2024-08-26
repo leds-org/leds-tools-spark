@@ -1,16 +1,13 @@
 import { expandToString } from "langium/generate";
 import { LocalEntity } from "../../../../../language/generated/ast.js";
-import { RelationInfo } from "../../../../util/relations.js";
 
-export function generate(cls: LocalEntity, relations: RelationInfo[]): string {
+export function generate(cls: LocalEntity): string {
     const index = generateIndexText(cls);
     return index
 }
 
 function generateIndexText(cls: LocalEntity): string {
     return expandToString`
-cypress/pageObjects/Index${cls.name}.ts
-
 const URL = 'http://localhost:5173/${cls.name}/Index${cls.name}';
 
 const elements = {

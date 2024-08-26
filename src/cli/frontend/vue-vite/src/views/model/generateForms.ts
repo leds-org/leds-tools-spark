@@ -225,7 +225,6 @@ return expandToString`
         hide-details
         name = "${capitalizeString(Enum.type.ref?.name || "")}"
         v-model="form.${capitalizeString(Enum.type.ref?.name || "")}"
-    >
     </v-select>
 </v-col>
 `
@@ -366,4 +365,4 @@ function generateTypeAttribute(attribute:Attribute): string{
     }
     return "text"
   
-  }
+}
