@@ -10,7 +10,7 @@ export function generate(model: Model, target_folder: string) : void {
     
     const application_folder = target_folder + `/${model.configuration?.name}.Application`
     const domain_folder = target_folder + `/${model.configuration?.name}.Domain`
-    const test_folder = target_folder + `/${model.configuration?.name}.Test`
+    const test_folder = target_folder + `/${model.configuration?.name}.Domain.Test`
     const webApi_folder = target_folder + `/${model.configuration?.name}.WebAPI`
     const infrastructure_folder = target_folder + `/${model.configuration?.name}.Infrastructure`
 

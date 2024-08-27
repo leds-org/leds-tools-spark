@@ -26,7 +26,7 @@ function generateProjectsln(model: Model) : string {
 	EndProject
 	Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{COMPOSE-GUID}"
 	EndProject
-	Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "${model.configuration?.name}.Test", "${model.configuration?.name}\\${model.configuration?.name}.Test\\${model.configuration?.name}.Test.csproj", "{TEST-GUID}"
+	Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "${model.configuration?.name}.Domain.Test", "${model.configuration?.name}\\${model.configuration?.name}.Domain.Test\\${model.configuration?.name}.Domain.Test.csproj", "{TEST-GUID}"
 	EndProject
 	Global
 		GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -8,30 +8,30 @@ import { generateModel } from "./model-generator.js";
 export function generate(model: Model, target_folder: string) : void {
 
     const modules =  model.abstractElements.filter(isModule);
-  
+
     const all_entities = modules.map(module => module.elements.filter(isLocalEntity)).flat()
-  
+
     const relation_maps = processRelations(all_entities)
-  
+
     const imported_entities = processImportedEntities(model)
-  
+
     for(const mod of modules) {
-      
+
       const package_name      = `${model.configuration?.name}` 
-  
+
       const supertype_classes = processSupertypes(mod)
-  
+
       const mod_classes = mod.elements.filter(isLocalEntity)
-  
+
       for(const cls of mod_classes) {
         const class_name = cls.name
         const {attributes, relations} = getAttrsAndRelations(cls, relation_maps)
-        
+
         attributes
         fs.writeFileSync(path.join(target_folder,`${class_name}.cs`), toString(generateModel(cls, supertype_classes.has(cls), relations, package_name, imported_entities)))
         if (!cls.is_abstract){
         }
-        
+
       }
     }
 }
