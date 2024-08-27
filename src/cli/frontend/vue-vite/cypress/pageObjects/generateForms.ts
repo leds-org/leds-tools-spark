@@ -1,5 +1,5 @@
 import { expandToString } from "langium/generate";
-import { LocalEntity } from "../../../../../language/generated/ast.js";
+import { Attribute, LocalEntity } from "../../../../../language/generated/ast.js";
 import { capitalizeString } from "../../../../util/generator-utils.js";
 
 export function generate(cls: LocalEntity): string {
@@ -10,12 +10,12 @@ export function generate(cls: LocalEntity): string {
     let attribute = ""
 
     for (const attr of cls.attributes) {
-        fillFields += `this.fillField${cls.name}${capitalizeString(attr.name)}(${capitalizeString(attr.type)}value); \n`
-        editFields += `this.editField${cls.name}${capitalizeString(attr.name)}(${capitalizeString(attr.type)}value); \n`
+        fillFields += `this.fillField${cls.name}${capitalizeString(attr.name)}(${capitalizeString(attr.name)}value); \n`
+        editFields += `this.editField${cls.name}${capitalizeString(attr.name)}(${capitalizeString(attr.name)}value); \n`
         Fields += `field${cls.name}${capitalizeString(attr.name)}: () => cy.get('input[name="${capitalizeString(attr.name)}"]'), \n`
-        attribute += `${capitalizeString(attr.name)}value: ${attr.type}, `
+        attribute += `${capitalizeString(attr.name)}value: ${generateTypeAttribute(attr)}, `
         FieldFunctions += `
-static fillField${cls.name}${capitalizeString(attr.name)}(${capitalizeString(attr.name)}value: ${attr.type}) {
+static fillField${cls.name}${capitalizeString(attr.name)}(${capitalizeString(attr.name)}value: ${generateTypeAttribute(attr)}) {
     elements.field${cls.name}${capitalizeString(attr.name)}().type(${capitalizeString(attr.name)}value);
 };
 
@@ -23,9 +23,9 @@ static clearField${cls.name}${capitalizeString(attr.name)}() {
     elements.field${cls.name}${capitalizeString(attr.name)}().clear();
 };
 
-static editField${cls.name}${capitalizeString(attr.name)}(${capitalizeString(attr.name)}value: ${attr.type}) {
+static editField${cls.name}${capitalizeString(attr.name)}(${capitalizeString(attr.name)}value: ${generateTypeAttribute(attr)}) {
     this.clearField${cls.name}${capitalizeString(attr.name)}();
-    if (value != '') {
+    if (${capitalizeString(attr.name)}value != '') {
         this.fillField${cls.name}${capitalizeString(attr.name)}(${capitalizeString(attr.name)}value);
     };
 }; \n`
@@ -79,4 +79,19 @@ class Form${cls.name}{
 }
 
 export default Form${cls.name}`
+}
+
+function generateTypeAttribute(attribute:Attribute): string{
+
+    if (attribute.type.toString().toLowerCase() === "date"){
+        return "Date"
+    }
+    if (attribute.type.toString().toLowerCase() === "datetime"){
+        return "Date"
+    }
+    if (attribute.type.toString().toLowerCase() === "integer"){
+        return "number"
+    }
+    return "string"
+
 }
