@@ -16,9 +16,8 @@ export function registerValidationChecks(services: SPARKServices) {
             validator.checkAbstractEntityExtendsAbstract,
             validator.checkCyclicExtensions
         ],
-        Attribute: validator.checkNameIsSnakeCase,
+        Attribute: validator.checkBoth,
         AttributeEnum: validator.checkNameIsCamelCase
-
     };
     registry.register(checks, validator);
 }
@@ -27,6 +26,18 @@ export function registerValidationChecks(services: SPARKServices) {
  * Implementation of custom validations.
  */
 export class SPARKValidator {
+
+    // Não consegui encontrar o elemento pra definir a verificação por linguagem
+    checkBoth(n: NamedAstNode, accept: ValidationAcceptor) : void {
+        const isCamelCase = /^[A-Z]\w*$/.test(n.name);
+        const isSnakeCase = /^[a-z_][a-z0-9_]*$/.test(n.name);
+    
+        if (!isCamelCase && !isSnakeCase) {
+            accept('warning', "This name should be in CamelCase or snake_case", { node: n, property: 'name' });
+        }
+    }
+    
+
     checkNameIsCamelCase(n: NamedAstNode, accept: ValidationAcceptor) : void {
         if(!n.name.match(/^[A-Z]\w*$/)) {
             accept('warning', "This name should be in CamelCase", { node: n, property: 'name' })

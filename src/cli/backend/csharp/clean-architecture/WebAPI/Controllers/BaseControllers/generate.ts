@@ -37,7 +37,7 @@ namespace ${model.configuration?.name}.WebApi.Controllers.BaseControllers
         }
 
         [HttpGet]
-        [EnableQuery(PageSize = 5, MaxExpansionDepth = 5)]
+        [EnableQuery(PageSize = 25, MaxExpansionDepth = 3)]
         public async Task<IQueryable<Response>> GetAll()
         {
             var response = await _mediator.Send(new GetAllCommand(), new CancellationToken());
@@ -45,7 +45,7 @@ namespace ${model.configuration?.name}.WebApi.Controllers.BaseControllers
         }
 
         [HttpGet("{id}")]
-        [EnableQuery(MaxExpansionDepth = 5)]
+        [EnableQuery(MaxExpansionDepth = 3)]
         public async Task<IQueryable<Response>> GetById(Guid id)
         {
 
@@ -60,27 +60,76 @@ namespace ${model.configuration?.name}.WebApi.Controllers.BaseControllers
                 return BadRequest();
             }
             var response = await _mediator.Send(Command, cancellationToken);
-            return Ok(response);
+
+            if (response.StatusCode != 201)
+            {
+                return ApiBadRequestResult(response);
+            }
+
+            return ApiResult(response);
 
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(Guid id, CancellationToken cancellationToken)
         {
+            if (id == Guid.Empty) return BadRequest();
+
             var command = _mapper.Map<DeleteCommand>(id);
-            await _mediator.Send(command, cancellationToken);
+            var response = await _mediator.Send(command, cancellationToken);
+
+            if (response != null) { }
+
+            if (response.StatusCode != 200)
+            {
+                return ApiBadRequestResult(response);
+            }
+
             return Ok();
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult> Update(Guid id, UpdateCommand Command, CancellationToken cancellationToken)
         {
-            if (id == null)
+            if (id == Guid.Empty)
             {
                 return BadRequest();
             }
             var response = await _mediator.Send(Command, cancellationToken);
-            return Updated(response);
+
+            if (response.StatusCode != 200)
+            {
+                return ApiBadRequestResult(response);
+            }
+
+            return ApiResult(response);
+        }
+
+        internal OkObjectResult ApiResult(ApiResponse? apiResponse)
+        {
+            if (apiResponse != null)
+            {
+                adicionarURI(apiResponse.StatusCode);
+                //this.Response.StatusCode = apiResponse.StatusCode;
+                var objectResult = new OkObjectResult(apiResponse);
+                objectResult.StatusCode = apiResponse.StatusCode;
+                return objectResult;
+            }
+
+            void adicionarURI(int statusCode)
+            {
+                apiResponse.Uri = statusCode == 201 ? string.Concat(Request.Path, "/", apiResponse.Uri) : Request.Path;
+            }
+            return Ok(apiResponse);
+        }
+
+        internal BadRequestObjectResult ApiBadRequestResult(ResponseBase? apiResponse)
+        {
+
+            this.Response.StatusCode = apiResponse.StatusCode;
+            var badRequest = new BadRequestObjectResult(apiResponse);
+            badRequest.StatusCode = apiResponse.StatusCode;
+            return badRequest;
         }
     }
 }`

@@ -33,6 +33,7 @@ namespace ${model.configuration?.name}.Infrastructure.EntitiesConfiguration
     {
         public void Configure(EntityTypeBuilder<${cls.name}> builder)
         {
+            builder.HasKey(x => x.Id)
             ${generateRelations(cls, relation_maps)}
         }
     }
@@ -80,7 +81,8 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
         builder
             .HasOne<${tgt.name}>(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${tgt.name}) 
             .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
-            .HasForeignKey<${tgt.name}>(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name}Id);`
+            .HasForeignKey<${tgt.name}>(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${tgt.name}${cls.name}Id)
+            .IsRequired(false);`
       } else {
         return ""
       }
@@ -92,7 +94,7 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
             builder
                 .HasMany<${tgt.name}>(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${tgt.name}s) 
                 .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
-                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name}Id);`
+                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${tgt.name}${cls.name}Id);`
       }
     case "ManyToOne":
       if(owner) {
@@ -102,7 +104,7 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
             builder
                 .HasMany<${tgt.name}>(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${tgt.name}s) 
                 .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
-                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name}Id);`
+                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${tgt.name}${cls.name}Id);`
       }
     case "ManyToMany":
       if(owner) {

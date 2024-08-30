@@ -35,9 +35,12 @@ namespace ${model.configuration?.name}.Infrastructure.Repositories.Common
     public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
     {
         protected readonly AppDbContext Context;
+        protected readonly DbSet<T> DbSet;
+
         public BaseRepository(AppDbContext context)
         {
             Context = context;
+            DbSet =  Context.Set<T>();
         }
 
         public async Task Create(T entity)

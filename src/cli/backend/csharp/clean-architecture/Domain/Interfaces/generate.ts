@@ -79,6 +79,5 @@ namespace ${model.configuration?.name}.Domain.Interfaces.Common
         void AddRange(ICollection<T> entities);
         void DeleteRange(ICollection<T> entities);
     }
-}
-`
+}`
 }

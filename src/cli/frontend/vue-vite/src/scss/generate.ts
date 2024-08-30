@@ -36,17 +36,14 @@ function generateStyle(): string {
 @import './layout/reboot';
 @import './layout/container';
 @import './layout/sidebar';
-@import './layout/rtl';
 @import './layout/topbar';
 @import './layout/horizontal';
-@import './layout/dark';
 @import './layout/customizer';
 
 @import './components/VBreadcrumb';
 @import './components/VAlert';
 @import './components/VButtons';
 @import './components/VCard';
-@import './components/VCarousel';
 @import './components/VField';
 @import './components/VList';
 @import './components/VInput';
@@ -63,7 +60,6 @@ function generateStyle(): string {
 @import './components/VDatatable';
 
 @import './pages/datatable';
-@import './pages/dashboards';
 @import './pages/editor';
 @import './pages/authentication';
 @import './pages/apps';
@@ -75,7 +71,7 @@ function generateVariables(): string {
 @use 'sass:math';
 @use 'sass:map';
 @use 'sass:meta';
-@use 'vuetify/lib/styles/tools/functions' as *;
+//@use 'vuetify/lib/styles/tools/functions' as *;
 
 // Custom Variables
 // colors

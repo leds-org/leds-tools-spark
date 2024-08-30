@@ -82,7 +82,7 @@ export default ColorsOptions;`
 
 function generateSharedBaseBread(): string {
     return expandToString`
-<script setup >
+<script async setup >
 
 const props = defineProps({
     title: String,
@@ -114,7 +114,7 @@ const props = defineProps({
     </div>
 </template>
 
-<style lang="scss">
+<style async lang="scss">
 .page-breadcrumb {
     .v-toolbar {
         background: transparent;
@@ -125,7 +125,7 @@ const props = defineProps({
 
 function generateSharedUiParent(): string {
     return expandToString`
-<script setup lang="ts">
+<script async setup lang="ts">
 const props = defineProps({
     title: String
 });

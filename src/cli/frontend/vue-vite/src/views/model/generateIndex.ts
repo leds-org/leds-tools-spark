@@ -5,6 +5,7 @@ import { RelationInfo } from "../../../../../util/relations.js";
 
 export function generate(cls: LocalEntity, relations: RelationInfo[]): string {
     const path_form =  "`" + `/${cls.name}/form${cls.name}/\${id}` +  "`"
+    const path_details = "`" + `/${cls.name}/details${cls.name}/\${id}` + "`" 
 
     let interfaces = ""
     let headers = ""
@@ -21,13 +22,13 @@ ${capitalizeString(attr.name)}: string;`
     : '';
     relations.map(rel => headers +=  generateRelation(cls, rel))
 
-    const index = generateIndexText(cls,path_form, headers, interfaces);
+    const index = generateIndexText(cls,path_form, headers, interfaces, path_details);
     return index
     
 
 }
 
-function generateIndexText(cls: LocalEntity, path_form: string, headers: string, interfaces: string): string {
+function generateIndexText(cls: LocalEntity, path_form: string, headers: string, interfaces: string, path_details: string): string {
     return expandToString`
 <template>
     <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs" />
@@ -40,10 +41,10 @@ function generateIndexText(cls: LocalEntity, path_form: string, headers: string,
         ></v-text-field>
       </v-col>
       <v-col cols="4" class="d-flex align-start">
-        <v-btn class="custom-width" color="primary" variant="flat" dark @click="search${cls.name}">Buscar</v-btn>
+        <v-btn class="custom-width" color="primary" variant="flat" dark @click="search${cls.name}" name="SearchButton">Buscar</v-btn>
       </v-col>
       <v-col cols="2" class="d-flex justify-end">
-        <v-btn class="custom-width-2" color="primary" variant="flat" dark @click="add${cls.name}">Cadastrar ${cls.name}</v-btn>
+        <v-btn class="custom-width-2" color="primary" variant="flat" dark @click="add${cls.name}" name="CreateButton">Cadastrar ${cls.name}</v-btn>
       </v-col>
     </v-row>
     <v-row>
@@ -68,6 +69,7 @@ function generateIndexText(cls: LocalEntity, path_form: string, headers: string,
             </v-dialog>
           </template>
           <template v-slot:item.actions="{ item }">
+          <v-icon class="mdi mdi-eye me-2" color="primary" size="small" @click="goToDetail(item.Id)" name="detailsList"/>
             <v-icon color="primary" size="small" class="me-2" @click="editItem(item.Id)">
               mdi-pencil
             </v-icon>
@@ -84,7 +86,7 @@ function generateIndexText(cls: LocalEntity, path_form: string, headers: string,
   </template>
   
   
-<script setup lang="ts">
+<script async setup lang="ts">
 import BaseBreadcrumb from '@/components/shared/BaseBreadcrumb.vue';
 import dayjs from 'dayjs';
 import Swal from 'sweetalert2';
@@ -157,7 +159,7 @@ const deleteItem = async () => {
       Swal.fire({
         icon: "error",
         title: "Erro ao salvar!",
-        text: "Não foi possível apagar, pois a ${cls.name} está vinculada a um projeto."
+        text: "Não foi possível apagar."
       });
     } finally {
       closeDelete();
@@ -176,6 +178,10 @@ function add${cls.name}() {
 
 function editItem(id: any) {
   router.push({ path: ${path_form} });
+}
+
+function goToDetail(id: any) {
+  router.push({ path: ${path_details} });
 }
 
 function closeDelete() {

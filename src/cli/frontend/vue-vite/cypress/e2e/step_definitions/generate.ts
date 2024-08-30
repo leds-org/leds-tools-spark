@@ -1,11 +1,10 @@
-import { Attribute, isEnumX, isLocalEntity, isModule, LocalEntity, Model } from "../../../../../../language/generated/ast.js"
+import { Attribute, isLocalEntity, isModule, LocalEntity, Model } from "../../../../../../language/generated/ast.js"
 import fs from "fs";
 import path from "path";
-import { createPath } from "../../../../../util/generator-utils.js";
-import { generate as generateForms } from "./generateForms.js";
-import { generate as generateIndex } from "./generateIndex.js";
+//import { createPath } from "../../../../../util/generator-utils.js";
 import { processRelations, RelationInfo } from "../../../../../util/relations.js";
-import { generate as generateDetails } from "./generateDetails.js";
+import { generateDeleteFeature, generateDelete } from "./generateDelete.js"
+import { createPath } from "../../../../../util/generator-utils.js";
 
 export function generate(model: Model, target_folder: string) : void {
 
@@ -16,16 +15,12 @@ export function generate(model: Model, target_folder: string) : void {
     const relation_maps = processRelations(all_entities)
 
     for(const mod of modules) {
-      const enumx = mod.elements.filter(isEnumX)
+      //const enumx = mod.elements.filter(isEnumX)
       for(const cls of mod.elements.filter(isLocalEntity)) {
-          const {relations} = getAttrsAndRelations(cls, relation_maps)
+          const {} = getAttrsAndRelations(cls, relation_maps)
           const cls_folder = createPath(target_folder, `${cls.name}`)
-
-          fs.mkdirSync(cls_folder, {recursive:true})
-
-          fs.writeFileSync(path.join(cls_folder, `Form${cls.name}.vue`), generateForms(cls, enumx, relations))
-          fs.writeFileSync(path.join(cls_folder, `Index${cls.name}.vue`), generateIndex(cls, relations))
-          fs.writeFileSync(path.join(cls_folder, `Details${cls.name}.vue`), generateDetails(cls, enumx, relations))
+          fs.writeFileSync(path.join(target_folder, `delete${cls.name}.feature`), generateDeleteFeature(cls))
+          fs.writeFileSync(path.join(cls_folder, `delete${cls.name}.ts`), generateDelete(cls))
       }
         
     }
