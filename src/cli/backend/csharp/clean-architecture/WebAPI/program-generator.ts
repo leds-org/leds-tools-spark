@@ -15,6 +15,7 @@ using ${model.configuration?.name}.Infrastructure;
 using ${model.configuration?.name}.Infrastructure.Context;
 using ${model.configuration?.name}.WebApi.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,13 +32,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.ODataConfiguration();
 
-#region Adição do Serilog
-//Log.Logger = new LoggerConfiguration()
-//            .MinimumLevel.Debug()
-//            .WriteTo.Console()
-//            .WriteTo.File("logs/myapp.txt", rollingInterval: RollingInterval.Day)
-//            .CreateLogger();
-//builder.Host.UseSerilog(Log.Logger);
+#region Serilog
+Directory.CreateDirectory("logs");
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .WriteTo.File("logs/log.txt")
+    .CreateLogger();
+Log.Information("Serilog has been successfully configured.");
+
+builder.Host.UseSerilog();
 #endregion
 
 var app = builder.Build();
