@@ -10,7 +10,7 @@ export function generate(model: Model, target_folder: string) : void {
     fs.mkdirSync(repositories_folder, {recursive: true})
 
     ProjectGenerator(model, target_folder)
-    helpersGenerator(target_folder)
+    helpersGenerator(model, target_folder)
     repositoriesGenerator(model, repositories_folder)
 
 }

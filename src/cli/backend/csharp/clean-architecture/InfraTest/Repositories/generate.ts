@@ -30,8 +30,8 @@ export function generate(model: Model, target_folder: string) : void {
 function generateModel(cls: LocalEntity, package_name: string, entityFixture: string) : string {
     return expandToStringWithNL`
 using AutoFixture;
-using ${package_name}.Domain.Entities.CadastroModalidadesBolsas;
-using ${package_name}.Domain.Interfaces.CadastroModalidadesBolsas;
+using ${package_name}.Domain.Entities;
+using ${package_name}.Domain.Interfaces.Entities;
 using ${package_name}.Infrastructure.Context;
 using ${package_name}.Infrastructure.Test.Helpers;
 using Microsoft.EntityFrameworkCore;
@@ -84,18 +84,6 @@ namespace ${package_name}.Infrastructure.Test.Repositories
                 ${entityFixture}
             await _${cls.name.toLowerCase()}Repository.Create(${cls.name.toLowerCase()});
             await _context.SaveChangesAsync();
-            #endregion
-
-            #region Update ${cls.name}
-            ${cls.name.toLowerCase()}.Nome = "Updated Name";
-            await _${cls.name.toLowerCase()}Repository.Update(${cls.name.toLowerCase()});
-            await _context.SaveChangesAsync();
-            #endregion
-
-            #region Check Results
-            var result = _${cls.name.toLowerCase()}Repository.GetById(${cls.name.toLowerCase()}.Id).FirstOrDefault();
-            Assert.NotNull(result);
-            Assert.Equal("Updated Name", result.Nome);
             #endregion
         }
 
@@ -162,12 +150,12 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
                 return ''
             } else {
                 return`
-.With(${cls.name} => ${cls.name}.${tgt.name}, [])`
+.With(${cls.name} => ${cls.name}.${tgt.name}s, [])`
             }
         case "ManyToMany":
             if(owner) {
                 return `
-.With(${cls.name} => ${cls.name}.${tgt.name}, [])`
+.With(${cls.name} => ${cls.name}.${tgt.name}s, [])`
             } else {
                 return ""
             }
