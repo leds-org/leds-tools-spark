@@ -150,4 +150,3 @@ Ferramenta para captura de mudanças em bancos de dados relacionais e propagaç�
 
 
 
-
