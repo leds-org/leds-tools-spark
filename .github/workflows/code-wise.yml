@@ -32,7 +32,7 @@ jobs:
         run: |
             python -c "
             import agentops
-            agentops.init('${{ secrets.AGENTOPS_API_KEY }}')
+            agentops.init($AGENTOPS_API_KEY)
             "
                 
       - name: Get committer's name
