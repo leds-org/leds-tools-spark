@@ -3,11 +3,11 @@ import 'helpers'
 
 Configuration:
     'Configuration' '{'
-        ('software_name' ':' name=STRING 
+        ('software_name' ':' name=STRING
         |'about' ':' description=STRING
         |DataBaseName
         |PackagePath
-        |Language 
+        |Language
         |Features)*
     '}'
 ;
@@ -15,7 +15,7 @@ Configuration:
 
 fragment DataBaseName:
     'database_name:' database_name=STRING
-; 
+;
 
 fragment Language:
     'language:' language = LANGUAGETYPE

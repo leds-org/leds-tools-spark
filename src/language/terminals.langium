@@ -8,4 +8,3 @@ terminal BOOLEAN: 'true'|'false';
 
 terminal ML_COMMENT: /\/\*[\s\S]*?\*\//;
 terminal SL_COMMENT: /\/\/[^\n\r]*/;
-

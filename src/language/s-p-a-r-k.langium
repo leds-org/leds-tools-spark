@@ -10,7 +10,7 @@ entry Model:
 ;
 
 AbstractElement:
-    Module | EnumX  
+    Module | EnumX
 ;
 
 Module:
@@ -18,4 +18,5 @@ Module:
     'module' name=QualifiedName '{'
         (elements+=(AbstractElement | LocalEntity))*
     '}'
+    (Comment)?
 ;

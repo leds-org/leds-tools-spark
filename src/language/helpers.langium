@@ -18,9 +18,16 @@ QualifiedNameWithWildcard returns string:
 ;
 
 fragment Comment:
-     comment = (SL_COMMENT |ML_COMMENT)
+    comment = (SL_COMMENT |ML_COMMENT)
 ;
 
 FEATURE_TYPE returns string:
     ('authentication')
+;
+
+fragment Description:
+    'description' ':' description=STRING
+;
+fragment Name:
+    'name' ':' name_fragment=STRING
 ;
