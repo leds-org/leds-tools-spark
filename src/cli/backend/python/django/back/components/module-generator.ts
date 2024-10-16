@@ -5,7 +5,7 @@ import { generateURLAPI } from './url-generator.js'
 import { generateAPIView } from './view-generator.js'
 import { generateSerializer } from './serialize-generator.js'
 import { base_ident, capitalizeString, createPath } from '../../../../../util/generator-utils.js'
-import { Attribute, Entity, LocalEntity, Model, Module, isLocalEntity, isModule, Actor, isActor } from '../../../../../../language/generated/ast.js'
+import { Attribute, Entity, LocalEntity, Model, Module, isLocalEntity, isModule, Actor } from '../../../../../../language/generated/ast.js'
 import path from 'path'
 import fs from 'fs'
 import { expandToStringWithNL } from 'langium/generate'
@@ -14,11 +14,11 @@ const ident = base_ident
 export function generateModules(app: Model, target_folder: string) : void {
     // Processa quais Entidades representam algum ator
     const entity_to_actor = new Map<Entity, Actor>()
-    app.abstractElements.filter(isActor).forEach(a => {
-        if(a.entity.ref) {
-            entity_to_actor.set(a.entity.ref, a)
-        }
-    })
+    // app.abstractElements.filter(isActor).forEach(a => {
+    //     if(a.entity.ref) {
+    //         entity_to_actor.set(a.entity.ref, a)
+    //     }
+    // })
 
     const APPS_PATH = createPath(target_folder, "backend", "apps/")
     // Criando os models, service e applications
@@ -289,7 +289,7 @@ function entitySignals(e: LocalEntity, map: Map<Entity, Actor>) : string {
     const post_save = map.has(e) ?
         expandToStringWithNL`
             if created:
-                group = Group.objects.get(name="${map.get(e)?.name}")
+                group = Group.objects.get(name="${map.get(e)?.id}")
                 instance.user_application.groups.add(group)
         ` :
         'pass'
