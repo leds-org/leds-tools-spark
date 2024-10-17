@@ -1,5 +1,5 @@
 import { expandToString } from "langium/generate";
-import { isUseCase, isUseCasesModel, Model, UseCase } from "../../../language/generated/ast.js"
+import { isUseCase, isUseCasesModel, Model, UseCase } from "../../language/generated/ast.js"
 import fs from "fs";
 import path from "path";
 
@@ -28,7 +28,7 @@ allow {
 allow {
     startswith(input.path, "/${useCase.id?.toLocaleLowerCase()}")
     ${useCase.events.map(event => `startswith(input.path, "/${event.id.toLocaleLowerCase()}")`).join('\n')}
-    ${useCase.actors.map(actor => `input.user.role == "${actor}"`).join('\n')}
+    ${useCase.actors.map(actor => `input.user.role == "${actor.ref?.id}"`).join('\n')}
 }
 `
 }

@@ -7,13 +7,10 @@ import { generate as minimalgenerateDocker } from "./minimal-api/docker-generato
 import { generate as cleanArchGenerate} from "./clean-architecture/generator.js"
 import { generate as cleanprojectGenerate} from "./clean-architecture/project-generator.js"
 import { generate as cleangenerateDocker } from "./clean-architecture/docker-generator.js"
-import { generate as opaGenerator } from "../opa/generator.js"
 
 export function generate(model: Model, target_folder: string) : void {
     const target_folder_back = target_folder+"/backend"
     const target_folder_projname = target_folder_back + "/" + model.configuration?.name
-
-    opaGenerator(model, target_folder_projname)
 
     //creating folders
 

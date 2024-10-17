@@ -113,6 +113,10 @@
             {
                 "command": "s-p-a-r-k.generateBacklog",
                 "title": "Generate Backlog "
+            },
+            {
+                "command": "s-p-a-r-k.generateAuthorization",
+                "title": "Generate Authorization "
             }
         ],
         "menus": {
@@ -135,6 +139,10 @@
                 },
                 {
                     "command": "s-p-a-r-k.generateBacklog",
+                    "when": "editorLangId == s-p-a-r-k"
+                },
+                {
+                    "command": "s-p-a-r-k.generateAuthorization",
                     "when": "editorLangId == s-p-a-r-k"
                 }
             ],
@@ -161,6 +169,11 @@
                 },
                 {
                     "command": "s-p-a-r-k.generateBacklog",
+                    "group": "z_commands",
+                    "when": "editorLangId == s-p-a-r-k"
+                },
+                {
+                    "command": "s-p-a-r-k.generateAuthorization",
                     "group": "z_commands",
                     "when": "editorLangId == s-p-a-r-k"
                 }

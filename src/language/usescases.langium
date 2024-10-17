@@ -3,7 +3,7 @@ import 'entities'
 // Definição de Atores
 Actor:
     (Comment)?
-    'actor' id=ID ('name' ':' fullName=STRING)? ('extends' superType=[Actor:QualifiedName])?
+    'actor' id=QualifiedName ('name' ':' fullName=STRING)? ('extends' superType=[Actor:QualifiedName])?
     (Comment)?
 ;
 
@@ -13,7 +13,7 @@ UseCase:
     'usecase' id=QualifiedName ('extends' superType=[UseCase:QualifiedName])? '{'
         Name
         Description?
-        'performer' ':' actors+=STRING (',' actors+=STRING)*
+        'performer' ':' actors+=[Actor:QualifiedName] (',' actors+=[Actor:QualifiedName])*
         (events+=Event)*
     '}'
     (Comment)?

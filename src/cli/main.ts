@@ -27,6 +27,7 @@ export type GenerateOptions = {
     destination?: string;
     only_front?: boolean,
     only_back?: boolean,
+    only_opa?: boolean,
     all?: boolean,
     only_Documentation?:boolean,
     only_Backlog?:boolean
