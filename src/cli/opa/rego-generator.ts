@@ -29,6 +29,5 @@ allow {
     startswith(input.path, "/${useCase.id?.toLocaleLowerCase()}")
     ${useCase.events.map(event => `startswith(input.path, "/${event.id.toLocaleLowerCase()}")`).join('\n')}
     ${useCase.actors.map(actor => `input.user.role == "${actor.ref?.id}"`).join('\n')}
-}
-`
+}`
 }
