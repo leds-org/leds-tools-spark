@@ -34,7 +34,7 @@ jobs:
             import os
             import agentops
             api_key = os.getenv('AGENTOPS_API_KEY')
-            agentops.init(api_key)
+            agentops.init(str(api_key))
             "
 
       - name: Get committer's name
