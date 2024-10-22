@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - develop
+      - developing
 
 jobs:
   install:
@@ -76,7 +76,7 @@ jobs:
         run: |
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
             vsce publish --pat ${{ secrets.VSCODE_TOKEN }}
-          elif [ "${{ github.ref }}" == "refs/heads/develop" ]; then
+          elif [ "${{ github.ref }}" == "refs/heads/developing" ]; then
             vsce publish --pre-release --pat ${{ secrets.VSCODE_TOKEN }}
           else
-            echo "Branch is neither main nor develop, skipping publish."
+            echo "Branch is neither main nor developing, skipping publish."
