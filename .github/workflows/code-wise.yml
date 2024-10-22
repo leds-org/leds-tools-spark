@@ -24,16 +24,7 @@ jobs:
         run: |
           sudo apt-get install jq
           pip install requests
-          pip install agentops  
-      
-      - name: Run AgentOps Monitoring
-        env:
-            AGENTOPS_API_KEY: ${{ secrets.AGENTOPS_API_KEY }}
-        run: |
-            python -c "
-            import agentops
-            agentops.init($AGENTOPS_API_KEY)
-            "
+          pip install agentops 
 
       - name: Get committer's name
         id: get-committer
