@@ -31,12 +31,10 @@ jobs:
             AGENTOPS_API_KEY: ${{ secrets.AGENTOPS_API_KEY }}
         run: |
             python -c "
-            import os
             import agentops
-            api_key = os.environ.get('AGENTOPS_API_KEY')
-            agentops.init(api_key)
+            agentops.init($AGENTOPS_API_KEY)
             "
-                
+
       - name: Get committer's name
         id: get-committer
         run: |
@@ -66,7 +64,7 @@ jobs:
               # Print the content being sent for analysis
               #echo "Content sent for analysis: "
               #echo "$CONTENT"
-              
+
               # Determine the language based on the file extension
               case "$FILE" in
                 *.py) LANG="python" ;;
@@ -81,13 +79,11 @@ jobs:
                 *.cs) LANG="csharp" ;;
                 *) LANG="plaintext" ;;  # Default for unknown file types
               esac
-              
-              REQUEST="Analyze the following '$LANG' code for performance improvements and code smells. Limit your feedback to 20 lines of concise suggestions:\n\n$CONTENT"
-              #echo "Request being sent to GPT API:"
-              #echo "$REQUEST"
 
-               # Create valid JSON payload using jq to escape variables correctly
-              JSON_PAYLOAD=$(jq -n --arg model "gpt-4" \
+              REQUEST="Analyze the following '$LANG' code for performance improvements, code smells and give example how to fix. Limit your feedback to 2000 characteres of concise suggestions and group the sugestions in named performance problem/code smell categories. If possibel named the categories with perfomed and code smell name:\n\n$CONTENT"
+
+              # Create valid JSON payload using jq to escape variables correctly
+              JSON_PAYLOAD=$(jq -n --arg model "gpt-4o-mini" \
                       --arg system_message "You are a code analysis assistant focused on performance and code quality." \
                       --arg user_message "$REQUEST" \
                       '{
@@ -102,17 +98,17 @@ jobs:
                     # Print the JSON payload to verify correct formatting
                     echo "JSON Payload:"
                     echo "$JSON_PAYLOAD"
-                                
+
               # Send the file content to the GPT API for performance and code smells analysis
                 RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
                 -H "Authorization: Bearer $OPENAI_API_KEY" \
                 -H "Content-Type: application/json" \
                 -d "$JSON_PAYLOAD")
 
-                
+
               echo "Response from GPT API:"
               echo "$RESPONSE"
-              
+
               SUGGESTIONS=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
               ALL_SUGGESTIONS+="$FILE:\n$SUGGESTIONS\n\n"
 
@@ -133,7 +129,7 @@ jobs:
                 curl -s -H "Content-Type: application/json" \
                 -d "$DISCORD_MESSAGE" \
                 "$DISCORD_WEBHOOK_URL"
-            
+
               # Save suggestions to an environment variable for the next step
                 echo "ALL_SUGGESTIONS<<EOF" >> $GITHUB_ENV
                 echo -e "$ALL_SUGGESTIONS" >> $GITHUB_ENV
@@ -143,12 +139,12 @@ jobs:
           else
             echo "No code files found."
           fi
-    
+
       - name: Comment on Pull Request
         env:
           SUGGESTIONS: ${{ env.SUGGESTIONS }}  # Carregar as sugestões do ambiente
         run: |
-          
+
           ESCAPED_SUGGESTIONS=$(echo "$ALL_SUGGESTIONS" | jq -Rsa .)
 
           curl -s -X POST "https://api.github.com/repos/${{ github.repository }}/issues/${{github.event.pull_request.number}}/comments" \
