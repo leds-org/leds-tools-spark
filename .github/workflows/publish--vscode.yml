@@ -80,3 +80,4 @@ jobs:
             vsce publish --pre-release --pat ${{ secrets.VSCODE_TOKEN }}
           else
             echo "Branch is neither main nor developing, skipping publish."
+          fi
