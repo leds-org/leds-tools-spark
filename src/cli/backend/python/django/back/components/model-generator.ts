@@ -1,5 +1,5 @@
 import { Attribute, EnumEntityAtribute, EnumX, LocalEntity, Module, Relation, isEnumX, isImportedEntity, isLocalEntity, isManyToMany, isModule, isModuleImport } from "../../../../../../language/generated/ast.js"
-import { base_ident, capitalizeString, ident_size, topologicalSort } from "../../../../../util/generator-utils.js"
+import { base_ident, capitalizeString, topologicalSort } from "../../../../../util/generator-utils.js"
 const ident = base_ident
 
 export function generateModels(m: Module) : string {
@@ -102,7 +102,7 @@ function generateEnum(e: EnumX) : string {
 
     const lines = [
         `class ${e.name}(models.TextChoices):`,
-        `${ident_size}"""${e.comment ?? ''}"""`,
+        `${ident}"""${e.comment ?? ''}"""`,
         ...e.attributes.map(a => {
             const str = split_on_camelcase(a.name).toLowerCase()
             return `${ident}${str.toUpperCase()} = '${str.toUpperCase()}', _('${a.fullName ?? capitalizeString(str.replaceAll('_', ' '))}')`
@@ -149,7 +149,7 @@ function generateEnumAttribute(e: EnumEntityAtribute) : string {
         }
     }
 
-    return `${e.name} = models.CharField(max_length=${tamanho}, choices=${e.type.ref?.name}.choices, default=${e.type.ref?.name}.${valor})`
+    return `${e.name} = models.CharField(max_length=${tamanho}, choices=${e.type.ref?.name}.choices, default=${e.type.ref?.name}.${valor.toUpperCase()})`
 } 
 
 function generateAttribute(a: Attribute) : string {
