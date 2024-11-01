@@ -18,6 +18,7 @@ function generateProgram(model: Model, target_folder: string) : string {
     return expandToStringWithNL`
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
+    using Shared;
     
     // modules
     ${generateModuleNames(modules)}

@@ -5,7 +5,7 @@ import { capitalizeString } from "../../../../util/generator-utils.js"
 
 
 export function generateModel(cls: LocalEntity, is_supertype: boolean, relations: RelationInfo[], package_name: string, importedEntities: Map<ImportedEntity, ModuleImport | undefined>, identity: boolean) : Generated {
-  const supertype = cls.superType?.ref  
+  const supertype = cls.superType?.ref
   const is_abstract = cls?.is_abstract
 
   const external_relations = relations.filter(relation => relation.tgt.$container != cls.$container)
@@ -15,13 +15,13 @@ export function generateModel(cls: LocalEntity, is_supertype: boolean, relations
     {
       using Microsoft.EntityFrameworkCore;
 
-    ${external_relations.map(relation => `using ${package_name.replace(cls.$container.name,relation.tgt.$container.name)}.${relation.tgt.name};`).join('\n')}
-    
+    ${external_relations.map(relation => `using ${package_name.replace(cls.$container.name,relation.tgt.$container.name)};`).join('\n')}
+
     ${supertype ? generateImportSuperEntity(package_name, cls, supertype, importedEntities) : undefined}
     public ${is_abstract? `abstract` : undefined} class ${cls.name} ${supertype ? `extends ${supertype.name}` : ': AppUser'} {
-          
+
       private DateTime createdAt = DateTime.Now;
-      
+
       ${cls.attributes.map(a => generateAttribute(a,is_abstract)).join('\n')}
       ${generateRelations(cls, relations)}
       ${generateEnum(cls)}
@@ -36,16 +36,18 @@ export function generateModel(cls: LocalEntity, is_supertype: boolean, relations
     {
       using Microsoft.EntityFrameworkCore;
 
-    ${external_relations.map(relation => `using ${package_name.replace(cls.$container.name,relation.tgt.$container.name)}.${relation.tgt.name};`).join('\n')}
-    
+      ${external_relations.filter(relation => relation.tgt.$container.name !== package_name)
+        .map(relation => `using ${package_name.replace(cls.$container.name, relation.tgt.$container.name)};`)
+        .join('\n')}
+
     ${supertype ? generateImportSuperEntity(package_name, cls, supertype, importedEntities) : undefined}
-    public ${is_abstract? `abstract` : undefined} class ${cls.name} ${supertype ? `extends ${supertype.name}` : ''} {
-        
+    public ${is_abstract? `abstract` : undefined} class ${cls.name} ${supertype ? `: ${supertype.name}` : ''} {
+
       ${is_abstract?`public Guid Id { get; set; }`: undefined}
       private DateTime createdAt = DateTime.Now;
 
       ${!supertype && !is_abstract?`public Guid Id { get; set; }`: undefined}
-      
+
       ${cls.attributes.map(a => generateAttribute(a,is_abstract)).join('\n')}
       ${generateRelations(cls, relations)}
       ${generateEnum(cls)}
@@ -74,9 +76,9 @@ export function generateIdentityUser(cls: LocalEntity, package_name: string): st
 function generateImportSuperEntity (package_name: string, entity: Entity, supertype: Entity, importedEntities: Map<ImportedEntity, ModuleImport | undefined>):string {
 
   if (isLocalEntity(supertype)){
-    return `using ${package_name.replace(entity.$container.name.toLowerCase(),generateImportEntity(supertype,importedEntities))}.${supertype.name};`
+    return ``
   }
-  return `using ${generateImportEntity(supertype,importedEntities)}.${supertype.name};` 
+  return `using ${generateImportEntity(supertype,importedEntities)};`
 
 } 
 
@@ -148,14 +150,13 @@ function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : 
   switch(card) {
   case "OneToOne":
     if(owner) {
-      return expandToStringWithNL`
-        //OneToOne
-        public Guid? ${tgt.name.toLowerCase()}Id {get; set; }
-        public ${tgt.name}? ${tgt.name} { get; set; }
-      `
+      return ""
     } else {
       return expandToStringWithNL`
-      `
+      //OneToOne
+      public Guid? ${tgt.name.toLowerCase()}Id {get; set; }
+      public ${tgt.name}? ${tgt.name} { get; set; }
+    `
     }
   case "OneToMany":
     if(owner) {
