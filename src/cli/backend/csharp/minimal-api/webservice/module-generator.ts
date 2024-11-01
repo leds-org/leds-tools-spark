@@ -139,6 +139,7 @@ function generateContextDb(modules: Module[], package_name: string, relation_map
             ${generateDbSet(all_entities)}
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
+            ${generateKeyDeclarations(all_entities)}
             ${generateDbRelations(all_entities, relation_maps)}
             } 
         }
@@ -150,15 +151,23 @@ function generateDbSet(entities: LocalEntity[]) : string {
   return entities.map(cls => `public DbSet<${cls.name}> ${cls.name}s { get; set; }`).join('\n');
 }
 
+function generateKeyDeclarations(all_entities: LocalEntity[]): string {
+  return all_entities
+    .filter(cls => cls.superType?.ref == null)  // Inclui apenas super classes
+    .map(cls => `modelBuilder.Entity<${cls.name}>().HasKey(e => e.Id);`)  // Assume Id como chave primária
+    .join('\n');
+}
+
+
 function generateDbRelations(entities: LocalEntity[], relation_maps: Map<LocalEntity, RelationInfo[]>) : Generated {
   const node = new CompositeGeneratorNode()
   for (const cls of entities) {
-      const {relations} = getAttrsAndRelations(cls, relation_maps)
-
-      for(const rel of relations) {
-        node.append(generateRelation(cls, rel))
-        node.appendNewLine()
-      }
+    const {relations} = getAttrsAndRelations(cls, relation_maps)
+    
+    for(const rel of relations) {
+      node.append(generateRelationConfiguration(cls, rel))
+      node.appendNewLine()
+    }
   }
   node.append('base.OnModelCreating(modelBuilder);')
   return node
@@ -173,51 +182,84 @@ function generateDbContextUsing (modules: Module[]): string {
   return usings
 }
 
-function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : Generated {
-    switch(card) {
+function generateRelationConfiguration(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : Generated {
+  const getPluralName = (name: string) => `${name}s`;
+
+  switch(card) {
     case "OneToOne":
       if(owner) {
         return expandToStringWithNL`
-          //OneToOne
-        `
+            // Configuração Um-para-Um onde ${cls.name} é proprietário
+            modelBuilder.Entity<${cls.name}>()
+                .HasOne(e => e.${tgt.name})
+                .WithOne(e => e.${cls.name})
+                .HasForeignKey<${tgt.name}>("${cls.name}Id")
+                .OnDelete(DeleteBehavior.Restrict);`;
       } else {
         return expandToStringWithNL`
+            // Configuração Um-para-Um onde ${cls.name} é dependente
             modelBuilder.Entity<${cls.name}>()
-                .HasOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
-                .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
-                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name.toLowerCase()}Id);`
+                .HasOne(e => e.${tgt.name})
+                .WithOne(e => e.${cls.name})
+                .HasForeignKey<${cls.name}>(e => e.${tgt.name}Id)
+                .OnDelete(DeleteBehavior.Restrict);`;
       }
+
     case "OneToMany":
       if(owner) {
-        return ''
+        const pluralName = getPluralName(tgt.name);
+        return expandToStringWithNL`
+            // Configuração Um-para-Muitos onde ${cls.name} é proprietário da coleção
+            modelBuilder.Entity<${cls.name}>()
+                .HasMany(e => e.${pluralName})
+                .WithOne(e => e.${cls.name})
+                .HasForeignKey(e => e.${cls.name}Id)
+                .OnDelete(DeleteBehavior.Cascade);`;
       } else {
         return expandToStringWithNL`
+            // Configuração Um-para-Muitos onde ${cls.name} é dependente
             modelBuilder.Entity<${cls.name}>()
-                .HasOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
-                .WithOne();`
+                .HasOne(e => e.${tgt.name})
+                .WithMany(e => e.${getPluralName(cls.name)})
+                .HasForeignKey(e => e.${tgt.name}Id)
+                .OnDelete(DeleteBehavior.Restrict);`;
       }
+
     case "ManyToOne":
       if(owner) {
-        return ''
-      } else {
         return expandToStringWithNL`
+            // Configuração Muitos-para-Um onde ${cls.name} é dependente
             modelBuilder.Entity<${cls.name}>()
-                .HasMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
-                .WithOne();`
+                .HasOne(e => e.${tgt.name})
+                .WithMany(e => e.${getPluralName(cls.name)})
+                .HasForeignKey(e => e.${tgt.name}Id)
+                .OnDelete(DeleteBehavior.Restrict);`;
+      } else {
+        const pluralName = getPluralName(tgt.name);
+        return expandToStringWithNL`
+            // Configuração Muitos-para-Um onde ${cls.name} possui a coleção
+            modelBuilder.Entity<${cls.name}>()
+                .HasMany(e => e.${pluralName})
+                .WithOne(e => e.${cls.name})
+                .HasForeignKey(e => e.${cls.name}Id)
+                .OnDelete(DeleteBehavior.Cascade);`;
       }
+
     case "ManyToMany":
       if(owner) {
+        const pluralName = getPluralName(tgt.name);
+        const clsPluralName = getPluralName(cls.name);
         return expandToStringWithNL`
-          //ManyToMany
-          modelBuilder.Entity<${cls.name}>()
-            .HasMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
-            .WithMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}s);
-        `
+            // Configuração Muitos-para-Muitos usando entity type builder
+            modelBuilder.Entity<${cls.name}>()
+                .HasMany(e => e.${pluralName})
+                .WithMany(e => e.${clsPluralName})
+                .UsingEntity(j => j.ToTable("${cls.name}${tgt.name}"));`;
       } else {
-        return ''
+        return ''; // A configuração já foi feita pelo lado proprietário
       }
-    }
   }
+}
 
   function generateContextDbFactory(package_name: string): string{
     return expandToStringWithNL`
