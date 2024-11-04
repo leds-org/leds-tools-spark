@@ -36,7 +36,18 @@ function generateProgram(model: Model, target_folder: string) : string {
 
             var app = builder.Build();
 
-            if (app.Environment.IsDevelopment()) 
+            // Automatically apply migrations at startup
+            CreateDatabase(app);
+
+            void CreateDatabase(WebApplication app)
+            {
+                var serviceScope = app.Services.CreateScope();
+                var dataContext = serviceScope.ServiceProvider.GetService<ContextDb>();
+                dataContext?.Database.EnsureCreated();
+                dataContext?.Database.Migrate();
+            }
+
+            if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();

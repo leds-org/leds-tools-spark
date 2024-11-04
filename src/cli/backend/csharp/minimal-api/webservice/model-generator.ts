@@ -147,44 +147,36 @@ function generateRelations(cls: LocalEntity, relations: RelationInfo[]) : Genera
 function generateRelation(cls: LocalEntity, { tgt, card, owner }: RelationInfo): Generated {
   // Helper function to create plural form
   const getPluralName = (name: string) => `${name}s`;
+  const pluralName = getPluralName(tgt.name);
 
   switch (card) {
     case "OneToOne":
-      return expandToStringWithNL`
-        // Navigation property e chave estrangeira para ${tgt.name}
-        ${owner ? '' : `public Guid? ${tgt.name}Id { get; set; }`}
-        public virtual ${tgt.name}? ${tgt.name} { get; set; }`;
+      if (owner) {
+        return expandToStringWithNL`
+          // Navigation property and foreign key for ${tgt.name}
+          public Guid ${tgt.name}Id { get; set; }
+          public virtual ${tgt.name} ${tgt.name} { get; set; }`;
+      } else {
+        return expandToStringWithNL`
+          // Navigation property and foreign key for ${cls.name}
+          public Guid? ${cls.name}Id { get; set; }
+          public virtual ${cls.name}? ${cls.name} { get; set; }`;
+      }
 
     case "OneToMany":
-      if(owner) {
-        const pluralName = getPluralName(tgt.name);
         return expandToStringWithNL`
-          // Coleção de ${tgt.name} (lado um-para-muitos)
+          // Reference to ${tgt.name} (one-to-many side)
           public virtual ICollection<${tgt.name}> ${pluralName} { get; set; } = new HashSet<${tgt.name}>();`;
-      } else {
-        return expandToStringWithNL`
-          // Referência para ${tgt.name} (lado muitos-para-um)
-          public Guid ${tgt.name}Id { get; set; }
-          public virtual ${tgt.name} ${tgt.name} { get; set; } = null!;`;
-      }
 
     case "ManyToOne":
-      if(owner) {
-        return expandToStringWithNL`
-          // Referência para ${tgt.name} (lado muitos-para-um)
-          public Guid ${tgt.name}Id { get; set; }
-          public virtual ${tgt.name} ${tgt.name} { get; set; } = null!;`;
-      } else {
-        const pluralName = getPluralName(cls.name);
-        return expandToStringWithNL`
-          // Coleção de ${cls.name} (lado um-para-muitos)
-          public virtual ICollection<${cls.name}> ${pluralName} { get; set; } = new HashSet<${cls.name}>();`;
-      }
+      return expandToStringWithNL`
+        // Collection of ${tgt.name} (many-to-one side)
+        public Guid ${tgt.name}Id { get; set; }
+        public virtual ${tgt.name} ${tgt.name} { get; set; } = null!;`;
 
     case "ManyToMany":
-      const pluralName = getPluralName(tgt.name);
       return expandToStringWithNL`
-        // Coleção de ${tgt.name} (lado muitos-para-muitos)
+        // Collection of ${tgt.name} (many-to-many side)
         public virtual ICollection<${tgt.name}> ${pluralName} { get; set; } = new HashSet<${tgt.name}>();`;
   }
 }

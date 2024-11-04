@@ -182,81 +182,62 @@ function generateDbContextUsing (modules: Module[]): string {
   return usings
 }
 
-function generateRelationConfiguration(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : Generated {
+function generateRelationConfiguration(cls: LocalEntity, { tgt, card, owner }: RelationInfo): Generated {
   const getPluralName = (name: string) => `${name}s`;
 
-  switch(card) {
+  switch (card) {
     case "OneToOne":
-      if(owner) {
+      if (owner) {
         return expandToStringWithNL`
-            // Configuração Um-para-Um onde ${cls.name} é proprietário
+            // Configuration for One-to-One, where ${cls.name} is the owner
             modelBuilder.Entity<${cls.name}>()
                 .HasOne(e => e.${tgt.name})
                 .WithOne(e => e.${cls.name})
                 .HasForeignKey<${tgt.name}>("${cls.name}Id")
                 .OnDelete(DeleteBehavior.Restrict);`;
       } else {
-        return expandToStringWithNL`
-            // Configuração Um-para-Um onde ${cls.name} é dependente
-            modelBuilder.Entity<${cls.name}>()
-                .HasOne(e => e.${tgt.name})
-                .WithOne(e => e.${cls.name})
-                .HasForeignKey<${cls.name}>(e => e.${tgt.name}Id)
-                .OnDelete(DeleteBehavior.Restrict);`;
+        return ''
       }
 
     case "OneToMany":
-      if(owner) {
+      if (owner) {
         const pluralName = getPluralName(tgt.name);
         return expandToStringWithNL`
-            // Configuração Um-para-Muitos onde ${cls.name} é proprietário da coleção
+            // Configuration for One-to-Many, where ${cls.name} is the owner of the collection
             modelBuilder.Entity<${cls.name}>()
                 .HasMany(e => e.${pluralName})
                 .WithOne(e => e.${cls.name})
-                .HasForeignKey(e => e.${cls.name}Id)
-                .OnDelete(DeleteBehavior.Cascade);`;
+                .HasForeignKey(e => e.${cls.name}Id);`;
       } else {
-        return expandToStringWithNL`
-            // Configuração Um-para-Muitos onde ${cls.name} é dependente
-            modelBuilder.Entity<${cls.name}>()
-                .HasOne(e => e.${tgt.name})
-                .WithMany(e => e.${getPluralName(cls.name)})
-                .HasForeignKey(e => e.${tgt.name}Id)
-                .OnDelete(DeleteBehavior.Restrict);`;
+        return ''
       }
 
     case "ManyToOne":
-      if(owner) {
+      if (owner) {
+        const pluralName = getPluralName(cls.name);
         return expandToStringWithNL`
-            // Configuração Muitos-para-Um onde ${cls.name} é dependente
+            // Configuration for Many-to-One, where ${cls.name} is the dependent
             modelBuilder.Entity<${cls.name}>()
                 .HasOne(e => e.${tgt.name})
-                .WithMany(e => e.${getPluralName(cls.name)})
+                .WithMany(e => e.${pluralName})
                 .HasForeignKey(e => e.${tgt.name}Id)
                 .OnDelete(DeleteBehavior.Restrict);`;
       } else {
-        const pluralName = getPluralName(tgt.name);
-        return expandToStringWithNL`
-            // Configuração Muitos-para-Um onde ${cls.name} possui a coleção
-            modelBuilder.Entity<${cls.name}>()
-                .HasMany(e => e.${pluralName})
-                .WithOne(e => e.${cls.name})
-                .HasForeignKey(e => e.${cls.name}Id)
-                .OnDelete(DeleteBehavior.Cascade);`;
+        return ''
       }
 
     case "ManyToMany":
-      if(owner) {
+      if (owner) {
         const pluralName = getPluralName(tgt.name);
         const clsPluralName = getPluralName(cls.name);
         return expandToStringWithNL`
-            // Configuração Muitos-para-Muitos usando entity type builder
+            // Configuration for Many-to-Many using entity type builder
             modelBuilder.Entity<${cls.name}>()
                 .HasMany(e => e.${pluralName})
                 .WithMany(e => e.${clsPluralName})
                 .UsingEntity(j => j.ToTable("${cls.name}${tgt.name}"));`;
       } else {
-        return ''; // A configuração já foi feita pelo lado proprietário
+        return '';
       }
   }
 }

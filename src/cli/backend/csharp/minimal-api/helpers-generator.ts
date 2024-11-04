@@ -21,7 +21,7 @@ function generateAppSettings (model: Model): string {
     return expandToStringWithNL`
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost,1433;Database=${model.configuration?.database_name || "DefaultDB"};User Id=sa;Password=Senha@123;Trusted_Connection=False;TrustServerCertificate=True;"
+    "DefaultConnection": "Server=sqlserver,1433;Database=${model.configuration?.database_name || "DefaultDB"};User Id=sa;Password=Senha@123;Trusted_Connection=False;TrustServerCertificate=True;"
   },
   "Logging": {
     "LogLevel": {
