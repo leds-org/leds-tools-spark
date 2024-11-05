@@ -1,19 +1,31 @@
 import 'entities'
 
+// Definição de Atores
 Actor:
     (Comment)?
-    // TODO Talvez o entity deva ser só LocalEntity
-    'actor' name=QualifiedName 'is' entity=[Entity:QualifiedName] ('extends' superType=[Actor:QualifiedName])?
+    'actor' id=QualifiedName ('name' ':' fullName=STRING)? ('extends' superType=[Actor:QualifiedName])?
+    (Comment)?
 ;
 
+// Definição de Casos de Uso
 UseCase:
     (Comment)?
-    'usecase' name=QualifiedName ('extends' superType=[UseCase:QualifiedName])? '{'
-        'fullname'  ':' fullName=STRING
-        'kind'      ':' kind=('manage' | 'view')
-        'performed' ':' actors+=[Actor:QualifiedName]    (',' actors+=[Actor:QualifiedName])*
-        'entities'  ':' models+=[Entity:QualifiedName]   (',' models+=[Entity:QualifiedName])*
-        ('extend'   ':' extend+=[UseCase:QualifiedName]  (',' extend+=[UseCase:QualifiedName])*)?
-        ('include'  ':' include+=[UseCase:QualifiedName] (',' include+=[UseCase:QualifiedName])*)?
+    'usecase' id=QualifiedName ('extends' superType=[UseCase:QualifiedName])? '{'
+        Name
+        Description?
+        'performer' ':' actors+=[Actor:QualifiedName] (',' actors+=[Actor:QualifiedName])*
+        (events+=Event)*
+    '}'
+    (Comment)?
+;
+
+// Definição de Eventos
+Event:
+    'event' id=ID '{'
+        (Name
+        Description?
+        'action' ':' action=STRING
+        ('depend' ':' depends+=[Event:QualifiedName] (',' depends+=[Event:QualifiedName])*)?
+        )*
     '}'
 ;

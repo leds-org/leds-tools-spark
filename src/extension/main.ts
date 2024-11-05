@@ -77,11 +77,14 @@ function registerGenerateCommands(context: vscode.ExtensionContext) : void {
 
     const generateBoth = build_generate_functions({ all: true })
     context.subscriptions.push(vscode.commands.registerCommand("s-p-a-r-k.generateBoth", generateBoth))
-    
+
     const generateDocumentation = build_generate_functions({ only_Documentation: true })
     context.subscriptions.push(vscode.commands.registerCommand("s-p-a-r-k.generateDocumentation", generateDocumentation))
 
     const generateBacklog = build_generate_functions({ only_Backlog: true })
     context.subscriptions.push(vscode.commands.registerCommand("s-p-a-r-k.generateBacklog", generateBacklog))
+
+    const generateAuthorization = build_generate_functions({ only_opa: true })
+    context.subscriptions.push(vscode.commands.registerCommand("s-p-a-r-k.generateAuthorization", generateAuthorization))
 
 }

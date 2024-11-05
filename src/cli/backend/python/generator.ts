@@ -12,7 +12,7 @@ export function generate(model: Model, target_folder: string) : void {
     fs.mkdirSync(target_folder_back, {recursive:true})
 
 
-   djangoGenerate(model,target_folder_back)
-    
-    
-}  
+    djangoGenerate(model,target_folder_back)
+
+
+}

@@ -33,7 +33,7 @@ namespace ${model.configuration?.name}.Infrastructure.EntitiesConfiguration
     {
         public void Configure(EntityTypeBuilder<${cls.name}> builder)
         {
-            builder.HasKey(x => x.Id)
+            builder.HasKey(x => x.Id);
             ${generateRelations(cls, relation_maps)}
         }
     }
