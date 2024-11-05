@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 import { Attribute, ImportedEntity, LocalEntity, Model, Module, ModuleImport, isEnumX, isLocalEntity, isModule, isModuleImport } from "../../../../../language/generated/ast.js";
-import { createPath } from "../../../../util/generator-utils.js";
+import { capitalizeString, createPath } from "../../../../util/generator-utils.js";
 import { RelationInfo, processRelations } from "../../../../util/relations.js";
 import { CompositeGeneratorNode, Generated, expandToStringWithNL, toString } from "langium/generate";
 import { generateIdentityUser, generateModel } from "./model-generator.js";
@@ -262,7 +262,7 @@ namespace ${package_name}
                 .Build();
 
             var optionsBuilder = new DbContextOptionsBuilder<ContextDb>();
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            var connectionString = configuration.GetConnectionString("${capitalizeString(package_name || "model")}Connection");
             optionsBuilder.UseSqlServer(connectionString);
 
             return new ContextDb(optionsBuilder.Options);
