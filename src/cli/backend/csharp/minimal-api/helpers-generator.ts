@@ -3,9 +3,10 @@ import fs from "fs";
 import path from "path";
 import { generate as generateProperties} from "./properties/generator.js";
 import { expandToStringWithNL } from "langium/generate";
+import { capitalizeString } from "../../../util/generator-utils.js";
 
 export function generate(model: Model, target_folder: string) : void {
-    
+
     const target_folder_properties = target_folder + "/Properties"
     fs.mkdirSync(target_folder_properties, {recursive: true});
 
@@ -21,7 +22,7 @@ function generateAppSettings (model: Model): string {
     return expandToStringWithNL`
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost,1433;Database=${model.configuration?.database_name || "DefaultDB"};User Id=sa;Password=Senha@123;Trusted_Connection=False;TrustServerCertificate=True;"
+    "${capitalizeString(model.configuration?.name || "model")}Connection": "Server=sqlserver,1433;Database=${model.configuration?.database_name || "DefaultDB"};User Id=sa;Password=Senha@123;Trusted_Connection=False;TrustServerCertificate=True;"
   },
   "Logging": {
     "LogLevel": {

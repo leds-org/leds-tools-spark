@@ -9,6 +9,7 @@ export function generateModel(cls: LocalEntity, is_supertype: boolean, relations
   const is_abstract = cls?.is_abstract
 
   const external_relations = relations.filter(relation => relation.tgt.$container != cls.$container)
+
   if (identity) {
     return expandToStringWithNL`
     namespace ${package_name}
@@ -18,20 +19,19 @@ export function generateModel(cls: LocalEntity, is_supertype: boolean, relations
     ${external_relations.map(relation => `using ${package_name.replace(cls.$container.name,relation.tgt.$container.name)};`).join('\n')}
 
     ${supertype ? generateImportSuperEntity(package_name, cls, supertype, importedEntities) : undefined}
-    public ${is_abstract? `abstract` : undefined} class ${cls.name} ${supertype ? `extends ${supertype.name}` : ': AppUser'} {
+    public ${is_abstract ? `abstract` : ''} class ${cls.name} ${supertype ? `extends ${supertype.name}` : ': AppUser'} {
 
       private DateTime createdAt = DateTime.Now;
 
-      ${cls.attributes.map(a => generateAttribute(a,is_abstract)).join('\n')}
+      ${cls.attributes.map(a => generateAttribute(a, is_abstract)).join('\n')}
       ${generateRelations(cls, relations)}
       ${generateEnum(cls)}
 
     }
     }
   `
-  }
-  else{
-  return expandToStringWithNL`
+  } else {
+    return expandToStringWithNL`
     namespace ${package_name}
     {
       using Microsoft.EntityFrameworkCore;
@@ -41,14 +41,14 @@ export function generateModel(cls: LocalEntity, is_supertype: boolean, relations
         .join('\n')}
 
     ${supertype ? generateImportSuperEntity(package_name, cls, supertype, importedEntities) : undefined}
-    public ${is_abstract? `abstract` : undefined} class ${cls.name} ${supertype ? `: ${supertype.name}` : ''} {
+    public ${is_abstract ? `abstract` : ''} class ${cls.name} ${supertype ? `: ${supertype.name}` : ''} {
 
-      ${is_abstract?`public Guid Id { get; set; }`: undefined}
+      ${is_abstract ? `public Guid Id { get; set; }` : ''}
       private DateTime createdAt = DateTime.Now;
 
-      ${!supertype && !is_abstract?`public Guid Id { get; set; }`: undefined}
+      ${!supertype && !is_abstract ? `public Guid Id { get; set; }` : ''}
 
-      ${cls.attributes.map(a => generateAttribute(a,is_abstract)).join('\n')}
+      ${cls.attributes.map(a => generateAttribute(a, is_abstract)).join('\n')}
       ${generateRelations(cls, relations)}
       ${generateEnum(cls)}
 
@@ -136,58 +136,48 @@ function generateTypeAttribute(attribute:Attribute): Generated{
 }
 
 function generateRelations(cls: LocalEntity, relations: RelationInfo[]) : Generated {
-  
   const node = new CompositeGeneratorNode()
-
-  for(const rel of relations) {
+  for (const rel of relations) {
     node.append(generateRelation(cls, rel))
     node.appendNewLine()
   }
   return node
 }
 
-function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : Generated {
-  switch(card) {
-  case "OneToOne":
-    if(owner) {
-      return ""
-    } else {
+function generateRelation(cls: LocalEntity, { tgt, card, owner }: RelationInfo): Generated {
+  // Helper function to create plural form
+  const getPluralName = (name: string) => `${name}s`;
+  const pluralName = getPluralName(tgt.name);
+
+  switch (card) {
+    case "OneToOne":
+      if (owner) {
+        return expandToStringWithNL`
+          // Navigation property and foreign key for ${tgt.name}
+          public Guid ${tgt.name}Id { get; set; }
+          public virtual ${tgt.name} ${tgt.name} { get; set; }`;
+      } else {
+        return expandToStringWithNL`
+          // Navigation property and foreign key for ${cls.name}
+          public Guid? ${cls.name}Id { get; set; }
+          public virtual ${cls.name}? ${cls.name} { get; set; }`;
+      }
+
+    case "OneToMany":
+        return expandToStringWithNL`
+          // Reference to ${tgt.name} (one-to-many side)
+          public virtual ICollection<${tgt.name}> ${pluralName} { get; set; } = new HashSet<${tgt.name}>();`;
+
+    case "ManyToOne":
       return expandToStringWithNL`
-      //OneToOne
-      public Guid? ${tgt.name.toLowerCase()}Id {get; set; }
-      public ${tgt.name}? ${tgt.name} { get; set; }
-    `
-    }
-  case "OneToMany":
-    if(owner) {
-      return ''
-    } else {
+        // Collection of ${tgt.name} (many-to-one side)
+        public Guid ${tgt.name}Id { get; set; }
+        public virtual ${tgt.name} ${tgt.name} { get; set; } = null!;`;
+
+    case "ManyToMany":
       return expandToStringWithNL`
-      //OneToMany
-      public ICollection<${tgt.name}>? ${tgt.name}s { get; set;}
-      `
-    }
-  case "ManyToOne":
-    if(owner) {
-      return expandToStringWithNL`
-        //ManyToOne
-        public ${tgt.name}? ${tgt.name} { get; set; }
-        public Guid? ${tgt.name.toLowerCase()}Id {get; set; }
-      `
-    } else {
-      return ''
-    }
-  case "ManyToMany":
-    if(owner) {
-      return expandToStringWithNL`
-        //ManyToMany
-        public ICollection<${tgt.name}>? ${tgt.name}s { get; set;}
-      `
-    } else {
-      return expandToStringWithNL`
-        public ICollection<${tgt.name}>? ${tgt.name}s { get; set;}
-      `
-    }
+        // Collection of ${tgt.name} (many-to-many side)
+        public virtual ICollection<${tgt.name}> ${pluralName} { get; set; } = new HashSet<${tgt.name}>();`;
   }
 }
 

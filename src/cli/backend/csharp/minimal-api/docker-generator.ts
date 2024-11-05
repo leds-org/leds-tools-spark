@@ -11,13 +11,13 @@ export function generate(model: Model, target_folder: string) : void {
 }
 function generateDockerfile(model : Model) : string {
     return expandToStringWithNL`
-  
+
   FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
   USER app
   WORKDIR /app
   EXPOSE 8080
   EXPOSE 8081
-  
+
   FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
   ARG BUILD_CONFIGURATION=Release
   WORKDIR /src
@@ -26,11 +26,11 @@ function generateDockerfile(model : Model) : string {
   COPY . .
   WORKDIR "/src/${model.configuration?.name}"
   RUN dotnet build "./${model.configuration?.name}.csproj" -c $BUILD_CONFIGURATION -o /app/build
-  
+
   FROM build AS publish
   ARG BUILD_CONFIGURATION=Release
   RUN dotnet publish "./${model.configuration?.name}.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-  
+
   FROM base AS final
   WORKDIR /app
   COPY --from=publish /app/publish .
@@ -40,7 +40,7 @@ function generateDockerfile(model : Model) : string {
   function generateDockerCompose(model: Model, target_folder: string): void {
     fs.writeFileSync(path.join(target_folder,'docker-compose.dcproj'), generatedockercomposedcproj(model));
     fs.writeFileSync(path.join(target_folder, 'docker-compose.yml'), generatedockercomposeyml(model));
-    fs.writeFileSync(path.join(target_folder, 'docker-compose.override.yml'), generateDockerComposeOverride());
+    fs.writeFileSync(path.join(target_folder, 'docker-compose.override.yml'), generateDockerComposeOverride(model));
   }
 
   function generatedockercomposedcproj(model: Model): string {
@@ -106,7 +106,7 @@ networks:
   backend:
 services:
   sqlserver:
-    container_name: sqlserver  
+    container_name: sqlserver
     image: mcr.microsoft.com/mssql/server
     environment:
       - ACCEPT_EULA=Y
@@ -143,12 +143,12 @@ function generateLaunchSettings(model: Model): string {
 }`
 }
 
-function generateDockerComposeOverride(): string{
+function generateDockerComposeOverride(model: Model): string{
   return expandToStringWithNL`
 version: '3.4'
 
 services:
-  morango:
+  ${model.configuration?.name?.toLowerCase()}:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080

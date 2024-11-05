@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 import { Attribute, ImportedEntity, LocalEntity, Model, Module, ModuleImport, isEnumX, isLocalEntity, isModule, isModuleImport } from "../../../../../language/generated/ast.js";
-import { createPath } from "../../../../util/generator-utils.js";
+import { capitalizeString, createPath } from "../../../../util/generator-utils.js";
 import { RelationInfo, processRelations } from "../../../../util/relations.js";
 import { CompositeGeneratorNode, Generated, expandToStringWithNL, toString } from "langium/generate";
 import { generateIdentityUser, generateModel } from "./model-generator.js";
@@ -139,6 +139,7 @@ function generateContextDb(modules: Module[], package_name: string, relation_map
             ${generateDbSet(all_entities)}
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
+            ${generateKeyDeclarations(all_entities)}
             ${generateDbRelations(all_entities, relation_maps)}
             } 
         }
@@ -150,15 +151,23 @@ function generateDbSet(entities: LocalEntity[]) : string {
   return entities.map(cls => `public DbSet<${cls.name}> ${cls.name}s { get; set; }`).join('\n');
 }
 
+function generateKeyDeclarations(all_entities: LocalEntity[]): string {
+  return all_entities
+    .filter(cls => cls.superType?.ref == null)  // Inclui apenas super classes
+    .map(cls => `modelBuilder.Entity<${cls.name}>().HasKey(e => e.Id);`)  // Assume Id como chave primária
+    .join('\n');
+}
+
+
 function generateDbRelations(entities: LocalEntity[], relation_maps: Map<LocalEntity, RelationInfo[]>) : Generated {
   const node = new CompositeGeneratorNode()
   for (const cls of entities) {
-      const {relations} = getAttrsAndRelations(cls, relation_maps)
-
-      for(const rel of relations) {
-        node.append(generateRelation(cls, rel))
-        node.appendNewLine()
-      }
+    const {relations} = getAttrsAndRelations(cls, relation_maps)
+    
+    for(const rel of relations) {
+      node.append(generateRelationConfiguration(cls, rel))
+      node.appendNewLine()
+    }
   }
   node.append('base.OnModelCreating(modelBuilder);')
   return node
@@ -173,51 +182,65 @@ function generateDbContextUsing (modules: Module[]): string {
   return usings
 }
 
-function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : Generated {
-    switch(card) {
+function generateRelationConfiguration(cls: LocalEntity, { tgt, card, owner }: RelationInfo): Generated {
+  const getPluralName = (name: string) => `${name}s`;
+
+  switch (card) {
     case "OneToOne":
-      if(owner) {
+      if (owner) {
         return expandToStringWithNL`
-          //OneToOne
-        `
-      } else {
-        return expandToStringWithNL`
+            // Configuration for One-to-One, where ${cls.name} is the owner
             modelBuilder.Entity<${cls.name}>()
-                .HasOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
-                .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
-                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name.toLowerCase()}Id);`
+                .HasOne(e => e.${tgt.name})
+                .WithOne(e => e.${cls.name})
+                .HasForeignKey<${tgt.name}>("${cls.name}Id")
+                .OnDelete(DeleteBehavior.Restrict);`;
+      } else {
+        return ''
       }
+
     case "OneToMany":
-      if(owner) {
-        return ''
-      } else {
+      if (owner) {
+        const pluralName = getPluralName(tgt.name);
         return expandToStringWithNL`
+            // Configuration for One-to-Many, where ${cls.name} is the owner of the collection
             modelBuilder.Entity<${cls.name}>()
-                .HasOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
-                .WithOne();`
+                .HasMany(e => e.${pluralName})
+                .WithOne(e => e.${cls.name})
+                .HasForeignKey(e => e.${cls.name}Id);`;
+      } else {
+        return ''
       }
+
     case "ManyToOne":
-      if(owner) {
-        return ''
-      } else {
+      if (owner) {
+        const pluralName = getPluralName(cls.name);
         return expandToStringWithNL`
+            // Configuration for Many-to-One, where ${cls.name} is the dependent
             modelBuilder.Entity<${cls.name}>()
-                .HasMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
-                .WithOne();`
-      }
-    case "ManyToMany":
-      if(owner) {
-        return expandToStringWithNL`
-          //ManyToMany
-          modelBuilder.Entity<${cls.name}>()
-            .HasMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
-            .WithMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}s);
-        `
+                .HasOne(e => e.${tgt.name})
+                .WithMany(e => e.${pluralName})
+                .HasForeignKey(e => e.${tgt.name}Id)
+                .OnDelete(DeleteBehavior.Restrict);`;
       } else {
         return ''
       }
-    }
+
+    case "ManyToMany":
+      if (owner) {
+        const pluralName = getPluralName(tgt.name);
+        const clsPluralName = getPluralName(cls.name);
+        return expandToStringWithNL`
+            // Configuration for Many-to-Many using entity type builder
+            modelBuilder.Entity<${cls.name}>()
+                .HasMany(e => e.${pluralName})
+                .WithMany(e => e.${clsPluralName})
+                .UsingEntity(j => j.ToTable("${cls.name}${tgt.name}"));`;
+      } else {
+        return '';
+      }
   }
+}
 
   function generateContextDbFactory(package_name: string): string{
     return expandToStringWithNL`
@@ -239,7 +262,7 @@ namespace ${package_name}
                 .Build();
 
             var optionsBuilder = new DbContextOptionsBuilder<ContextDb>();
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            var connectionString = configuration.GetConnectionString("${capitalizeString(package_name || "model")}Connection");
             optionsBuilder.UseSqlServer(connectionString);
 
             return new ContextDb(optionsBuilder.Options);

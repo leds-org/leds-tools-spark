@@ -29,14 +29,25 @@ function generateProgram(model: Model, target_folder: string) : string {
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddDbContext<ContextDb>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("${capitalizeString(model.configuration?.name || "model")}Connection")));
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             ${generateFeatureBuilder(features)}
 
             var app = builder.Build();
 
-            if (app.Environment.IsDevelopment()) 
+            // Automatically apply migrations at startup
+            CreateDatabase(app);
+
+            void CreateDatabase(WebApplication app)
+            {
+                var serviceScope = app.Services.CreateScope();
+                var dataContext = serviceScope.ServiceProvider.GetService<ContextDb>();
+                dataContext?.Database.EnsureCreated();
+                dataContext?.Database.Migrate();
+            }
+
+            if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
