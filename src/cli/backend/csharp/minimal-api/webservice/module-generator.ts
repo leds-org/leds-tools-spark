@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 import { Attribute, ImportedEntity, LocalEntity, Model, Module, ModuleImport, isEnumX, isLocalEntity, isModule, isModuleImport } from "../../../../../language/generated/ast.js";
-import { createPath } from "../../../../util/generator-utils.js";
+import { capitalizeString, createPath } from "../../../../util/generator-utils.js";
 import { RelationInfo, processRelations } from "../../../../util/relations.js";
 import { CompositeGeneratorNode, Generated, expandToStringWithNL, toString } from "langium/generate";
 import { generateIdentityUser, generateModel } from "./model-generator.js";
@@ -21,20 +21,24 @@ export function generateModules(model: Model, target_folder: string) : void {
 
   const clsauth = model.configuration?.entity
 
+  const sahred_folder = createPath(target_folder, "Shared")
+
+  fs.writeFileSync(path.join(sahred_folder, `ContextDb.cs`),
+  toString(generateContextDb(modules, "Shared", relation_maps, features)));
+
   for(const mod of modules) {
-    
+
     const package_name      = `${mod.name}`
-    const MODULE_PATH       = createPath(target_folder, package_name.replaceAll(".","/"))    
+    const MODULE_PATH       = createPath(target_folder, package_name.replaceAll(".","/"))
 
     const supertype_classes = processSupertypes(mod)
 
     const mod_classes = mod.elements.filter(isLocalEntity)
 
-    fs.writeFileSync(path.join(MODULE_PATH, `ContextDb.cs`), toString(generateContextDb(mod, package_name, relation_maps, features)))
     for(const cls of mod_classes) {
       const class_name = cls.name
       const {attributes, relations} = getAttrsAndRelations(cls, relation_maps)
-      
+
       attributes
       if (clsauth != undefined && clsauth.ref?.name == cls.name) {
         fs.writeFileSync(path.join(MODULE_PATH,`${class_name}.cs`), toString(generateModel(cls, supertype_classes.has(cls), relations, package_name, imported_entities, true)))
@@ -44,8 +48,8 @@ export function generateModules(model: Model, target_folder: string) : void {
       }
       if (!cls.is_abstract){
       }
-      
-      
+
+
     }
 
     for (const enumx of mod.elements.filter(isEnumX)){
@@ -101,117 +105,142 @@ function getAttrsAndRelations(cls: LocalEntity, relation_map: Map<LocalEntity, R
   }
 }
 
-function generateContextDb(mod : Module, package_name: string, relation_maps: Map<LocalEntity, RelationInfo[]>, features: string | undefined) : Generated {
-  
-   
+function generateContextDb(modules: Module[], package_name: string, relation_maps: Map<LocalEntity, RelationInfo[]>, features: string | undefined) : Generated {
+  // Coleta todas as entidades de todos os módulos
+  const all_entities = modules.flatMap(mod => mod.elements.filter(isLocalEntity));
+
   if (features == 'authentication'){
     return expandToStringWithNL`
     namespace ${package_name}{
-
     using Microsoft.EntityFrameworkCore;
     using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+    ${generateDbContextUsing(modules)}
 
     internal class ContextDb : IdentityDbContext
         {
             public ContextDb(DbContextOptions<ContextDb> options) : base(options) { }
-            ${generateDbSet(mod)}
+            ${generateDbSet(all_entities)}
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
-            ${generateDbRelations(mod, relation_maps)}
-            } 
+            ${generateDbRelations(all_entities, relation_maps)}
+            }
         }
     }`
   }
   else{
-  return expandToStringWithNL`
+    return expandToStringWithNL`
     namespace ${package_name}{
-
     using Microsoft.EntityFrameworkCore;
+    ${generateDbContextUsing(modules)}
 
     public class ContextDb : DbContext
         {
             public ContextDb(DbContextOptions<ContextDb> options) : base(options) { }
-            ${generateDbSet(mod)}
+            ${generateDbSet(all_entities)}
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
-            ${generateDbRelations(mod, relation_maps)}
+            ${generateKeyDeclarations(all_entities)}
+            ${generateDbRelations(all_entities, relation_maps)}
             } 
         }
-    }
-  `
+    }`
   }
 }
 
-function generateDbSet (mod : Module) : string {
-    let dbsets = "";
-    for(const cls of mod.elements.filter(isLocalEntity)) {
-        dbsets += `public DbSet<${cls.name}> ${cls.name}s { get; set; } \n`
-    }
-    return dbsets
+function generateDbSet(entities: LocalEntity[]) : string {
+  return entities.map(cls => `public DbSet<${cls.name}> ${cls.name}s { get; set; }`).join('\n');
 }
 
-function generateDbRelations(mod : Module, relation_maps: Map<LocalEntity, RelationInfo[]>) : Generated {
-    const node = new CompositeGeneratorNode()
-    for (const cls of mod.elements.filter(isLocalEntity)) {
-        const {relations} = getAttrsAndRelations(cls, relation_maps)
-
-        for(const rel of relations) {
-          node.append(generateRelation(cls, rel))
-          node.appendNewLine()
-        }
-        
-    }
-    node.append('base.OnModelCreating(modelBuilder);')
-    return node
+function generateKeyDeclarations(all_entities: LocalEntity[]): string {
+  return all_entities
+    .filter(cls => cls.superType?.ref == null)  // Inclui apenas super classes
+    .map(cls => `modelBuilder.Entity<${cls.name}>().HasKey(e => e.Id);`)  // Assume Id como chave primária
+    .join('\n');
 }
 
-function generateRelation(cls: LocalEntity, {tgt, card, owner}: RelationInfo) : Generated {
-    switch(card) {
+
+function generateDbRelations(entities: LocalEntity[], relation_maps: Map<LocalEntity, RelationInfo[]>) : Generated {
+  const node = new CompositeGeneratorNode()
+  for (const cls of entities) {
+    const {relations} = getAttrsAndRelations(cls, relation_maps)
+    
+    for(const rel of relations) {
+      node.append(generateRelationConfiguration(cls, rel))
+      node.appendNewLine()
+    }
+  }
+  node.append('base.OnModelCreating(modelBuilder);')
+  return node
+}
+
+// Cria os "using ${nomedomodulo} para adicionar ao contexto do banco"
+function generateDbContextUsing (modules: Module[]): string {
+  let usings = ""
+  for(const mod of modules) {
+    usings += `using ${mod.name}; \n`
+  }
+  return usings
+}
+
+function generateRelationConfiguration(cls: LocalEntity, { tgt, card, owner }: RelationInfo): Generated {
+  const getPluralName = (name: string) => `${name}s`;
+
+  switch (card) {
     case "OneToOne":
-      if(owner) {
+      if (owner) {
         return expandToStringWithNL`
-          //OneToOne
-        `
-      } else {
-        return expandToStringWithNL`
+            // Configuration for One-to-One, where ${cls.name} is the owner
             modelBuilder.Entity<${cls.name}>()
-                .HasOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
-                .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
-                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name.toLowerCase()}Id);`
+                .HasOne(e => e.${tgt.name})
+                .WithOne(e => e.${cls.name})
+                .HasForeignKey<${tgt.name}>("${cls.name}Id")
+                .OnDelete(DeleteBehavior.Restrict);`;
+      } else {
+        return ''
       }
+
     case "OneToMany":
-      if(owner) {
-        return ''
-      } else {
+      if (owner) {
+        const pluralName = getPluralName(tgt.name);
         return expandToStringWithNL`
+            // Configuration for One-to-Many, where ${cls.name} is the owner of the collection
             modelBuilder.Entity<${cls.name}>()
-                .HasMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
-                .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
-                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name.toLowerCase()}Id);`
+                .HasMany(e => e.${pluralName})
+                .WithOne(e => e.${cls.name})
+                .HasForeignKey(e => e.${cls.name}Id);`;
+      } else {
+        return ''
       }
+
     case "ManyToOne":
-      if(owner) {
-        return ''
-      } else {
+      if (owner) {
+        const pluralName = getPluralName(cls.name);
         return expandToStringWithNL`
+            // Configuration for Many-to-One, where ${cls.name} is the dependent
             modelBuilder.Entity<${cls.name}>()
-                .HasMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
-                .WithOne(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}) 
-                .HasForeignKey(${cls.name.toLowerCase()} => ${cls.name.toLowerCase()}.${cls.name.toLowerCase()}Id);`
-      }
-    case "ManyToMany":
-      if(owner) {
-        return expandToStringWithNL`
-          //ManyToMany
-          modelBuilder.Entity<${cls.name}>()
-            .HasMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${tgt.name}s) 
-            .WithMany(${tgt.name.toLowerCase()} => ${tgt.name.toLowerCase()}.${cls.name}s);
-        `
+                .HasOne(e => e.${tgt.name})
+                .WithMany(e => e.${pluralName})
+                .HasForeignKey(e => e.${tgt.name}Id)
+                .OnDelete(DeleteBehavior.Restrict);`;
       } else {
         return ''
       }
-    }
+
+    case "ManyToMany":
+      if (owner) {
+        const pluralName = getPluralName(tgt.name);
+        const clsPluralName = getPluralName(cls.name);
+        return expandToStringWithNL`
+            // Configuration for Many-to-Many using entity type builder
+            modelBuilder.Entity<${cls.name}>()
+                .HasMany(e => e.${pluralName})
+                .WithMany(e => e.${clsPluralName})
+                .UsingEntity(j => j.ToTable("${cls.name}${tgt.name}"));`;
+      } else {
+        return '';
+      }
   }
+}
 
   function generateContextDbFactory(package_name: string): string{
     return expandToStringWithNL`
@@ -219,6 +248,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using Shared;
 
 namespace ${package_name}
 {
@@ -232,7 +262,7 @@ namespace ${package_name}
                 .Build();
 
             var optionsBuilder = new DbContextOptionsBuilder<ContextDb>();
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            var connectionString = configuration.GetConnectionString("${capitalizeString(package_name || "model")}Connection");
             optionsBuilder.UseSqlServer(connectionString);
 
             return new ContextDb(optionsBuilder.Options);
