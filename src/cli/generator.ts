@@ -10,46 +10,45 @@ import { generate as opaGenerate } from './opa/generator.js'
 import path from 'path';
 import chalk from 'chalk';
 
-export function generate(model: Model,  filePath: string, destination: string | undefined,  opts: GenerateOptions): string {
+export function generate(model: Model, filePath: string, destination: string | undefined, opts: GenerateOptions): string {
+    const final_destination = extractDestination(filePath, destination);
 
-    const final_destination  = extractDestination(filePath, destination);
-    if (opts.only_back){
-        if (model.configuration?.language === 'python'){
-            pythonGenerate(model,final_destination )
+    if (opts.only_back) {
+        // Backend generation
+        if (model.configuration?.language === 'python') {
+            pythonGenerate(model, final_destination);
+        } else if (model.configuration?.language?.startsWith("csharp")) {
+            csharpGenerator(model, final_destination);
+        } else if (model.configuration?.language === "java") {
+            javaGenerate(model, final_destination);
         }
-        if (model.configuration?.language?.startsWith("csharp")){
-            csharpGenerator(model,final_destination)
-        }
-        if (model.configuration?.language === "java"){
-            javaGenerate (model,final_destination )
-        }
-    }
-    if (opts.only_front) {
-        vueVitegenerate(model, final_destination)
-    }
-    if (opts.only_Documentation) {
-        docGenerate (model, final_destination)
-    }
-    if (opts.only_Backlog) {
+    } else if (opts.only_front) {
+        // Frontend generation
+        vueVitegenerate(model, final_destination);
+    } else if (opts.only_Documentation) {
+        // Documentation generation
+        docGenerate(model, final_destination);
+    } else if (opts.only_Backlog) {
+        // Backlog generation
         console.log(chalk.yellow(`Not implemented yet`));
-    }
-    if (opts.only_opa){
-        opaGenerate(model, final_destination)
-    }
-    else {
-        if (model.configuration?.language == 'python'){
-            pythonGenerate(model,final_destination )
+    } else if (opts.only_opa) {
+        // OPA generation
+        opaGenerate(model, final_destination);
+    } else {
+        // Generate All
+        if (model.configuration?.language === 'python') {
+            pythonGenerate(model, final_destination);
+        } else if (model.configuration?.language?.startsWith("csharp")) {
+            csharpGenerator(model, final_destination);
+        } else if (model.configuration?.language === 'java') {
+            javaGenerate(model, final_destination);
         }
-        if (model.configuration?.language?.startsWith("csharp")){
-            csharpGenerator(model,final_destination)
-        }
-        if (model.configuration?.language == 'java'){
-            javaGenerate (model,final_destination )
-        }
-        docGenerate (model, final_destination)
-        vueVitegenerate(model, final_destination)
-        opaGenerate(model, final_destination)
+
+        docGenerate(model, final_destination);
+        vueVitegenerate(model, final_destination);
+        opaGenerate(model, final_destination);
     }
+
     return final_destination;
 }
 
